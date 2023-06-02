@@ -21,6 +21,9 @@ use App\Http\Controllers\UserController;
 */
 
 
+Route::get('homepage', function() {
+    return view('homepage');
+});
 
 Route::get('/login', function () {
     return view('auth.login');

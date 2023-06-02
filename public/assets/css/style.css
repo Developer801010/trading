@@ -43,3 +43,125 @@ div.dataTables_wrapper div.dataTables_filter input{
     padding-left: 15px;
 }
 
+
+/* homepage */
+.home-navbar {
+    height: 120px;
+}
+
+.navbar-brand {
+    padding-left: 80px;
+}
+
+.btn-out {
+    border: 1px solid #627413;
+    color: #0a1d5f;
+    transition: 0.3s;
+}
+
+.btn-out:hover {
+    border: 1px solid #627413;
+    background: #627413;
+    color: white;
+}
+
+.btn-sub {
+    border: 1px solid #0a1d5f;
+    color: white;
+    background: #0a1d5f;
+    transition: 0.3s;
+}
+
+.btn-sub:hover {
+    border: 1px solid #0a1d5f;
+    color: #0a1d5f;
+    background: white;
+}
+
+.mask {
+    mask-image: linear-gradient(black, transparent);
+}
+
+.sec {
+    position: relative;
+}
+
+.background {
+    margin-top: 8rem;
+    width: 100%;
+    opacity: 0.2;
+}
+
+.banner {
+    position: absolute;
+    top: 10rem;
+    left: 0;
+    width: 100%;
+    opacity: .8;
+}
+
+.right-text {
+    margin-right: 4rem;
+    position: absolute;
+    top: 36rem;
+    width: 50rem;
+    right: 0;
+    font-size: 1.6rem;
+    line-height: 4rem;
+    color: #0a1d5f;
+    font-weight: bold;
+    animation-name: right-fade;
+    animation-delay: 2s;
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+
+@keyframes right-fade {
+    from {right: 0; opacity: 0;}
+    to {right: 4rem; opacity: 1;}
+}
+
+.left-text {
+    margin-left: 4rem;
+    position: absolute;
+    top: 48rem;
+    width: 50rem;
+    left: 0;
+    font-size: 1.6rem;
+    line-height: 4rem;
+    color: #0a1d5f;
+    font-weight: bold;
+    animation-name: left-fade;
+    animation-delay: 1s;
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+  
+@keyframes left-fade {
+    from {left: 0; opacity: 0;}
+    to {left: 4rem; opacity: 1;}
+}
+
+.com {
+    margin-right: 4rem;
+    position: absolute;
+    top: 60rem;
+    width: 36rem;
+    right: 16rem;
+    font-size: 1.6rem;
+    line-height: 4rem;
+    color: #0a1d5f;
+    font-weight: bold;
+    animation-name: right-fade-img;
+    animation-delay: 3s;
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+  
+@keyframes right-fade-img {
+    from {right: 12rem; opacity: 0;}
+    to {right: 16rem; opacity: 1;}
+}
