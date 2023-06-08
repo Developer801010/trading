@@ -102,8 +102,7 @@
 
 <!-- END: Page Vendor JS-->
 <script>
-    var createRoleUrl = "{{ route('roles.create') }}";    
-    var createPatientReferralUrl = "{{ route('referral.create') }}"
+    
 </script>
 
 <script src="{{ asset('assets/js/scripts.js') }}"></script>

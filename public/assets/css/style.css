@@ -1,3 +1,19 @@
+@font-face {
+    font-family: 'Barlow-Extra';
+    src: local('JostSemi'), url('../font/Barlow-ExtraBold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'JostSemi';
+    src: local('JostSemi'), url('../font/JostSemi.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'JostLight';
+    src: local('JostLight'), url('../font/JostLight.woff') format('woff');
+}
+
+
 .login-error{
     margin-top: 15px;    
 }
@@ -43,16 +59,19 @@ div.dataTables_wrapper div.dataTables_filter input{
     padding-left: 15px;
 }
 
+.front-logo{
+    width: 130px !important;
+}
 
+.welcome-msg{
+    font-family: JostLight;
+    padding: 60px 20px;
+}
+
+.home-banner img{
+    width: 100%;
+}
 /* homepage */
-.home-navbar {
-    height: 120px;
-}
-
-.navbar-brand {
-    padding-left: 80px;
-}
-
 .btn-out {
     border: 1px solid #627413;
     color: #0a1d5f;
@@ -78,90 +97,449 @@ div.dataTables_wrapper div.dataTables_filter input{
     background: white;
 }
 
-.mask {
-    mask-image: linear-gradient(black, transparent);
+.btn_member{
+    text-transform: uppercase;
+    font-family: 'JostSemi';
+    font-size: 20px;
 }
 
-.sec {
+  .navbar {
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(22, 22, 26, 0.18);
+  }
+
+  .front-nav .nav-item{
+    padding: 0 10px;
+  }
+
+  .navbar .navbar-nav .nav-link {
+    color: #000;
+    font-weight: bold;
+    font-size:20px;
+    font-family: JostSemi;
+    text-transform: uppercase;
+  }
+
+  .navbar .navbar-nav .nav-link.active{
+    color:#627413 !important;
+  }
+
+  .btn-outline-dark {
+    border-radius: 0;
+  }
+
+  .btn-outline-dark:focus {
+    box-shadow: none;
+  }
+
+  .subscription-section, .checkout-section{
+    margin-top: 130px;
+    padding: 50px 0;
+  }
+
+    .subscription-section h1{
+    font-family: Barlow-Extra;
+    font-size: 60px;
+  }
+
+  #footer{
+    background: #edf1f4;
+  }
+
+  .footer_container{
+    padding: 40px 20px;
+  }
+
+  .footer-logo{
+    width: 250px !important;
+  }
+
+  .subscription-title{
+    padding-bottom: 50px;
+  }
+  
+  .side-by-side__image {
+    width: 100%;
+  }
+
+  .blue-underlay {
     position: relative;
-}
+    z-index: 1;
+  }
 
-.background {
-    margin-top: 8rem;
+  .blue-underlay:before {
     width: 100%;
-    opacity: 0.2;
-}
+    background: #008cff;
+    content: "";
+    top: 20px;
+    left: 20px;
+    -webkitclip-path: polygon(100% 0,100% 88%,85% 100%,0 100%,0 0);
+    clip-path: polygon(100% 0,100% 88%,85% 100%,0 100%,0 0);
+    height: 100%;
+    z-index: -1;
+  }
 
-.banner {
-    position: absolute;
-    top: 10rem;
-    left: 0;
+  .side-by-side__image img {
+    object-fit: cover;
+    height: 100%;
     width: 100%;
-    opacity: .8;
-}
+  }
 
-.right-text {
-    margin-right: 4rem;
-    position: absolute;
-    top: 36rem;
-    width: 50rem;
-    right: 0;
-    font-size: 1.6rem;
-    line-height: 4rem;
-    color: #0a1d5f;
+  .clipped-image img {
+    clip-path: polygon(100% 0,100% 90%,87% 100%,0 100%,0 0);
+  }
+
+  .subscription_content{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .subscription_content h2{
+    padding-bottom: 20px;
+    font-family: Barlow-Extra;
+  }
+
+  .subscription_content ul li::before {
+    content: "\2713";
+    margin-right: 10px; 
+    color: #008cff;
     font-weight: bold;
-    animation-name: right-fade;
-    animation-delay: 2s;
-    animation-duration: 3s;
-    animation-fill-mode: forwards;
-    opacity: 0;
-}
+  }
 
-@keyframes right-fade {
-    from {right: 0; opacity: 0;}
-    to {right: 4rem; opacity: 1;}
-}
+  .subscription_content ul{
+    list-style-type: none;
+    padding-left: 40px;
+  }
 
-.left-text {
-    margin-left: 4rem;
-    position: absolute;
-    top: 48rem;
-    width: 50rem;
-    left: 0;
-    font-size: 1.6rem;
-    line-height: 4rem;
-    color: #0a1d5f;
-    font-weight: bold;
-    animation-name: left-fade;
-    animation-delay: 1s;
-    animation-duration: 3s;
-    animation-fill-mode: forwards;
-    opacity: 0;
-}
+  .subscription_content ul li{
+    padding-bottom: 5px;
+    font-family: 'JostSemi';
+    font-size: 20px;
+  }
   
-@keyframes left-fade {
-    from {left: 0; opacity: 0;}
-    to {left: 4rem; opacity: 1;}
-}
+  .subscription_row{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin: 0 auto;
+    grid-gap: 50px;
+    padding: 60px 0;
+  }
 
-.com {
-    margin-right: 4rem;
+  .subscription_box{
+    position: relative;
+    background: #fff;
+    padding: 35px 40px;
+    border-radius: 20px;
+    box-shadow: rgb(0 0 0 / 24%) 0 7px 12px 5px;
+  }
+
+  .subscription_box .popular_badge{
     position: absolute;
-    top: 60rem;
-    width: 36rem;
-    right: 16rem;
-    font-size: 1.6rem;
-    line-height: 4rem;
-    color: #0a1d5f;
+    top: -32px;
+    background: #f78d1f;
+    text-transform: uppercase;
+    color: white;
+    right: 35px;
+    padding: 4px 11px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    margin-bottom: 0;
+    font-family: 'Barlow-Extra';
+  }
+
+  .subscription_box .title{
+    font-size: 20px;
+    font-family: 'JostSemi';
+  }
+
+  .subscription_box .price{
+    font-size: 20px;
+    font-family: 'JostSemi';
+    color:#627413;
+  }
+
+  .subscription_box .content{
+    font-family: jostLight;
+    padding: 15px 0;
+  }
+
+  .subscription_box .content ul li{
+    padding:8px 0;
+  }
+
+  .short-description{
+    color:#008cff;
+  }
+
+  .subscription_box .btn_subscribe{
+    text-decoration: none;
+    position: relative;
+    display: block;
+    letter-spacing: 1px;
+    padding: 10px 0;
+    border-radius: 10px;
+    font-size: 23px;
+    background: #627413;
+    border: 1px solid #627413;
+    text-align: center;
+    text-transform: uppercase;
+    color: white;
+    font-family: 'JostSemi';
+  }
+
+  .rule{
+    display: flex;
+    align-items: baseline;
+    padding-bottom: 15px;
+  }
+
+  .rule input{
+    margin-right: 10px;
+  }
+
+  #bottom-bar {
+    background: #434343;
+    padding: 15px;
+  }
+
+  .bottom-bar-content{
+    text-align: center;
+    color: white;
+    font-size: 20px;
+  }
+
+  .bottom-bar-content a{
+    color:white;
+    text-decoration: none;
+  }
+
+  #footer ul{
+    padding-left: 15px;
+  }
+
+  #footer ul li{
+    list-style: none;
+    cursor: pointer;
+  }
+
+  #footer ul li a{
+    color:black;
+    text-decoration: none;
+  }
+
+  #footer .social_icon_title{
+    padding: 10px 0;
+  }
+
+  #footer .social_icons{
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .footer_subtitle{
     font-weight: bold;
-    animation-name: right-fade-img;
-    animation-delay: 3s;
-    animation-duration: 3s;
-    animation-fill-mode: forwards;
-    opacity: 0;
-}
+    font-size: 20px;
+    padding-bottom: 10px;
+  }
+
+  .subscription_box{
+    position: relative;
+    background: #fff;
+    padding: 35px 40px;
+    border-radius: 20px;
+    box-shadow: rgb(0 0 0 / 24%) 0 7px 12px 5px;
+  }
+
+  .checkout-title{
+    text-transform: uppercase;
+    font-family: Barlow-Extra;
+    padding-bottom:30px;
+  }
+
+  .payment-option{
+    border: 2px solid #c9c4c4;
+    padding: 15px;
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 15px;
+  }
+
+  .checkout-section label{
+    font-family: JostLight;
+  }
+
+  .stripe-image{
+    width: 170px;
+  }
+
+  .paypal-image{
+    width: 80px;
+  }
+
+  #stripe, #paypal{
+    margin-right: 5px;
+  }
+
+  .payment_radio{
+    display: flex;
+    align-items: center;
+  }
+
+  .payment_active, .membership_active{
+    border: 2px solid #0731c5 !important;
+    background: lightgray;
+  }
+
+  .btn_payment{
+    background: #f78d1f;
+    border: 1px solid #f78d1f;
+    position: relative;
+    display: block;
+    letter-spacing: 1px;
+    padding: 10px 0;
+    border-radius: 10px;
+    font-size: 23px;
+    font-family: 'JostSemi';
+    width: 100%;
+    color: white;
+    margin-top: 15px;
+  }
+
+  .btn_payment:hover{
+    color:#f78d1f;
+    border: 1px solid #f78d1f;
+  }
+
+  .img_stripe{
+    width: 300px;
+  }
+
+  .terms{
+    margin-top: 20px;
+  }
+
+  .conditions a{
+    text-decoration: none;
+  }
+
+  .membership_save_img{
+    width: 100px;
+  }
+
+  .memberships{
+    border: 2px solid #c9c4c4;
+    padding: 15px;
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 15px;
+  }
+
+  .membership_radio{
+    display: flex;
+    align-items: center;
+  }
+
+  .memberships .membership_radio i{
+    margin-right: 10px;
+  }
+
+  .memberships .membership_radio input{
+    display: none;
+  }
+
+  .memberships .membership_radio label{
+    font-weight: bold;
+    padding-top: 6px;
+    font-size: 18px;
+  }
+
+  .memberships .membership_radio span{
+    color: #0731c5;
+    font-family: 'Barlow-Extra';
+  }
+
+  .membership_most_popular label{
+    padding-left: 15px;
+  }
   
-@keyframes right-fade-img {
-    from {right: 12rem; opacity: 0;}
-    to {right: 16rem; opacity: 1;}
-}
+  @media screen and (max-width: 768px) {
+    .btn-outline-dark {
+      border: none;
+      padding: 0;
+      outline: none;
+    }
+  
+    .btn-outline-dark:hover {
+      background: none;
+      color: gray;
+    }
+
+    .home-banner{
+      margin-top: 130px;
+    }
+
+    .welcome-msg{
+      padding: 20px 10px;
+      font-size: 16px;
+    }
+
+    .mobile-pt-0{
+      padding-top: 0;
+    }
+
+    .navbar .navbar-nav .nav-link{
+      font-size: 14px;
+      padding-bottom: 0px;
+    }
+
+    .btn_member{
+      font-size:14px;
+    }
+
+    .footer_container{
+      text-align: center;
+    }
+
+    .footer-logo {
+      width: 150px !important;
+      padding-bottom: 15px;
+    }
+
+    .bottom-bar-content{
+      font-size: 16px;
+    }
+
+    .subscription-section h1{
+      font-size: 30px;
+    }
+
+    .subscription_content h2{
+      padding-top: 30px;
+    }
+
+    .subscription_content ul li{
+      font-size: 16px;
+    }
+
+    .subscription_row{
+      display: block;
+      padding: 30px 10px;
+    }
+
+    .subscription_box{
+      margin-bottom: 50px;
+    }
+
+    .subscription_box .btn_subscribe{
+      font-size: 16px;
+    }
+
+    #footer ul{
+      padding-left: 0;
+    }
+  }
+  

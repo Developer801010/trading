@@ -4,7 +4,7 @@
         <ul class="nav navbar-nav flex-row">
             <li class="nav-item me-auto">
                 <a class="navbar-brand" href="{{route('home')}}">
-                    <img src="{{ asset('assets/image/logo.svg') }}" />
+                    <img src="{{ asset('assets/image/logo.png') }}" />
                 </a>
             </li>
             <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pe-0" data-bs-toggle="collapse"><i class="d-block d-xl-none text-primary toggle-icon font-medium-4" data-feather="x"></i><i class="d-none d-xl-block collapse-toggle-icon font-medium-4  text-primary" data-feather="disc" data-ticon="disc"></i></a></li>
@@ -42,12 +42,6 @@
                     </a> 
                 </li>
 
-                <li class="nav-item @if(request()->is('clinics*')) active @endif">
-                    <a class="d-flex align-items-center" href="{{ route('clinics.index') }}">
-                        <i data-feather="clipboard"></i>
-                        <span class="menu-title text-truncate">Clinic</span>
-                    </a> 
-                </li>
             @endcan
 
             @role(['user'])
@@ -58,19 +52,6 @@
                     </a> 
                 </li>
 
-                <li class="nav-item @if(request()->is('referral*')) active @endif">
-                    <a class="d-flex align-items-center" href="{{ route('referral.index') }}">
-                        <i data-feather="copy"></i>
-                        <span class="menu-title text-truncate">Patient Management</span>
-                    </a> 
-                </li>
-
-                <li class="nav-item @if(request()->is('calendar*')) active @endif">
-                    <a class="d-flex align-items-center" href="{{ route('calendar.index') }}">
-                        <i data-feather="calendar"></i>
-                        <span class="menu-title text-truncate">Calendar</span>
-                    </a> 
-                </li>
             @endrole
             
 

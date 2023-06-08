@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FrontController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -19,11 +20,15 @@ use App\Http\Controllers\UserController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/', [FrontController::class, 'homepage'])->name('front.home');
 
+Route::get('/subscription', [FrontController::class, 'subscription'])->name('front.subscription');
 
-Route::get('homepage', function() {
-    return view('homepage');
-});
+Route::get('/checkout/{subscription_type}', [FrontController::class, 'checkout'])->name('front.checkout');
+Route::post('/payment/process', [FrontController::class, 'process'])->name('payment.process');
+
+Route::get('/terms_conditions', [FrontController::class, 'terms_conditions'])->name('front.terms_conditions');
+
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -42,3 +47,4 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('profiles', ProfileController::class)->middleware('role:admin');
 
 });
+
