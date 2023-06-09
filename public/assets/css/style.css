@@ -235,9 +235,13 @@ div.dataTables_wrapper div.dataTables_filter input{
     box-shadow: rgb(0 0 0 / 24%) 0 7px 12px 5px;
   }
 
+  .subsscription_box_popular{
+    border: 4px solid #0731c5;
+  }
+
   .subscription_box .popular_badge{
     position: absolute;
-    top: -32px;
+    top: -36px;
     background: #f78d1f;
     text-transform: uppercase;
     color: white;
@@ -252,6 +256,7 @@ div.dataTables_wrapper div.dataTables_filter input{
   .subscription_box .title{
     font-size: 20px;
     font-family: 'JostSemi';
+    text-transform: uppercase;
   }
 
   .subscription_box .price{
@@ -271,6 +276,7 @@ div.dataTables_wrapper div.dataTables_filter input{
 
   .short-description{
     color:#008cff;
+    margin-bottom: 3px;
   }
 
   .subscription_box .btn_subscribe{
@@ -281,12 +287,17 @@ div.dataTables_wrapper div.dataTables_filter input{
     padding: 10px 0;
     border-radius: 10px;
     font-size: 23px;
-    background: #627413;
+    background: white;
     border: 1px solid #627413;
     text-align: center;
     text-transform: uppercase;
-    color: white;
+    color: #627413;
     font-family: 'JostSemi';
+  }
+
+  .subscription_box .btn_subscribe_popular{
+    background: #627413;
+    color: white;
   }
 
   .rule{
@@ -365,6 +376,7 @@ div.dataTables_wrapper div.dataTables_filter input{
     display: flex;
     justify-content: space-between;
     border-radius: 15px;
+    cursor: pointer;
   }
 
   .checkout-section label{
@@ -436,6 +448,7 @@ div.dataTables_wrapper div.dataTables_filter input{
     display: flex;
     justify-content: space-between;
     border-radius: 15px;
+    cursor: pointer;
   }
 
   .membership_radio{
@@ -464,6 +477,10 @@ div.dataTables_wrapper div.dataTables_filter input{
 
   .membership_most_popular label{
     padding-left: 15px;
+  }
+
+  .subscription_price{
+    font-size: 50px;
   }
   
   @media screen and (max-width: 768px) {

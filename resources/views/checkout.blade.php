@@ -39,8 +39,8 @@
             @csrf
             <section class="checkout-section">
                 <h1 class="text-center checkout-title">{{$subscription_type}} Checkout ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )</h1>
-                <input type="hidden" name="price" value="{{$price}}" />
-                <input type="hidden" name="period" value="{{$units}}" />
+                <input type="hidden" name="price" id="price" value="{{$price}}" />
+                <input type="hidden" name="period" id="period" value="{{$units}}" />
                 <div class="row">
                     <div class="col-md-7">
                         <h4 class="checkout-subtitle">Easy checkout with Stripe or PayPal. All major credit cards accepted.</h4>
@@ -77,7 +77,7 @@
     
                         <div class="conditions rule">
                             <input type="checkbox" id="conditions" />
-                            <label for="conditions">By Joining, I agree to these <a href="#">Terms/Conditions</a></label>
+                            <label for="conditions">By clicking Subscribe, you agree to the <a href="#">Terms/Conditions</a> and acknowledge reading the Privacy Policy. Products renew automatically until canceled and the payment method is saved for future purchases and subscription renewal.</label>
                         </div>
                         
                         <button type="submit" class="btn btn_payment">Pay with Credit/Debit Card</button>
@@ -85,7 +85,7 @@
                     </div>
                     <div class="col-md-1"></div>
                     <div class="col-md-4">
-                        <div class="memberships membership_active">
+                        <div class="memberships monthly-membership">
                             <div class="membership_radio">
                                 <i class="fa-regular fa-circle-question"></i>
                                 <input type="radio" name="membership" id="month" value="month">
@@ -93,15 +93,15 @@
                             </div>
                             <img src="{{ asset('assets/image/paypal.png') }}" class="membership_save_img" />
                         </div>
-                        <div class="memberships">
+                        <div class="memberships quarterly-membership">
                             <div class="membership_radio">
                                 <i class="fa-regular fa-circle-question"></i>
                                 <input type="radio" name="membership" id="quartely" value="quartely">
-                                <label for="quartely">$357.00 Quarterly Membership</label>
+                                <label for="quartely">$387.00 Quarterly Membership</label>
                             </div>
                             <img src="{{ asset('assets/image/paypal.png') }}" class="membership_save_img"  />
                         </div>
-                        <div class="memberships">
+                        <div class="memberships yearly-membership">
                             <div class="membership_radio flex-wrap membership_most_popular">
                                 <i class="fa-regular fa-circle-question"></i>
                                 <span class="text-uppercase">most popular</span>
@@ -133,6 +133,7 @@
     var stripe_option = $('#stripe');
     var paypal_option = $('#paypal');
     var btn_payment = $('.btn_payment');
+    var memberships = $('.memberships');
 
     payment_option.click(function(){
         if (!$(this).hasClass('payment_active')){
@@ -162,7 +163,49 @@
         }
     })
 
-    var stripe = Stripe('{{ env('STRIPE_KEY') }}');
+    //get period 
+    var period = $('#period').val();
+    if(period == 'mo'){
+        $('.monthly-membership').addClass('membership_active');
+    }else if(period == 'qu'){
+        $('.quarterly-membership').addClass('membership_active');
+    }else if(period == 'yr'){
+        $('.yearly-membership').addClass('membership_active');
+    }
+
+    memberships.click(function(){
+        var membership_type = 'monthly';
+
+        if ($(this).hasClass('monthly-membership')){
+            updateCheckoutAttributes(147, 'mo');
+            clearMembershipClass();
+            $('.monthly-membership').addClass('membership_active');
+        }else if ($(this).hasClass('quarterly-membership')){
+            updateCheckoutAttributes(387, 'qu');
+            clearMembershipClass();
+            $('.quarterly-membership').addClass('membership_active');            
+        }else if ($(this).hasClass('yearly-membership')){
+            updateCheckoutAttributes(787, 'yr');
+            clearMembershipClass();
+            $('.yearly-membership').addClass('membership_active');            
+        }
+
+    })
+
+    function updateCheckoutAttributes(price, period){
+        //for the title
+        $('.price').text(price);
+        $('.period').text(period);
+        //input type's value
+        $('#price').val(price);
+        $('#period').val(period);
+    }
+
+    function clearMembershipClass(){
+        $('.memberships').removeClass('membership_active');
+    }
+
+    var stripe = Stripe('{{ config('services.stripe.publish_key') }}');
 
     // Create an instance of Elements
     var elements = stripe.elements();
@@ -220,32 +263,21 @@
                     errorElement.textContent = result.error.message;
                 } else {
                     
-                    if (!$('#terms').is(':checked')) {
-                        $('#terms').siblings('label').addClass('error');
-                        return;
-                    }
+                    // if (!$('#terms').is(':checked')) {
+                    //     $('#terms').siblings('label').addClass('error');
+                    //     return;
+                    // }
 
-                    if (!$('#conditions').is(':checked')) {
-                        $('#conditions').siblings('label').addClass('error');
-                        return;
-                    }
+                    // if (!$('#conditions').is(':checked')) {
+                    //     $('#conditions').siblings('label').addClass('error');
+                    //     return;
+                    // }
 
                     // Send the token to your server
                     stripeTokenHandler(result.token);
                 }
             });
         }else{
-            if (!$('#terms').is(':checked')) {
-                $('#terms').siblings('label').addClass('error');
-                return;
-            }
-
-            if (!$('#conditions').is(':checked')) {
-                $('#conditions').siblings('label').addClass('error');
-                return;
-            }
-
-
             PayPalHandler();
         }
        

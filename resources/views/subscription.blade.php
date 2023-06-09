@@ -31,7 +31,7 @@
             <div class="subscription_row">
                 <div class="subscription_box">
                     <p class="title text-center">Monthly</p>
-                    <p class="price text-center">$147/mo</p>
+                    <p class="price text-center"><span class="subscription_price">$147</span>/mo</p>
                     <div class="content">
                         <ul>
                             <li>
@@ -48,10 +48,10 @@
                     <a href="{{ route('front.checkout', 'm') }}" class="btn_subscribe">Subscribe</a>
                 </div>
 
-                <div class="subscription_box">
+                <div class="subscription_box subsscription_box_popular">
                     <p class="popular_badge">Most Popular</p>
                     <p class="title text-center">Yearly</p>
-                    <p class="price text-center">$787/yr</p>
+                    <p class="price text-center"><span class="subscription_price">$787</span>/yr</p>
                     <div class="content">
                         <ul>
                             <li>
@@ -65,12 +65,12 @@
                             </li>
                         </ul>
                     </div>
-                    <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe">Subscribe</a>
-                </div>
+                    <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>
+                </div> 
 
                 <div class="subscription_box">
                     <p class="title text-center">Quarterly</p>
-                    <p class="price text-center">$387/qu</p>
+                    <p class="price text-center"><span class="subscription_price">$387</span>/qu</p>
                     <div class="content">
                         <ul>
                             <li>

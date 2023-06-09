@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Service\StripeService;
+use Exception;
 use Illuminate\Http\Request;
+use Stripe\Stripe;
 
 class FrontController extends Controller
 {
@@ -57,7 +60,19 @@ class FrontController extends Controller
 
     public function process(Request $request)
     {
-        dd($request->all());
+        $stripeObj = new StripeService();
+
+        $payment_option = $request->input('payment_option');
+        $token =  $request->stripeToken;
+
+        try{
+
+            
+
+        }catch(Exception $e){
+
+        }
+
         
     }
 }
