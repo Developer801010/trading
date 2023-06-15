@@ -5,14 +5,14 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-    <meta name="description" content="Coourse admin.">
-    <meta name="keywords" content="Course">
-    <meta name="author" content="Course">
-    <title>Register Page</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimal-ui">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="PIXINVENT">
+    <title>@yield('title', 'Register Page')</title>    
     <link rel="apple-touch-icon" href="{{ asset('app-assets/images/ico/apple-icon-120.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="app-assets/images/ico/favicon.ico">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('app-assets/images/ico/favicon.ico') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
     <!-- BEGIN: Vendor CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/vendors.min.css') }}">
@@ -22,13 +22,9 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/bootstrap.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/bootstrap-extended.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/colors.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/components.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/themes/dark-layout.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/themes/semi-dark-layout.css') }}">
-
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/components.css') }}">   
     <!-- BEGIN: Page CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/core/menu/menu-types/vertical-menu.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/core/colors/palette-gradient.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/forms/form-validation.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/pages/authentication.css') }}">
     <!-- END: Page CSS-->
 
@@ -36,91 +32,115 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">
     <!-- END: Custom CSS-->
 
+    <style>
+        .auth-wrapper .brand-logo{
+            margin: 1rem 0 2rem 0 !important;
+            width: 120px;
+            top: 0 !important;
+            left: 10px !important;
+        }
+    </style>
 </head>
 <!-- END: Head-->
 
 <!-- BEGIN: Body-->
 
-<body class="vertical-layout vertical-menu-modern 1-column  navbar-floating footer-static bg-full-screen-image  blank-page blank-page" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
-<!-- BEGIN: Content-->
-<div class="app-content content">
-    <div class="content-overlay"></div>
-    <div class="header-navbar-shadow"></div>
-    <div class="content-wrapper">
-        <div class="content-header row">
-        </div>
-        <div class="content-body">
-            <section class="row flexbox-container">
-                <div class="col-xl-8 col-10 d-flex justify-content-center">
-                    <div class="card bg-authentication rounded-0 mb-0">
-                        <div class="row m-0">
-                            <div class="col-lg-6 d-lg-block d-none text-center align-self-center pl-0 pr-3 py-0">
-                                <img src="{{ asset('app-assets/images/pages/register.jpg') }}" alt="branding logo">
+<body class="vertical-layout vertical-menu-modern blank-page navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="blank-page">
+    <!-- BEGIN: Content-->
+    <div class="app-content content ">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper">
+            <div class="content-header row">
+            </div>
+            <div class="content-body">
+                <div class="auth-wrapper auth-cover">
+                    <div class="auth-inner row m-0">
+                        <!-- Brand logo-->
+                        <a class="brand-logo" href="{{route('front.home')}}">
+                            <img src="{{asset('assets/image/logo.png')}}" class="brand-logo" />
+                        </a>
+                        <!-- /Brand logo-->
+
+                        <!-- Left Text-->
+                        <div class="col-lg-3 d-none d-lg-flex align-items-center p-0">
+                            <div class="w-100 d-lg-flex align-items-center justify-content-center">
+                                <img class="img-fluid w-100" src="{{asset('app-assets/images/illustration/create-account.svg')}}" alt="multi-steps" />
                             </div>
-                            <div class="col-lg-6 col-12 p-0">
-                                <div class="card rounded-0 mb-0 p-2">
-                                    <div class="card-header pt-50 pb-1">
-                                        <div class="card-title">
-                                            <h4 class="mb-0">Create Account</h4>
-                                        </div>
-                                    </div>
-                                    <p class="px-2">Fill the below form to create a new account.</p>
-                                    <div class="card-content">
-                                        <div class="card-body pt-0">
-                                            <form method="POST" action="{{ route('register') }}">
+                        </div>
+                        <!-- /Left Text-->
+
+                        <!-- Register-->
+                        <div class="col-lg-9 d-flex align-items-center auth-bg px-2 px-sm-3 px-lg-5 pt-3">
+                            <div class="width-700 mx-auto">
+                                <div class="bs-stepper register-multi-steps-wizard shadow-none">
+                                    <div class="bs-stepper-content px-0 mt-4">
+                                        <div id="account-details" class="content" role="tabpanel" aria-labelledby="account-details-trigger">
+                                            <div class="content-header mb-2">
+                                                <h2 class="card-title fw-bold mb-1">Adventure starts here 🚀</h2>
+                                                <p class="card-text mb-2">Make your app management easy and fun!</p>
+                                            </div>
+                                            <div class="col-md-12">
+                                                @include('layouts.error')
+                                            </div>
+
+                                            <form method="post" action="{{route('register')}}" class="registerForm">
                                                 @csrf
-                                                <div class="form-label-group">
-                                                    <!-- <input type="text" id="inputName" class="form-control" placeholder="Name" required> -->
-                                                    <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-                                                    <label for="name">Name</label>
-                                                    @error('name')
-                                                    <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                    </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-label-group">
-                                                    <!-- <input type="email" id="inputEmail" class="form-control" placeholder="Email" required> -->
-                                                    <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Email" value="{{ old('email') }}" required autocomplete="email">
-                                                    <label for="email">Email</label>
-                                                    @error('email')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-label-group">
-                                                    <!-- <input type="password" id="inputPassword" class="form-control" placeholder="Password" required> -->
-                                                    <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Password" required autocomplete="new-password">
-                                                    <label for="password">Password</label>
-                                                    @error('password')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-label-group">
-                                                    <!-- <input type="password" id="inputConfPassword" class="form-control" placeholder="Confirm Password" required> -->
-                                                    <input id="password-confirm" type="password" class="form-control" name="password_confirmation" placeholder="Confirm Password" required autocomplete="new-password">
-                                                    <label for="password-confirm">Confirm Password</label>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <div class="col-12">
-                                                        <fieldset class="checkbox">
-                                                            <div class="vs-checkbox-con vs-checkbox-primary">
-                                                                <input type="checkbox" checked>
-                                                                <span class="vs-checkbox">
-                                                                    <span class="vs-checkbox--check">
-                                                                      <i class="vs-icon feather icon-check"></i>
-                                                                    </span>
-                                                                  </span>
-                                                                <span class=""> I accept the terms & conditions.</span>
-                                                            </div>
-                                                        </fieldset>
+
+                                                <input id="email_verified_at" type="hidden" name="email_verified_at" value="{{ now() }}">
+
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-1">
+                                                        <label class="form-label" for="email">First Name</label>
+                                                        <input type="text" name="first_name" id="first_name" class="form-control" placeholder="John" aria-label="" />
+                                                    </div>
+                                                    <div class="col-md-6 mb-1">
+                                                        <label class="form-label" for="email">Last Name</label>
+                                                        <input type="text" name="last_name" id="last_name" class="form-control" placeholder="Dae" aria-label="" />
+                                                    </div>
+
+                                                    <div class="col-md-6 mb-1">
+                                                        <label class="form-label" for="username">Username</label>
+                                                        <input type="text" name="name" id="name" class="form-control  @error('name') is-invalid @enderror" placeholder="johndoe" />
+                                                        @error('name')
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $message }}</strong>
+                                                        </span>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="col-md-6 mb-1">
+                                                        <label class="form-label" for="email">Email</label>
+                                                        <input type="email" name="email" id="email" class="form-control" placeholder="john.doe@email.com" aria-label="john.doe" />
                                                     </div>
                                                 </div>
-                                                <a href="login" class="btn btn-outline-primary float-left btn-inline mb-50">Login</a>
-                                                <button type="submit" class="btn btn-primary float-right btn-inline mb-50">Register</a>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-1">
+                                                        <label class="form-label" for="password">Password</label>
+                                                        <div class="input-group input-group-merge form-password-toggle">
+                                                            <input type="password" name="password" id="password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                                                            <span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-1">
+                                                        <label class="form-label" for="confirm-password">Confirm Password</label>
+                                                        <div class="input-group input-group-merge form-password-toggle">
+                                                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                                                            <span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span>
+                                                        </div>
+                                                    </div>                                                   
+                                                    <div class="col-md-6 mb-1">
+                                                        <label class="form-label" for="mobile_number">Mobile number</label>
+                                                        <input type="text" name="mobile_number" id="mobile_number" class="form-control mobile-number-mask" placeholder="(472) 765-3654" />
+                                                    </div>                                                  
+                                                </div>
+
+                                                <div class="row mt-1">
+                                                    <div class="col-md-12 mb-1">
+                                                        <button class="btn btn-primary" type="submit" style="width: 100%;">
+                                                            Sign Up
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
@@ -129,30 +149,84 @@
                         </div>
                     </div>
                 </div>
-            </section>
+
+            </div>
         </div>
     </div>
-</div>
-<!-- END: Content-->
+    <!-- END: Content-->
 
 
-<!-- BEGIN: Vendor JS-->
-<script src="app-assets/vendors/js/vendors.min.js"></script>
-<!-- BEGIN Vendor JS-->
+    <!-- BEGIN: Vendor JS-->
+    <script src="{{ asset('app-assets/vendors/js/vendors.min.js') }}"></script>
+    <!-- BEGIN Vendor JS-->
 
-<!-- BEGIN: Page Vendor JS-->
-<!-- END: Page Vendor JS-->
+    <!-- BEGIN: Page Vendor JS-->
+    <script src="{{ asset('app-assets/vendors/js/forms/select/select2.full.min.js') }}"></script>
+    <script src="{{ asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js')}}"></script>
+    <script src="{{ asset('app-assets/vendors/js/forms/cleave/cleave.min.js') }}"></script>
+    <script src="{{ asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js') }}"></script>
+    <!-- END: Page Vendor JS-->
 
-<!-- BEGIN: Theme JS-->
-<script src="app-assets/js/core/app-menu.js"></script>
-<script src="app-assets/js/core/app.js"></script>
-<script src="app-assets/js/scripts/components.js"></script>
-<!-- END: Theme JS-->
+    <!-- BEGIN: Theme JS-->
+    <script src="{{ asset('app-assets/js/core/app-menu.js') }}"></script>
+    <script src="{{ asset('app-assets/js/core/app.js') }}"></script>
+    <!-- END: Theme JS-->
 
-<!-- BEGIN: Page JS-->
-<!-- END: Page JS-->
+    <script>
+        $(window).on('load', function() {
+            if (feather) {
+                feather.replace({
+                    width: 14,
+                    height: 14
+                });
+            }
+        })
 
+        var registerForm = $('.registerForm');
+        var mobileNumberMask = $('.mobile-number-mask');
+
+        if (mobileNumberMask.length) {
+            new Cleave(mobileNumberMask, {
+                phone: true,
+                phoneRegionCode: 'US'
+            });
+        }
+
+        if (registerForm.length) {
+            registerForm.validate({
+                errorClass: 'error',
+                rules: {
+                    'first_name': {
+                        required: true
+                    },
+                    'last_name': {
+                        required: true
+                    },
+                    'name': {
+                        required: true
+                    },
+                    'email': {
+                        required: true,
+                        email: true
+                    },
+                    'password': {
+                        required: true
+                    },
+                    'password_confirmation': {
+                        required: true,
+                        equalTo: '#password'
+                    },
+                    'mobile_number': {
+                        required: true
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 <!-- END: Body-->
 
 </html>
+
+
+

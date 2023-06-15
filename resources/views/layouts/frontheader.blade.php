@@ -21,7 +21,27 @@
             <a class="nav-link">Contact</a>
           </li>
         </ul>
-        <a class="btn btn-sub fw-bold btn_member" href={{ route('login') }}>Member Login</a>
+        @auth
+          <p class="login-msg">Welcome <b>{{auth()->user()->name}}</b></p>
+
+          <a class="tn btn-sub fw-bold btn_member btn-login" href="{{ route('logout') }}"  onclick="event.preventDefault(); document.getElementById('logout-form').submit();">            
+            Logout
+          </a>
+          @role('admin')
+            <a class="btn btn-out fw-bold btn_member btn-register" target="_blank" href={{ route('admin.home') }}>Dashboard</a>
+          @else
+            <a class="btn btn-out fw-bold btn_member btn-register" href={{ route('front.account') }}>Dashboard</a>
+          @endrole
+
+          <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+              @csrf
+          </form>
+          
+        @else
+          <a class="btn btn-sub fw-bold btn_member btn-login" href={{ route('login') }}>Login</a>
+          <a class="btn btn-out fw-bold btn_member btn-register" href={{ route('register') }}>Register</a>
+        @endauth
+        
       </div>
     </div>
   </nav>

@@ -5,7 +5,7 @@
 <style>
     .StripeElement {
         background-color: white;
-        padding: 8px 14px;
+        padding: 20px 14px;
         border-radius: 4px;
         border: 1px solid #E4E4E4;
     }
@@ -35,12 +35,20 @@
 
 @section('content')
     <div class="container">
-        <form method="post" action="{{ route('payment.process') }}" id="payment-form">
+        <form method="post" action="{{ route('front.payment.process') }}" id="payment-form">
             @csrf
             <section class="checkout-section">
                 <h1 class="text-center checkout-title">{{$subscription_type}} Checkout ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )</h1>
+              
+                <input type="hidden" name="stripe_plan_id" id="stripe_plan_id" 
+                value="@if ($units == 'mo') {{$month_plan}} @elseif ($units == 'qu') {{$quarter_plan}}  @elseif($units == 'yr' ) {{$year_plan}} @endif" />
+
                 <input type="hidden" name="price" id="price" value="{{$price}}" />
+
                 <input type="hidden" name="period" id="period" value="{{$units}}" />
+                
+                @include('layouts.error');
+
                 <div class="row">
                     <div class="col-md-7">
                         <h4 class="checkout-subtitle">Easy checkout with Stripe or PayPal. All major credit cards accepted.</h4>
@@ -80,7 +88,7 @@
                             <label for="conditions">By clicking Subscribe, you agree to the <a href="#">Terms/Conditions</a> and acknowledge reading the Privacy Policy. Products renew automatically until canceled and the payment method is saved for future purchases and subscription renewal.</label>
                         </div>
                         
-                        <button type="submit" class="btn btn_payment">Pay with Credit/Debit Card</button>
+                        <button type="submit" id="card-button" class="btn btn_payment" data-secret="{{ $intent->client_secret }}">Pay with Credit/Debit Card</button>
     
                     </div>
                     <div class="col-md-1"></div>
@@ -173,6 +181,11 @@
         $('.yearly-membership').addClass('membership_active');
     }
 
+    var month_plan = '{{$month_plan}}';
+    var quarter_plan = '{{$quarter_plan}}';
+    var year_plan = '{{$year_plan}}';    
+    var stripe_plan_id = $('#stripe_plan_id');
+
     memberships.click(function(){
         var membership_type = 'monthly';
 
@@ -180,14 +193,17 @@
             updateCheckoutAttributes(147, 'mo');
             clearMembershipClass();
             $('.monthly-membership').addClass('membership_active');
+            stripe_plan_id.val(month_plan);
         }else if ($(this).hasClass('quarterly-membership')){
             updateCheckoutAttributes(387, 'qu');
             clearMembershipClass();
-            $('.quarterly-membership').addClass('membership_active');            
+            $('.quarterly-membership').addClass('membership_active');    
+            stripe_plan_id.val(quarter_plan);        
         }else if ($(this).hasClass('yearly-membership')){
             updateCheckoutAttributes(787, 'yr');
             clearMembershipClass();
             $('.yearly-membership').addClass('membership_active');            
+            stripe_plan_id.val(year_plan);
         }
 
     })
@@ -209,6 +225,9 @@
 
     // Create an instance of Elements
     var elements = stripe.elements();
+    const cardButton = document.getElementById('card-button');
+    const clientSecret = cardButton.dataset.secret;
+    var payment_method;
 
     // Custom styling can be passed to options when creating an Element.
     // (Note that this demo uses a wider set of styles than the guide below.)
@@ -218,7 +237,7 @@
             lineHeight: '24px',
             fontFamily: '"Lato", sans-serif',
             fontSmoothing: 'antialiased',
-            fontSize: '14px',
+            fontSize: '16px',
             '::placeholder': {
             color: '#D4D4D4'
             }
@@ -248,6 +267,32 @@
         }
     });
 
+    cardButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        var paymentOption = $('input[name="payment_option"]:checked').val();
+
+        if(paymentOption == 'stripe'){
+                const { setupIntent, error } = await stripe.confirmCardSetup(
+                clientSecret, {
+                    payment_method: {
+                        card: card
+                    }
+                }
+            );
+    
+            if (error) {
+                // Display "error.message" to the user...
+                var errorElement = document.getElementById('card-errors');
+                errorElement.textContent = error.message;
+            } else {
+                // The card has been verified successfully...                
+                stripeTokenHandler(setupIntent.payment_method);
+            }
+        }else{
+
+        }
+    });
     // Handle form submission
     var form = document.getElementById('payment-form');
     form.addEventListener('submit', function(event) {
@@ -262,17 +307,6 @@
                     var errorElement = document.getElementById('card-errors');
                     errorElement.textContent = result.error.message;
                 } else {
-                    
-                    // if (!$('#terms').is(':checked')) {
-                    //     $('#terms').siblings('label').addClass('error');
-                    //     return;
-                    // }
-
-                    // if (!$('#conditions').is(':checked')) {
-                    //     $('#conditions').siblings('label').addClass('error');
-                    //     return;
-                    // }
-
                     // Send the token to your server
                     stripeTokenHandler(result.token);
                 }
@@ -284,17 +318,18 @@
     }); 
 
 
-    function stripeTokenHandler(token) {
+    function stripeTokenHandler(payment_method) {
         // Insert the token ID into the form so it gets submitted to the server
         var form = document.getElementById('payment-form');
         var hiddenInput = document.createElement('input');
         hiddenInput.setAttribute('type', 'hidden');
-        hiddenInput.setAttribute('name', 'stripeToken');
-        hiddenInput.setAttribute('value', token.id);
+        hiddenInput.setAttribute('name', 'payment_method');
+        hiddenInput.setAttribute('value', payment_method);
         form.appendChild(hiddenInput);
 
         // Submit the form
         form.submit();
+
     }
 
     function PayPalHandler(){

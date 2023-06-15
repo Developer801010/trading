@@ -51,8 +51,8 @@
 <div id="bottom-bar">
     <div class="container">
         <div class="bottom-bar-content">
-            <a href="tel:3124080045">(111) 111 1111</a> |  200 W Jackson Blvd, Suite 2025, Chicago, IL 60606  |  <a href="mailto:clientservices@agresource.com">clientservices@trading.com</a>
-            <p>Copyright 2022 AgResource Company</p>           
+            <a href="tel:3124080045">(111) 111 1111</a> |  200 W Jackson Blvd, Suite 2025, Chicago, IL 60606  |  <a href="mailto:clientservices@trading.com">clientservices@trading.com</a>
+            <p>Copyright 2023</p>           
         </div>
     </div>
 </div>

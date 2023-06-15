@@ -17,7 +17,7 @@
                         <div class="col-md-12">
                             @include('layouts.error')
                         </div>
-
+                        
                         <div class="col-12">
                             <div class="mb-1">
                                 <label class="form-label" for="name">Name</label>

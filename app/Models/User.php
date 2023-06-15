@@ -6,11 +6,13 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+
   
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, Billable;
   
@@ -20,18 +22,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
+        'first_name',
+        'last_name',
         'name',
         'email',
         'password',
-        'phone',
-        'date_of_birth',
-        'address',
-        'address_line2',
-        'city',
-        'state',
-        'postal',
-        'gender'
-
+        'mobile_number'
     ];
   
     /**
@@ -52,14 +48,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    public function patient()
+ 
+    public function sendEmailVerificationNotification()
     {
-        return $this->belongsTo(PatientTransaction::class);
-    }
-
-    public function clinics()
-    {
-        return $this->belongsToMany(Clinic::class, 'clinic_doctors');
+        $this->notify(new \App\Notifications\UserVerifyNotification(Auth::user()));  //pass the currently logged in user to the notification class
     }
 }

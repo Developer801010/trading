@@ -47,12 +47,12 @@
             <button class="btn btn-primary w-100" tabindex="4">Sign in</button>
         </form>
 
-        {{-- <p class="text-center mt-2">
+        <p class="text-center mt-2">
             <span>New on our platform?</span>
-            <a href="#">
+            <a href="{{route('register')}}">
                 <span>Create an account</span>
             </a>
-        </p> --}}
+        </p>
 
         <div class="my-2">            
         </div>

@@ -2,8 +2,8 @@
    <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
-            <li class="nav-item me-auto">
-                <a class="navbar-brand" href="{{route('home')}}">
+            <li class="nav-item me-auto" style="margin: 0 auto;">
+                <a class="navbar-brand" href="{{route('admin.home')}}">
                     <img src="{{ asset('assets/image/logo.png') }}" />
                 </a>
             </li>
@@ -18,7 +18,7 @@
                     <span>Dashboard</span>               
                 </li>
                 <li class="nav-item @if(request()->is('home')) active @endif">
-                    <a class="d-flex align-items-center" href="{{ route('home') }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.home') }}">
                         <i data-feather="home"></i>
                         <span class="menu-title text-truncate">Dashboard</span>
                     </a> 

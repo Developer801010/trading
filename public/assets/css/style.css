@@ -29,7 +29,7 @@
 } */
 
 .navbar-brand img{
-    width: 100%;
+    width: 120px;
 }
 
 .main-menu .main-menu-content{
@@ -71,17 +71,29 @@ div.dataTables_wrapper div.dataTables_filter input{
 .home-banner img{
     width: 100%;
 }
+
+#navbarSupportedContent{
+  position: relative;
+}
+
+.login-msg{
+  position: absolute;
+  right: 100px;
+  top: -30px;
+}
+
 /* homepage */
 .btn-out {
     border: 1px solid #627413;
-    color: #0a1d5f;
+    color: white;
+    background: #627413;
     transition: 0.3s;
 }
 
 .btn-out:hover {
     border: 1px solid #627413;
-    background: #627413;
-    color: white;
+    background: white;
+    color: #627413;
 }
 
 .btn-sub {
@@ -101,6 +113,20 @@ div.dataTables_wrapper div.dataTables_filter input{
     text-transform: uppercase;
     font-family: 'JostSemi';
     font-size: 20px;
+    text-decoration: none;
+}
+
+.btn-login{
+  margin-right: 30px;
+  padding: 6px 25px;
+}
+
+.btn-register{
+  padding: 6px 15px;
+}
+
+.home-content{
+  padding: 50px 0;
 }
 
   .navbar {
@@ -112,7 +138,7 @@ div.dataTables_wrapper div.dataTables_filter input{
     padding: 0 10px;
   }
 
-  .navbar .navbar-nav .nav-link {
+  #navbarSupportedContent .nav-link {
     color: #000;
     font-weight: bold;
     font-size:20px;
@@ -120,7 +146,7 @@ div.dataTables_wrapper div.dataTables_filter input{
     text-transform: uppercase;
   }
 
-  .navbar .navbar-nav .nav-link.active{
+  #navbarSupportedContent .nav-link.active{
     color:#627413 !important;
   }
 
@@ -295,9 +321,19 @@ div.dataTables_wrapper div.dataTables_filter input{
     font-family: 'JostSemi';
   }
 
+  .subscription_box .btn_subscribe:hover{
+    background: #627413;
+    color: white;
+  }
+
   .subscription_box .btn_subscribe_popular{
     background: #627413;
     color: white;
+  }
+
+  .subscription_box .btn_subscribe_popular:hover{
+    background: white;
+    color: #627413;
   }
 
   .rule{
@@ -346,7 +382,11 @@ div.dataTables_wrapper div.dataTables_filter input{
 
   #footer .social_icons{
     display: flex;
-    justify-content: space-around;
+    padding-left: 0;
+  }
+
+  .social_icons li {
+    padding-right: 20px;
   }
 
   .footer_subtitle{
@@ -482,7 +522,50 @@ div.dataTables_wrapper div.dataTables_filter input{
   .subscription_price{
     font-size: 50px;
   }
+
+  .dashboard-section {
+    margin-top: 200px;
+  }
+
+  .account-section{
+    padding: 0 10px 50px;
+  }
+
+  .verify-section{
+    margin: 200px 0 50px;
+  }
+
+  .openposition-section{
+    margin: 50px 0;
+  }
+
+  .account-nav ul{
+    list-style: none;
+    display: flex;
+    justify-content: space-evenly;
+    line-height: 24px;
+    background: #617694;
+    padding-left: 0;
+  }
+
+  .account-nav ul li{
+    width: 100%;
+    text-align: center;
+    padding: 15px 20px;
+  }
+
+  .account-nav ul li.active{
+    background: #627413;
+  }
   
+  .account-nav ul li a{
+    color: white;
+    text-decoration: none;
+    font-family: 'JostSemi';
+    font-size: 18px;
+    text-transform: uppercase;
+  }
+
   @media screen and (max-width: 768px) {
     .btn-outline-dark {
       border: none;
@@ -509,11 +592,11 @@ div.dataTables_wrapper div.dataTables_filter input{
     }
 
     .navbar .navbar-nav .nav-link{
-      font-size: 14px;
+      font-size: 16px;
       padding-bottom: 0px;
     }
 
-    .btn_member{
+    .btn_login{
       font-size:14px;
     }
 
@@ -557,6 +640,18 @@ div.dataTables_wrapper div.dataTables_filter input{
 
     #footer ul{
       padding-left: 0;
+    }
+
+    #footer .social_icons{
+      justify-content: center;
+    }
+
+    .btn_member{
+      font-size: 16px;
+    }
+
+    .navbar{
+      padding-bottom: 20px;
     }
   }
   

@@ -17,6 +17,7 @@
 
     
     <link href="{{asset('assets/css/bootstrap.css')}}" rel="stylesheet">
+    
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">
     
 
@@ -31,6 +32,7 @@
     <script src="{{asset('assets/js/bootstrap.js')}}"></script>
     <script src="https://kit.fontawesome.com/8c0eabb613.js" crossorigin="anonymous"></script>
     @yield('page-script')
+
 </body>
 <!-- END: Body-->
 

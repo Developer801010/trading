@@ -27,7 +27,24 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    // protected $redirectTo = RouteServiceProvider::HOME;
+
+    protected function authenticated(Request $request, $user)
+    {
+         // Check if there is an intended URL in the session
+        if ($request->session()->has('url.intended')) {
+            // Redirect to the intended URL
+            return redirect()->intended($this->redirectPath());
+        }else{
+            if($user->hasRole('admin')){
+                return redirect('/home');  //it redirects to the dashboard
+            }
+    
+            return redirect('/account');
+        }
+        
+    }
+
 
     /**
      * Create a new controller instance.

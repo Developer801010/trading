@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Front;
 
-use App\Service\StripeService;
-use Exception;
+use App\Http\Controllers\Controller;
+use App\Models\Plan;
 use Illuminate\Http\Request;
-use Stripe\Stripe;
 
 class FrontController extends Controller
 {
-    /**
+     /**
      * Frontend page
      */
     public function homepage()
     {
-        return view('homepage');
+        return view('front.homepage');
     }
 
     /**
@@ -22,9 +21,8 @@ class FrontController extends Controller
      */
     public function subscription()
     {
-        return view('subscription');
+        return view('front.subscription');
     }
-
 
     
     /**
@@ -32,6 +30,7 @@ class FrontController extends Controller
      */
     public function checkout($subscription_type)
     {
+
         if($subscription_type == 'y'){
             $subscription_type = 'Yearly';
             $price = 787;
@@ -46,7 +45,23 @@ class FrontController extends Controller
             $units = 'mo';
         }
 
-        return view('checkout', compact('subscription_type', 'price', 'units'));
+        //Payment Methods For Subscriptions
+        $intent = auth()->user()->createSetupIntent();
+
+        //plan_id
+        $month_plan = Plan::where('name', 'Monthly')->value('stripe_plan');
+        $quarter_plan = Plan::where('name', 'Quarterly')->value('stripe_plan');
+        $year_plan = Plan::where('name', 'Yearly')->value('stripe_plan');
+
+        return view('front.checkout', 
+            compact('subscription_type', 
+            'price', 
+            'units', 
+            'intent',
+            'month_plan',
+            'quarter_plan',
+            'year_plan',
+        ));
     }
 
     /**
@@ -54,25 +69,7 @@ class FrontController extends Controller
      */
     public function terms_conditions()
     {
-        return view('terms');
+        return view('front.terms');
     }
-
-
-    public function process(Request $request)
-    {
-        $stripeObj = new StripeService();
-
-        $payment_option = $request->input('payment_option');
-        $token =  $request->stripeToken;
-
-        try{
-
-            
-
-        }catch(Exception $e){
-
-        }
-
-        
-    }
+   
 }

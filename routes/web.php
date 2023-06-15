@@ -1,14 +1,16 @@
 <?php
 
-use App\Http\Controllers\FrontController;
+use App\Http\Controllers\Front\FrontController;
+use App\Http\Controllers\Front\PaymentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\Backend\HomeController;
+use App\Http\Controllers\Backend\ProfileController;
+use App\Http\Controllers\Backend\RoleController;
+use App\Http\Controllers\Backend\UserController;
+use App\Http\Controllers\Front\AccountController;
+use App\Http\Controllers\Front\PositionmanagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,32 +21,40 @@ use App\Http\Controllers\UserController;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
-*/
+*/  
 Route::get('/', [FrontController::class, 'homepage'])->name('front.home');
 
 Route::get('/subscription', [FrontController::class, 'subscription'])->name('front.subscription');
-
-Route::get('/checkout/{subscription_type}', [FrontController::class, 'checkout'])->name('front.checkout');
-Route::post('/payment/process', [FrontController::class, 'process'])->name('payment.process');
-
 Route::get('/terms_conditions', [FrontController::class, 'terms_conditions'])->name('front.terms_conditions');
 
+Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
+    Route::get('/checkout/{subscription_type}', [FrontController::class, 'checkout'])->name('front.checkout');
+    Route::post('/payment/process', [PaymentController::class, 'process'])->name('front.payment.process');
+    Route::get('thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
+
+    Route::get('account', [AccountController::class, 'index'])->name('front.account');
+    Route::post('/account/store', [AccountController::class, 'store'])->name('front.account.store');
+
+    Route::group(['middleware' => ['verified']], function() {  //'role:subscriber'
+        Route::get('/open-position', [PositionmanagementController::class, 'openPosition'])->name('front.open-position');
+    });
+});
 
 Route::get('/login', function () {
     return view('auth.login');
 });
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::group(['middleware' => ['auth', 'role:admin'], ['prefix' => 'admin']], function() {
 
-Route::group(['middleware' => ['auth']], function() {
+    Route::get('/home', [HomeController::class, 'index'])->name('admin.home');
 
     Route::resource('roles', RoleController::class);
 
-    Route::resource('users', UserController::class)->middleware('role:admin');
+    Route::resource('users', UserController::class);
 
-    Route::resource('profiles', ProfileController::class)->middleware('role:admin');
+    Route::resource('profiles', ProfileController::class);
 
 });
 
