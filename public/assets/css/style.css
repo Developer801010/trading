@@ -18,6 +18,10 @@
     margin-top: 15px;    
 }
 
+.login-error ul{
+  margin-bottom: 0;
+}
+
 /* #DataTables_Table_0_info, 
 #DataTables_Table_0_length{
     margin-left: 14px;

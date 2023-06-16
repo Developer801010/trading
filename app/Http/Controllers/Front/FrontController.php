@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use Illuminate\Http\Request;
+use Laravel\Cashier\Subscription;
 
 class FrontController extends Controller
 {
@@ -19,9 +20,19 @@ class FrontController extends Controller
     /**
      * Subscription page
      */
-    public function subscription()
+    public function subscription(Request $request)
     {
-        return view('front.subscription');
+        
+        if($request->user()){
+            $activeSubscription = Subscription::where([
+                'user_id'=> auth()->user()->id,
+                'stripe_status' => 'active'
+            ])->get();
+
+            return view('front.subscription', compact('activeSubscription'));
+        }else{
+            return view('front.subscription');
+        }
     }
 
     
@@ -45,6 +56,11 @@ class FrontController extends Controller
             $units = 'mo';
         }
 
+        $activeSubscription = Subscription::where([
+            'user_id'=> auth()->user()->id,
+            'stripe_status' => 'active'
+        ])->get();
+
         //Payment Methods For Subscriptions
         $intent = auth()->user()->createSetupIntent();
 
@@ -61,6 +77,7 @@ class FrontController extends Controller
             'month_plan',
             'quarter_plan',
             'year_plan',
+            'activeSubscription'
         ));
     }
 

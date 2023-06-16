@@ -20,25 +20,25 @@ class PaymentController extends Controller
             $user = auth()->user();
             Stripe::setApiKey(config('services.stripe.secret_key'));
 
-            // $user->createOrGetStripeCustomer();  
+            $user->createOrGetStripeCustomer();  
 
-            // $paymentMethod = null;
-            // $paymentMethod = $request->payment_method;
+            $paymentMethod = null;
+            $paymentMethod = $request->payment_method;
 
-            // if($paymentMethod != null) {
-            //     $paymentMethod = $user->addPaymentMethod($paymentMethod);
-            // }
+            if($paymentMethod != null) {
+                $paymentMethod = $user->addPaymentMethod($paymentMethod);
+            }
 
-            // $plan = $request->stripe_plan_id;
+            $plan = $request->stripe_plan_id;
            
-            // $result = $request->user()->newSubscription('default', $plan)
-            //     ->create($paymentMethod != null ? $paymentMethod->id: '');
+            $result = $request->user()->newSubscription('default', $plan)
+                ->create($paymentMethod != null ? $paymentMethod->id: '');
 
-            // if ($result['stripe_status'] == 'active'){
-            //     // if status is active, add a subscribe role. 
-            //     $role = Role::where('name', 'subscriber')->first(); 
-            //     $user->roles()->attach($role->id);
-            // }
+            if ($result['stripe_status'] == 'active'){
+                // if status is active, add a subscribe role. 
+                $role = Role::where('name', 'subscriber')->first(); 
+                $user->roles()->attach($role->id);
+            }
 
             return redirect()->route('front.thanks')
                 ->with('success','You are subscribed to this plan. You can see real time trade.');
@@ -46,12 +46,20 @@ class PaymentController extends Controller
         }catch(Exception $e){            
             return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);          
         }
-
         
     }
 
     public function thanks()
     {
         return view('front.thanks');    
+    }
+
+    public function cancelSubscription(Request $request)
+    {
+        $subscriptionName = $request->subscriptionName;
+        if($subscriptionName){
+            $user = auth()->user();
+            $user->subscription($subscriptionName)->cancel();
+        }
     }
 }

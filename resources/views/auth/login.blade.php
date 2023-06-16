@@ -8,7 +8,7 @@
 <div class="card mb-0">
     <div class="card-body">
         @include('auth.logo')
-        <h4 class="card-title mb-1 text-center">Welcome to Referral System 👋</h4>
+        <h4 class="card-title mb-1 text-center">Welcome to the System 👋</h4>
         <p class="card-text mb-2">Please sign-in to your account and start the adventure</p>
         <form class="auth-login-form mt-2" action="{{ route('login') }}" method="POST">
             @csrf

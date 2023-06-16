@@ -45,7 +45,14 @@
                             </li>
                         </ul>
                     </div>
-                    <a href="{{ route('front.checkout', 'm') }}" class="btn_subscribe">Subscribe</a>
+                    @auth
+                        @if (count($activeSubscription) > 0)
+                        <a href="#" class="btn_subscribe">Subscribed</a>
+                        @endif
+                    @else
+                        <a href="{{ route('front.checkout', 'm') }}" class="btn_subscribe">Subscribe</a>
+                    @endauth
+                    
                 </div>
 
                 <div class="subscription_box subsscription_box_popular">
@@ -65,7 +72,14 @@
                             </li>
                         </ul>
                     </div>
-                    <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>
+                    @auth
+                        @if (count($activeSubscription) > 0)
+                        <a href="#" class="btn_subscribe btn_subscribe_popular">Subscribed</a>
+                        @endif
+                    @else
+                        <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>
+                    @endauth
+                    
                 </div> 
 
                 <div class="subscription_box">
@@ -84,7 +98,14 @@
                             </li>
                         </ul>
                     </div>
-                    <a href="{{ route('front.checkout', 'q') }}" class="btn_subscribe">Subscribe</a>
+                    @auth
+                        @if (count($activeSubscription) > 0)
+                        <a href="#" class="btn_subscribe">Subscribed</a>
+                        @endif
+                    @else
+                        <a href="{{ route('front.checkout', 'q') }}" class="btn_subscribe">Subscribe</a>
+                    @endauth
+                    
                 </div>           
             </div>
             <p class="short-description text-center">(All memberships renew automatically - cancel anytime)</p>

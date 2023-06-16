@@ -47,7 +47,7 @@
 
                 <input type="hidden" name="period" id="period" value="{{$units}}" />
                 
-                @include('layouts.error');
+                @include('layouts.error')
 
                 <div class="row">
                     <div class="col-md-7">
@@ -87,8 +87,12 @@
                             <input type="checkbox" id="conditions" />
                             <label for="conditions">By clicking Subscribe, you agree to the <a href="#">Terms/Conditions</a> and acknowledge reading the Privacy Policy. Products renew automatically until canceled and the payment method is saved for future purchases and subscription renewal.</label>
                         </div>
+                        @if (count($activeSubscription) > 0)
+                            <a class="btn btn_payment" >You already subscribed.</a>
+                        @else
+                            <button type="submit" id="card-button" class="btn btn_payment" data-secret="{{ $intent->client_secret }}">Pay with Credit/Debit Card</button>
+                        @endif
                         
-                        <button type="submit" id="card-button" class="btn btn_payment" data-secret="{{ $intent->client_secret }}">Pay with Credit/Debit Card</button>
     
                     </div>
                     <div class="col-md-1"></div>
@@ -297,7 +301,7 @@
     var form = document.getElementById('payment-form');
     form.addEventListener('submit', function(event) {
         event.preventDefault();
-
+        
         var paymentOption = $('input[name="payment_option"]:checked').val();
 
         if(paymentOption == 'stripe'){
@@ -326,10 +330,8 @@
         hiddenInput.setAttribute('name', 'payment_method');
         hiddenInput.setAttribute('value', payment_method);
         form.appendChild(hiddenInput);
-
         // Submit the form
         form.submit();
-
     }
 
     function PayPalHandler(){
