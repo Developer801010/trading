@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
         "laravelcollective/html": "^6.4",
+        "paypal/rest-api-sdk-php": "^1.6",
         "spatie/laravel-permission": "^5.10",
         "stripe/stripe-php": "^10.14",
         "twilio/sdk": "^7.4"
@@ -38,7 +39,8 @@
     },    
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "PayPal\\": "vendor/paypal/rest-api-sdk-php/lib/PayPal"
         }
     },
     "scripts": {

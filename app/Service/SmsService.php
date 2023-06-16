@@ -10,9 +10,9 @@ class SmsService{
     private $twilio_number   = '';
 
     public function __construct(){
-        $this->account_sid = env('TWILIO_ACCOUNT_SID');
-        $this->auth_token = env('TWILIO_AUTH_TOKEN');
-        $this->twilio_number = env('TWILIO_PHONE_NUMBER');
+        $this->account_sid = config('services.twilio.account_id');
+        $this->auth_token = env('services.twilio.auth_token');
+        $this->twilio_number = env('services.twilio.phone_number');
     }
 
     public function sendSMS($message, $recipients){

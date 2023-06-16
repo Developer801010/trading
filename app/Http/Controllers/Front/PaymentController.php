@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Stripe\Stripe;
 
+
 class PaymentController extends Controller
 {
     public function process(Request $request)
@@ -18,6 +19,7 @@ class PaymentController extends Controller
 
         try{
             $user = auth()->user();
+
             Stripe::setApiKey(config('services.stripe.secret_key'));
 
             $user->createOrGetStripeCustomer();  
@@ -49,11 +51,17 @@ class PaymentController extends Controller
         
     }
 
+    /**
+     * Goto the thanks page.
+     */
     public function thanks()
     {
         return view('front.thanks');    
     }
 
+    /**
+     * Cancel Stripe subscription
+     */
     public function cancelSubscription(Request $request)
     {
         $subscriptionName = $request->subscriptionName;
@@ -62,4 +70,5 @@ class PaymentController extends Controller
             $user->subscription($subscriptionName)->cancel();
         }
     }
+    
 }
