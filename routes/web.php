@@ -30,7 +30,8 @@ Route::get('/terms_conditions', [FrontController::class, 'terms_conditions'])->n
 Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
     Route::get('/checkout/{subscription_type}', [FrontController::class, 'checkout'])->name('front.checkout');
     Route::post('/payment/process', [PaymentController::class, 'process'])->name('front.payment.process');
-    Route::get('thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
+    Route::get('/thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
+  
 
     Route::get('account', [AccountController::class, 'index'])->name('front.account');
     Route::post('/account/store', [AccountController::class, 'store'])->name('front.account.store');
@@ -58,3 +59,6 @@ Route::group(['middleware' => ['auth', 'role:admin'], ['prefix' => 'admin']], fu
 
 });
 
+Route::get('/plan/create', [PaymentController::class, 'createPlan'])->name('front.createPlan');
+// Route::get('/plan/list', [PaymentController::class, 'listPlan'])->name('front.listPlan');
+// Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement']);

@@ -50,8 +50,8 @@ return [
             'redirect' => env('APP_URL').'/execute-payment',
             'cancel' => env('APP_URL').'/cancel',
             'executeAgreement' => [
-                'success' => '',
-                'failure' => ''
+                'success' => env('APP_URL').'/execute-agreement/true',
+                'failure' => env('APP_URL').'/execute-agreement/false'
             ]
         ]
     ],
