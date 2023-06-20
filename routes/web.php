@@ -60,5 +60,7 @@ Route::group(['middleware' => ['auth', 'role:admin'], ['prefix' => 'admin']], fu
 });
 
 Route::get('/plan/create', [PaymentController::class, 'createPlan'])->name('front.createPlan');
-// Route::get('/plan/list', [PaymentController::class, 'listPlan'])->name('front.listPlan');
+Route::get('/plan/list', [PaymentController::class, 'listPlan'])->name('front.listPlan');
+Route::get('/plan/{id}', [PaymentController::class, 'showPlan'])->name('front.showPlan');
+Route::get('/plan/{id}/activate', [PaymentController::class, 'activatePlan'])->name('front.activatePlan');
 // Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement']);

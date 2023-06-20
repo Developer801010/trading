@@ -8,9 +8,11 @@ use PayPal\Api\Plan;
 use PayPal\Api\ChargeModel;
 use PayPal\Api\Currency;
 use PayPal\Api\MerchantPreferences;
-use ResultPrinter;
+use PayPal\Api\Patch;
+use PayPal\Api\PatchRequest;
+use PayPal\Common\PayPalModel;
 
-class CreatePlan extends Paypal
+class SubscriptionPlan extends Paypal
 {
     public function create()
     {
@@ -31,22 +33,19 @@ class CreatePlan extends Paypal
         $plan->setPaymentDefinitions(array($paymentDefinition));
         $plan->setMerchantPreferences($merchantPreferences);
                
-        $request = clone $plan;
 
         try {
             $output = $plan->create($this->apiContext);
         } catch (Exception $ex) {
-            ResultPrinter::printError("Created Plan", "Plan", null, $request, $ex);
+            $ex->getMessage();
             exit(1);
-        }
-
-        ResultPrinter::printResult("Created Plan", "Plan", $output->getId(), $request, $output);
+        } 
 
         dd($output);
         
     }
 
-    protected function plan()
+    protected function plan(): Plan
     {
         $plan = new Plan();
         $plan->setName('Trade Plan')
@@ -56,20 +55,20 @@ class CreatePlan extends Paypal
         return $plan;
     }
 
-    protected function paymentDefinition()
+    protected function paymentDefinition(): PaymentDefinition
     {
         $paymentDefinition = new PaymentDefinition();
         $paymentDefinition->setName('Regular Payments')
             ->setType('REGULAR')
             ->setFrequency('Month')
             ->setFrequencyInterval("1")
-            ->setCycles("0")
+            ->setCycles("12")
             ->setAmount(new Currency(['value' => '100', 'currency' => 'USD']));
 
         return $paymentDefinition;
     }
 
-    protected function merchantPreferences()
+    protected function merchantPreferences(): MerchantPreferences
     {
         $merchantPreferences = new MerchantPreferences();
         
@@ -83,11 +82,41 @@ class CreatePlan extends Paypal
         return $merchantPreferences;
     }
 
-     // public function listPlan()
-    // {
-    //     $params = array('page_size' => 10);
-    //     $planList = Plan::all($params, $this->apiContext);
+    public function listPlan()
+    {
+        $params = array('page_size' => 10);
+        $planList = Plan::all($params, $this->apiContext);
 
-    //     return $planList;
-    // }
+        return $planList;
+    }
+
+    public function planDetail($id) 
+    {
+        $plan = Plan::get($id, $this->apiContext);
+        return $plan;
+    }
+
+     /**
+     * Activate Plan for PayPal
+     */
+    public function activate($id)
+    {
+        $createdPlan = $this->planDetail($id);
+        $patch = new Patch();
+
+        $value = new PayPalModel('{
+            "state":"ACTIVE"
+            }');
+
+        $patch->setOp('replace')
+            ->setPath('/')
+            ->setValue($value);
+        $patchRequest = new PatchRequest();
+        $patchRequest->addPatch($patch);
+
+        $createdPlan->update($patchRequest, $this->apiContext);
+
+        $plan = Plan::get($createdPlan->getId(), $this->apiContext);
+        return $plan;
+    }
 }

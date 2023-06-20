@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
-use App\Paypal\CreatePlan;
+use App\Paypal\SubscriptionPlan;
 use App\Service\StripeService;
 use Exception;
 use Illuminate\Http\Request;
@@ -72,18 +72,41 @@ class PaymentController extends Controller
         }
     }
     
+    /**
+     * create PayPal Plan
+     */
     public function createPlan()
     {
-        $plan = new createPlan();
+        $plan = new SubscriptionPlan();
         $plan->create();
     }
 
     /**
      * List plan for PayPal
      */
-    // public function listPlan()
-    // {    
-    //     $plan = new CreatePlan();
-    //     return $plan->listPlan();
-    // }
+    public function listPlan()
+    {    
+        $plan = new SubscriptionPlan();
+        return $plan->listPlan();
+    }
+
+    /**
+     * Show plan detail for PayPal
+     */
+    public function showPlan($id) 
+    {
+        $plan = new SubscriptionPlan();
+        return $plan->planDetail($id);
+    }
+
+   
+    /**
+     * Activate the plan for PayPal
+     */
+    public function activatePlan($id)
+    {
+        $plan = new SubscriptionPlan();
+        return $plan->activate($id);
+    }
+    
 }
