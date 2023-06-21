@@ -42,6 +42,30 @@
                     </a> 
                 </li>
 
+                <li class="navigation-header">
+                    <span>Payment management</span>               
+                </li>
+
+                <li class="nav-item">
+                    <a class="d-flex align-items-center" href="#">
+                        <i data-feather="aperture"></i>
+                        <span class="menu-title text-truncate">Payment</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li class="nav-item @if(request()->is('plans*')) active @endif">
+                            <a class="d-flex align-items-center" href="{{ route('plans.index') }}">
+                                <i data-feather="circle"></i>
+                                <span class="menu-item text-truncate">Plan Management</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item @if(request()->is('paypal/plan*')) active @endif">
+                            <a class="d-flex align-items-center" href="{{route('admin.list-plan-paypal')}}">
+                                <i data-feather="circle"></i><span class="menu-item text-truncate">Plan(Paypal)</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             @endcan
 
             @role(['user'])

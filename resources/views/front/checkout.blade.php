@@ -24,10 +24,12 @@
 
     #card-errors{
         color: red;
+        word-break: break-word;
     }
 
     .error{
         color:red;
+        word-break: break-word;
     }
 </style>
 @endsection
@@ -41,7 +43,10 @@
                 <h1 class="text-center checkout-title">{{$subscription_type}} Checkout ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )</h1>
               
                 <input type="hidden" name="stripe_plan_id" id="stripe_plan_id" 
-                value="@if ($units == 'mo') {{$month_plan}} @elseif ($units == 'qu') {{$quarter_plan}}  @elseif($units == 'yr' ) {{$year_plan}} @endif" />
+                value="@if ($units == 'mo') {{$month_plan['stripe_plan']}} @elseif ($units == 'qu') {{$quarter_plan['stripe_plan']}}  @elseif($units == 'yr' ) {{$year_plan['stripe_plan']}} @endif" />
+
+                <input type="hidden" name="paypal_plan_id" id="paypal_plan_id" 
+                value="@if ($units == 'mo') {{$month_plan['paypal_plan']}} @elseif ($units == 'qu') {{$quarter_plan['paypal_plan']}}  @elseif($units == 'yr' ) {{$year_plan['paypal_plan']}} @endif" />
 
                 <input type="hidden" name="price" id="price" value="{{$price}}" />
 
@@ -166,6 +171,7 @@
         }
 
         var paymentOption = $('input[name="payment_option"]:checked').val();
+
         if(paymentOption == 'paypal'){
             stripe_payment.addClass('d-none');
             btn_payment.text('Pay with PayPal');
@@ -185,10 +191,17 @@
         $('.yearly-membership').addClass('membership_active');
     }
 
-    var month_plan = '{{$month_plan}}';
-    var quarter_plan = '{{$quarter_plan}}';
-    var year_plan = '{{$year_plan}}';    
+    var month_plan_stripe = '{{$month_plan['stripe_plan']}}';
+    var month_plan_paypal = '{{$month_plan['paypal_plan']}}';
+
+    var quarter_plan_stripe = '{{$quarter_plan['stripe_plan']}}';
+    var quarter_plan_paypal = '{{$quarter_plan['paypal_plan']}}';
+
+    var year_plan_stripe = '{{$year_plan['stripe_plan']}}';    
+    var year_plan_paypal = '{{$year_plan['paypal_plan']}}';    
+
     var stripe_plan_id = $('#stripe_plan_id');
+    var paypal_plan_id = $('#paypal_plan_id');
 
     memberships.click(function(){
         var membership_type = 'monthly';
@@ -197,17 +210,20 @@
             updateCheckoutAttributes(147, 'mo');
             clearMembershipClass();
             $('.monthly-membership').addClass('membership_active');
-            stripe_plan_id.val(month_plan);
+            stripe_plan_id.val(month_plan_stripe);
+            paypal_plan_id.val(month_plan_paypal);
         }else if ($(this).hasClass('quarterly-membership')){
             updateCheckoutAttributes(387, 'qu');
             clearMembershipClass();
             $('.quarterly-membership').addClass('membership_active');    
-            stripe_plan_id.val(quarter_plan);        
+            stripe_plan_id.val(quarter_plan_stripe);    
+            paypal_plan_id.val(quarter_plan_paypal);    
         }else if ($(this).hasClass('yearly-membership')){
             updateCheckoutAttributes(787, 'yr');
             clearMembershipClass();
             $('.yearly-membership').addClass('membership_active');            
-            stripe_plan_id.val(year_plan);
+            stripe_plan_id.val(year_plan_stripe);
+            paypal_plan_id.val(year_plan_paypal);
         }
 
     })
@@ -294,7 +310,7 @@
                 stripeTokenHandler(setupIntent.payment_method);
             }
         }else{
-
+            PayPalHandler();
         }
     });
     // Handle form submission

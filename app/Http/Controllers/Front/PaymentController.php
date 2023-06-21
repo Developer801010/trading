@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
-use App\Paypal\SubscriptionPlan;
-use App\Service\StripeService;
+use App\Paypal\PaypalAgreement;
 use Exception;
 use Illuminate\Http\Request;
+use PayPal\Exception\PayPalConnectionException;
 use Spatie\Permission\Models\Role;
 use Stripe\Stripe;
 
@@ -15,40 +15,53 @@ class PaymentController extends Controller
 {
     public function process(Request $request)
     {
-        $stripeObj = new StripeService();    
         $payment_option = $request->input('payment_option');
+        $user = auth()->user();
 
-        try{
-            $user = auth()->user();
+        if($payment_option == 'stripe')
+        {
+            try{
+                Stripe::setApiKey(config('services.stripe.secret_key'));
 
-            Stripe::setApiKey(config('services.stripe.secret_key'));
+                $user->createOrGetStripeCustomer();  
 
-            $user->createOrGetStripeCustomer();  
+                $paymentMethod = null;
+                $paymentMethod = $request->payment_method;
 
-            $paymentMethod = null;
-            $paymentMethod = $request->payment_method;
+                if($paymentMethod != null) {
+                    $paymentMethod = $user->addPaymentMethod($paymentMethod);
+                }
 
-            if($paymentMethod != null) {
-                $paymentMethod = $user->addPaymentMethod($paymentMethod);
-            }
-
-            $plan = $request->stripe_plan_id;
-           
-            $result = $request->user()->newSubscription('default', $plan)
-                ->create($paymentMethod != null ? $paymentMethod->id: '');
-
-            if ($result['stripe_status'] == 'active'){
-                // if status is active, add a subscribe role. 
-                $role = Role::where('name', 'subscriber')->first(); 
-                $user->roles()->attach($role->id);
-            }
-
-            return redirect()->route('front.thanks')
-                ->with('success','You are subscribed to this plan. You can see real time trade.');
+                $plan = $request->stripe_plan_id;
             
-        }catch(Exception $e){            
-            return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);          
+                $result = $request->user()->newSubscription('default', $plan)
+                    ->create($paymentMethod != null ? $paymentMethod->id: '');
+
+                if ($result['stripe_status'] == 'active'){
+                    // if status is active, add a subscribe role. 
+                    $role = Role::where('name', 'subscriber')->first(); 
+                    $user->roles()->attach($role->id);
+                }
+
+                return redirect()->route('front.thanks')
+                ->with('success','You are subscribed to this plan. You can see real time trade.');
+
+            }catch(Exception $e){            
+                return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);          
+            }
         }
+        else
+        {
+            try{
+                
+                $agreement = new PaypalAgreement();
+                return $agreement->create($request->paypal_plan_id);
+
+            }catch(PayPalConnectionException $e){            
+                return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);          
+            }
+        }     
+       
         
     }
 
@@ -72,41 +85,30 @@ class PaymentController extends Controller
         }
     }
     
-    /**
-     * create PayPal Plan
-     */
-    public function createPlan()
+    public function createAgreement($id)
     {
-        $plan = new SubscriptionPlan();
-        $plan->create();
+        $agreement = new PaypalAgreement();
+        $agreement->create($id);
     }
 
-    /**
-     * List plan for PayPal
-     */
-    public function listPlan()
-    {    
-        $plan = new SubscriptionPlan();
-        return $plan->listPlan();
-    }
-
-    /**
-     * Show plan detail for PayPal
-     */
-    public function showPlan($id) 
+    public function executeAgreement($status) 
     {
-        $plan = new SubscriptionPlan();
-        return $plan->planDetail($id);
-    }
+        dd(request('token'));
+        if($status = 'true'){
+            $agreement = new PaypalAgreement();
+            $agreement->execute(request('token'));
 
-   
-    /**
-     * Activate the plan for PayPal
-     */
-    public function activatePlan($id)
-    {
-        $plan = new SubscriptionPlan();
-        return $plan->activate($id);
+            $user = auth()->user();
+            // if status is active, add a subscribe role. 
+            $role = Role::where('name', 'subscriber')->first(); 
+            $user->roles()->attach($role->id);
+            
+            return redirect()->route('front.thanks')
+            ->with('success','You are subscribed to this plan. You can see real time trade.');
+
+        }else{
+            return 'fail';
+        }
     }
     
 }

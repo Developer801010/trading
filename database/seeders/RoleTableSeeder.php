@@ -14,7 +14,7 @@ class RoleTableSeeder extends Seeder
     public function run(): void
     {
          //roles
-         $roles = [
+        $roles = [
             'user',
             'subscriber'
         ];

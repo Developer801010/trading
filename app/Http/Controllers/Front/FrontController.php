@@ -29,6 +29,7 @@ class FrontController extends Controller
                 'stripe_status' => 'active'
             ])->get();
 
+
             return view('front.subscription', compact('activeSubscription'));
         }else{
             return view('front.subscription');
@@ -65,9 +66,9 @@ class FrontController extends Controller
         $intent = auth()->user()->createSetupIntent();
 
         //plan_id
-        $month_plan = Plan::where('name', 'Monthly')->value('stripe_plan');
-        $quarter_plan = Plan::where('name', 'Quarterly')->value('stripe_plan');
-        $year_plan = Plan::where('name', 'Yearly')->value('stripe_plan');
+        $month_plan = Plan::where('name', 'Monthly')->first();  
+        $quarter_plan = Plan::where('name', 'Quarterly')->first();
+        $year_plan = Plan::where('name', 'Yearly')->first();
 
         return view('front.checkout', 
             compact('subscription_type', 

@@ -15,9 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('stripe_plan');
-            $table->string('billing_method');
-            $table->string('interval_count');
-            $table->string('currency');
+            $table->string('paypal_plan');
             $table->integer('price');
             $table->timestamps();
         });

@@ -47,7 +47,9 @@
                     </div>
                     @auth
                         @if (count($activeSubscription) > 0)
-                        <a href="#" class="btn_subscribe">Subscribed</a>
+                            <a href="#" class="btn_subscribe">Subscribed</a>
+                        @else
+                            <a href="{{ route('front.checkout', 'm') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>    
                         @endif
                     @else
                         <a href="{{ route('front.checkout', 'm') }}" class="btn_subscribe">Subscribe</a>
@@ -74,7 +76,9 @@
                     </div>
                     @auth
                         @if (count($activeSubscription) > 0)
-                        <a href="#" class="btn_subscribe btn_subscribe_popular">Subscribed</a>
+                            <a href="#" class="btn_subscribe btn_subscribe_popular">Subscribed</a>
+                        @else
+                            <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>    
                         @endif
                     @else
                         <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>
@@ -100,7 +104,9 @@
                     </div>
                     @auth
                         @if (count($activeSubscription) > 0)
-                        <a href="#" class="btn_subscribe">Subscribed</a>
+                            <a href="#" class="btn_subscribe">Subscribed</a>
+                        @else
+                            <a href="{{ route('front.checkout', 'q') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>    
                         @endif
                     @else
                         <a href="{{ route('front.checkout', 'q') }}" class="btn_subscribe">Subscribe</a>

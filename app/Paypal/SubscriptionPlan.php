@@ -14,17 +14,17 @@ use PayPal\Common\PayPalModel;
 
 class SubscriptionPlan extends Paypal
 {
-    public function create()
+    public function create($plan_name, $plan_description, $plan_frequency, $plan_frequency_interval, $plan_price)
     {
         // Set up plan details
-        $plan = $this->plan();
+        $plan = $this->plan($plan_name, $plan_description);
        
         // Set up billing cycles
-        $paymentDefinition = $this->paymentDefinition();    
+        $paymentDefinition = $this->paymentDefinition($plan_frequency, $plan_frequency_interval, $plan_price);    
        
-        $chargeModel = new ChargeModel();
-        $chargeModel->setType('SHIPPING')
-            ->setAmount(new Currency(array('value' => 10, 'currency' => 'USD')));
+        // $chargeModel = new ChargeModel();
+        // $chargeModel->setType('SHIPPING')
+        //     ->setAmount(new Currency(array('value' => 10, 'currency' => 'USD')));
            
         // Set up merchant preferences
         $merchantPreferences = $this->merchantPreferences();
@@ -37,33 +37,30 @@ class SubscriptionPlan extends Paypal
         try {
             $output = $plan->create($this->apiContext);
         } catch (Exception $ex) {
-            $ex->getMessage();
+            dd($ex->getMessage());
             exit(1);
         } 
-
-        dd($output);
-        
     }
 
-    protected function plan(): Plan
+    protected function plan($plan_name, $plan_description): Plan
     {
         $plan = new Plan();
-        $plan->setName('Trade Plan')
-        ->setDescription('Monthly subscription for Trade Plan')
+        $plan->setName($plan_name)
+        ->setDescription($plan_description)
         ->setType('fixed');
 
         return $plan;
     }
 
-    protected function paymentDefinition(): PaymentDefinition
+    protected function paymentDefinition($plan_frequency, $plan_frequency_interval, $plan_price): PaymentDefinition
     {
         $paymentDefinition = new PaymentDefinition();
-        $paymentDefinition->setName('Regular Payments')
+        $paymentDefinition->setName('Recurring Payments')
             ->setType('REGULAR')
-            ->setFrequency('Month')
-            ->setFrequencyInterval("1")
-            ->setCycles("12")
-            ->setAmount(new Currency(['value' => '100', 'currency' => 'USD']));
+            ->setFrequency($plan_frequency)
+            ->setFrequencyInterval($plan_frequency_interval)
+            ->setCycles('998')
+            ->setAmount(new Currency(['value' => $plan_price, 'currency' => 'USD']));
 
         return $paymentDefinition;
     }
@@ -76,15 +73,18 @@ class SubscriptionPlan extends Paypal
             ->setCancelUrl(config('services.paypal.url.executeAgreement.failure'))
             ->setAutoBillAmount("yes")
             ->setInitialFailAmountAction("CONTINUE")
-            ->setMaxFailAttempts("0")
-            ->setSetupFee(new Currency(array('value' => 1, 'currency' => 'USD')));
+            ->setMaxFailAttempts("0");
+            // ->setSetupFee(new Currency(array('value' => 1, 'currency' => 'USD')));
 
         return $merchantPreferences;
     }
 
     public function listPlan()
     {
-        $params = array('page_size' => 10);
+        $params = [
+            'page_size' => 10,
+            'status' => 'ALL'
+        ];
         $planList = Plan::all($params, $this->apiContext);
 
         return $planList;
@@ -117,6 +117,19 @@ class SubscriptionPlan extends Paypal
         $createdPlan->update($patchRequest, $this->apiContext);
 
         $plan = Plan::get($createdPlan->getId(), $this->apiContext);
+
         return $plan;
     }
+
+    /**
+     * Delete Plan
+     */
+
+     public function deletePlan($id)
+     {
+        $createdPlan = $this->planDetail($id);
+        $createdPlan->delete($this->apiContext);
+
+        return $createdPlan;
+     }
 }

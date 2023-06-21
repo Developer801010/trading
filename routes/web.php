@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Backend\HomeController;
+use App\Http\Controllers\Backend\PaymentManagementController;
+use App\Http\Controllers\Backend\PlanManagementController;
 use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\RoleController;
 use App\Http\Controllers\Backend\UserController;
@@ -36,6 +38,9 @@ Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
     Route::get('account', [AccountController::class, 'index'])->name('front.account');
     Route::post('/account/store', [AccountController::class, 'store'])->name('front.account.store');
 
+    // Route::post('/plan/{id}/agreement/create', [PaymentController::class, 'createAgreement'])->name('front.create-agreement-paypal');
+    Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement'])->name('front.execute-agreement-paypal');
+
     Route::group(['middleware' => ['verified']], function() {  //'role:subscriber'
         Route::get('/open-position', [PositionmanagementController::class, 'openPosition'])->name('front.open-position');
     });
@@ -57,10 +62,11 @@ Route::group(['middleware' => ['auth', 'role:admin'], ['prefix' => 'admin']], fu
 
     Route::resource('profiles', ProfileController::class);
 
+    Route::resource('plans', PlanManagementController::class);
+    Route::post('/paypal/plan/create', [PlanManagementController::class, 'createPlanPaypal'])->name('admin.create-plan-paypal');
+    Route::get('/paypal/plan/list', [PlanManagementController::class, 'listPlanPaypal'])->name('admin.list-plan-paypal');
+    Route::get('/paypal/plan/{id}', [PlanManagementController::class, 'showPlanPaypal'])->name('admin.show-plan-paypal');
+    Route::get('/paypal/plan/{id}/activate', [PlanManagementController::class, 'activatePlanPaypal'])->name('admin.activate-plan-paypal');
+    Route::delete('/paypal/plan/{id}/delete', [PlanManagementController::class, 'deletePlanPaypal'])->name('admin.delete-plan-paypal');    
 });
 
-Route::get('/plan/create', [PaymentController::class, 'createPlan'])->name('front.createPlan');
-Route::get('/plan/list', [PaymentController::class, 'listPlan'])->name('front.listPlan');
-Route::get('/plan/{id}', [PaymentController::class, 'showPlan'])->name('front.showPlan');
-Route::get('/plan/{id}/activate', [PaymentController::class, 'activatePlan'])->name('front.activatePlan');
-// Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement']);
