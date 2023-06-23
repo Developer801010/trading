@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Models\Plan;
+use App\Models\User;
 use App\Paypal\PaypalAgreement;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Laravel\Cashier\Subscription;
+use Laravel\Cashier\SubscriptionItem;
 use PayPal\Exception\PayPalConnectionException;
 use Spatie\Permission\Models\Role;
 use Stripe\Stripe;
@@ -53,15 +58,16 @@ class PaymentController extends Controller
         else
         {
             try{
-                
+                $paypal_plan_id = $request->paypal_plan_id;
+                $description = Plan::where('paypal_plan', $paypal_plan_id)->value('name');
+
                 $agreement = new PaypalAgreement();
-                return $agreement->create($request->paypal_plan_id);
+                return $agreement->create($request->paypal_plan_id, $description);
 
             }catch(PayPalConnectionException $e){            
                 return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);          
             }
         }     
-       
         
     }
 
@@ -85,30 +91,68 @@ class PaymentController extends Controller
         }
     }
     
-    public function createAgreement($id)
-    {
-        $agreement = new PaypalAgreement();
-        $agreement->create($id);
-    }
 
     public function executeAgreement($status) 
     {
-        dd(request('token'));
         if($status = 'true'){
             $agreement = new PaypalAgreement();
-            $agreement->execute(request('token'));
+            $executePayment = $agreement->execute(request('token'));
 
-            $user = auth()->user();
-            // if status is active, add a subscribe role. 
-            $role = Role::where('name', 'subscriber')->first(); 
-            $user->roles()->attach($role->id);
-            
-            return redirect()->route('front.thanks')
-            ->with('success','You are subscribed to this plan. You can see real time trade.');
+            $subscriptionId = $executePayment->id;
+            $state = $executePayment->state;            
+            $description = $executePayment->description;
+            $planId = session('planId');
+
+            DB::beginTransaction();
+
+            try{
+                
+                //save PayPal subscription data into the database 
+                $subscription = new Subscription();
+                $subscription->user_id = auth()->user()->id;
+                $subscription->name = $description;
+                $subscription->stripe_id = $subscriptionId;
+                $subscription->stripe_status = $state;
+                $subscription->stripe_price = $planId;   
+                $subscription->quantity = 1;   
+                $subscription->save();
+           
+                //user table update with PayPal status
+                $user = User::find(auth()->user()->id);
+                $user->pm_type = 'paypal';
+                $user->save();
+                
+                $user = auth()->user();
+                // Add a subscribe role. 
+                $role = Role::where('name', 'subscriber')->first(); 
+                $user->roles()->attach($role->id);
+                
+                DB::commit();
+
+                return redirect()->route('front.thanks')
+                ->with('success','You are subscribed to this plan. You can see real time trade.');                     
+
+            }catch(Exception $ex){
+
+                DB::rollBack();
+                return back()->with('error', $ex->getMessage());
+
+            }
+           
 
         }else{
-            return 'fail';
+            return redirect()->route('front.checkout')
+            ->with('error','There is a problem with your payment.');
+
         }
     }
     
+    public function pauseSubscription($id)
+    {
+        $agreement = new PaypalAgreement();
+        $agreement->pauseSubscription($id);
+
+        return redirect()->back()
+        ->with('success','Your subscription was paused.');
+    }
 }

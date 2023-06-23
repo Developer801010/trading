@@ -7,3 +7,10 @@
         </ul>
     </div>
 @endif
+
+@if(Session::has('flash_success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{Session::get('flash_success')}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif

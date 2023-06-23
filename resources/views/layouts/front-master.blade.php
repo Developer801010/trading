@@ -25,9 +25,9 @@
 </head>
 <!-- END: Head-->
 <body>
-    @include('layouts.frontheader')
+    @include('layouts.front-header')
     @yield('content')
-    @include('layouts.frontfooter')
+    @include('layouts.front-footer')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{asset('assets/js/bootstrap.js')}}"></script>
     <script src="https://kit.fontawesome.com/8c0eabb613.js" crossorigin="anonymous"></script>

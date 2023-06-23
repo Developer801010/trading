@@ -7,6 +7,7 @@ $(window).on('load', function() {
   }
 })
 
+
 const delete_form = $('.delete_form');
 delete_form.submit(function(e){
     e.preventDefault();

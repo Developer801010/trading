@@ -1,4 +1,4 @@
-@extends('layouts.frontmaster')
+@extends('layouts.front-master')
 @section('title', 'Homepage')
 
 @section('page-style')

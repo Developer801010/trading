@@ -30,7 +30,7 @@
           @role('admin')
             <a class="btn btn-out fw-bold btn_member btn-register" target="_blank" href={{ route('admin.home') }}>Dashboard</a>
           @else
-            <a class="btn btn-out fw-bold btn_member btn-register" href={{ route('front.account') }}>Dashboard</a>
+            <a class="btn btn-out fw-bold btn_member btn-register" href={{ route('front.account-profile') }}>Dashboard</a>
           @endrole
 
           <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

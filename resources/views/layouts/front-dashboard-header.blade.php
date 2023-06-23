@@ -1,7 +1,7 @@
 <div class="account-nav">
     <ul>
       <li class="@if (request()->is('account*')) active @endif">
-         <a href="{{route('front.account')}}">Account</a>
+         <a href="{{route('front.account-profile')}}">Account</a>
       </li>
       <li class="@if (request()->is('open-position*')) active @endif">
          <a href="{{route('front.open-position')}}">open positions</a>

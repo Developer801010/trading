@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function(Blueprint $table){
             $table->string('mobile_number')->nullable();
+            $table->timestamp('mobile_verified_at')->nullable();
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('mobile_number');
+            $table->timestamp('mobile_verified_at');
         });
     }
 };

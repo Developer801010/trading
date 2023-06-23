@@ -4,24 +4,27 @@ namespace App\Paypal;
 
 use DateInterval;
 use DateTime;
+use Exception;
+use Illuminate\Support\Facades\Session;
 use PayPal\Api\Agreement;
+use PayPal\Api\AgreementStateDescriptor;
 use PayPal\Api\Payer;
 use PayPal\Api\Plan;
 use PayPal\Api\ShippingAddress;
 
 class PaypalAgreement extends Paypal
 {
-    public function create($id) 
+    public function create($id, $description) 
     {
-        return redirect($this->agreement($id));
+        return redirect($this->agreement($id, $description));
     }
 
-    protected function agreement($id)
+    protected function agreement($id, $description)
     {
         $agreement = new Agreement();
 
         $agreement->setName('Subscription Agreement')
-            ->setDescription('Monthly Subscription Agreement')
+            ->setDescription($description.' Subscription Agreement')
             ->setStartDate($this->getPaypalDate())
             ->setPlan($this->plan($id))
             ->setPayer($this->payer());
@@ -30,6 +33,8 @@ class PaypalAgreement extends Paypal
 
         $agreement = $agreement->create($this->apiContext);
 
+        Session::flash('planId', $id);
+
         return $agreement->getApprovalLink();
 
     }
@@ -37,13 +42,17 @@ class PaypalAgreement extends Paypal
     protected function plan($id)
     {
         $plan = new Plan();
-        return $plan->setId($id);
+        $plan->setId($id);
+
+        return $plan;
     }
 
     protected function payer() 
     {
         $payer = new Payer();
-        return $payer->setPaymentMethod('paypal');
+        $payer->setPaymentMethod('paypal');
+
+        return $payer;
     }
 
     protected function shippingAddress()
@@ -61,6 +70,30 @@ class PaypalAgreement extends Paypal
     {
         $agreement = new Agreement();
         $agreement->execute($token, $this->apiContext);
+
+        return $agreement;
+    }
+
+    public function pauseSubscription($subscriptionID)
+    {
+        try {
+            $agreementStateDescriptor = new AgreementStateDescriptor();
+            $agreementStateDescriptor->setNote("Suspending the agreement");
+    
+            $agreement = Agreement::get($subscriptionID, $this->apiContext);
+            $agreement->cancel($agreementStateDescriptor, $this->apiContext);
+    
+            // Retrieve the updated agreement state
+            $updatedAgreement = Agreement::get($subscriptionID, $this->apiContext);
+            $state = $updatedAgreement->getState();
+
+            dd($state);
+            return $state;
+
+        }catch(Exception $ex){
+            echo "Error: " . $ex->getMessage();
+        }
+       
     }
 
     protected function getPaypalDate() {

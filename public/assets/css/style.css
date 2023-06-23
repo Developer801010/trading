@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Barlow-Extra';
-    src: local('JostSemi'), url('../font/Barlow-ExtraBold.woff') format('woff');
+    src: local('Barlow-Extra'), url('../font/Barlow-ExtraBold.woff') format('woff');
 }
 
 @font-face {
@@ -558,7 +558,14 @@ div.dataTables_wrapper div.dataTables_filter input{
     padding: 15px 20px;
   }
 
-  .account-nav ul li.active{
+  .account-nav ul li:hover{
+    cursor: pointer;
+    background: #627413;
+  }
+
+  .account-nav ul li.active,
+  .sidebar-inner ul li.active
+  {
     background: #627413;
   }
   
@@ -568,6 +575,52 @@ div.dataTables_wrapper div.dataTables_filter input{
     font-family: 'JostSemi';
     font-size: 18px;
     text-transform: uppercase;
+  }
+
+  .sidebar-inner{
+    position: relative;
+    display: block;
+    min-height: 100%;
+    background: #F8F8F8;
+    padding: 50px 22px 50px;
+  }
+
+  .sidebar-inner ul{
+    list-style: none;
+    margin: 0 0;
+    padding-left: 0;
+  }
+
+  .sidebar-inner li{
+    position: relative;
+    border-bottom: 3px solid #ffffff;
+    background: #617694;
+  }
+
+  .sidebar-inner ul li:hover{
+    cursor: pointer;
+    background: #627413;
+  }
+
+  .sidebar-inner li a{
+    position: relative;
+    display: block;
+    font-size: 18px;
+    text-transform: uppercase;
+    padding: 9px 20px;
+    line-height: 24px;
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'JostSemi';
+    letter-spacing: 1px;
+  }
+
+  .account-section .heading, lable{
+    font-family: 'JostSemi';
+  }
+
+  .btn_mobile_verification{
+    font-family: 'JostLight';
   }
 
   @media screen and (max-width: 768px) {
