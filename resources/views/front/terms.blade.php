@@ -1,4 +1,4 @@
-@extends('layouts.frontmaster')
+@extends('layouts.front-master')
 @section('title', 'Terms/Conditions')
 
 @section('page-style')
@@ -8,6 +8,7 @@
 
 @section('content')
     <section class="terms_section">
+        <h2>Terms and Section</h2>
     </section>
     
 @endsection

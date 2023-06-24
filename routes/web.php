@@ -37,19 +37,22 @@ Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
 
     Route::get('/account/profile', [AccountController::class, 'index'])->name('front.account-profile');
     Route::post('/account/store', [AccountController::class, 'store'])->name('front.account.store');
-    Route::post('/account/phone-verification', [AccountController::class, 'phoneVerification'])->name('front.account.phone-verification');
+    Route::post('/account/send-verification-code', [AccountController::class, 'sendVerificationCode'])->name('front.account.send-verification-code');
+    Route::post('/account/verify-phone-code', [AccountController::class, 'verifyPhoneCode'])->name('front.account.verify-phone-code');
 
     Route::get('/account/change-password', [AccountController::class, 'changePassword'])->name('front.account-change-password');
     Route::post('/account/change-password/process', [AccountController::class, 'changePasswordProcess'])->name('front.account-change-password-process');
 
-    Route::get('/account/notification', [AccountController::class, 'notification'])->name('front.account-notification');    
+    Route::get('/account/membership', [AccountController::class, 'membership'])->name('front.account-membership');    
 
     Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement'])->name('front.execute-agreement-paypal');
     Route::get('pause-agreement/{id}', [PaymentController::class, 'pauseSubscription'])->name('front.pause-agreement-paypal');
     
 
     Route::group(['middleware' => ['verified']], function() {  //'role:subscriber'
-        Route::get('/open-position', [PositionmanagementController::class, 'openPosition'])->name('front.open-position');
+        Route::get('/dashboard/open-position', [PositionManagementController::class, 'openPosition'])->name('front.open-position');
+        Route::get('/dashboard/closed-position', [PositionManagementController::class, 'closedPosition'])->name('front.closed-position');
+        Route::get('/dashboard/main-feed', [PositionManagementController::class, 'mainFeed'])->name('front.main-feed');
     });
 });
 

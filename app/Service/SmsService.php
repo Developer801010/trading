@@ -11,12 +11,13 @@ class SmsService{
 
     public function __construct(){
         $this->account_sid = config('services.twilio.account_id');
-        $this->auth_token = env('services.twilio.auth_token');
-        $this->twilio_number = env('services.twilio.phone_number');
+        $this->auth_token = config('services.twilio.auth_token');
+        $this->twilio_number = config('services.twilio.phone_number');
     }
 
     public function sendSMS($message, $recipients){
         try{
+
             $client = new Client($this->account_sid, $this->auth_token);
             $client->messages->create(
                 $recipients,

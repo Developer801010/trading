@@ -1,5 +1,5 @@
-@extends('layouts.frontmaster')
-@section('title', 'My Account')
+@extends('layouts.front-master')
+@section('title', 'Open Position')
 
 @section('page-style')
 <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css') }}">
@@ -15,7 +15,7 @@
 @section('content')
     <div class="container">
         <section class="dashboard-section">        
-            @include('layouts.frontdashboardheader')
+            @include('layouts.front-dashboard-header')
     
             @if(Session::has('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -24,8 +24,9 @@
                 </div>
             @endif
         </section>
-        <section class="openposition-section">
+        <section class="open-position-section  position-section">
             <div class="table-responsive">
+                <h1 class="table-title">Open Positions</h1>
                 <table class="list-table table">
                     <thead class="table-light">
                         <tr>

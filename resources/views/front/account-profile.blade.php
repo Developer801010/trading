@@ -4,6 +4,7 @@
 @section('page-style')
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/toastr.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/forms/form-validation.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/extensions/ext-component-sweet-alerts.css') }}">
 @endsection
 
 
@@ -56,17 +57,17 @@
                                     <input type="text" class="form-control phone-number-mask @if($mobileVerifiedStatus !== null) is-valid @else is-invalid @endif"
                                     id="phone" name="phone" value="{{auth()->user()->mobile_number}}">                                    
                                     @if($mobileVerifiedStatus !== null)                                        
-                                        <div class="valid-feedback">Verified.</div>
+                                        <div class="valid-feedback phone_verified_alarm">Verified.</div>
                                     @else
                                         <button class="btn btn-outline-primary waves-effect" id="btn_mobile_verification" type="button">Verify</button>
-                                        <div class="invalid-feedback">It's unverified. You have to verify it to get the notificaiton through the mobile.</div>
+                                        <div class="invalid-feedback phone_verified_alarm">It's unverified. You have to verify it to get the notificaiton through the mobile.</div>
                                     @endif
                                 </div>
                             </div>     
                             @if($mobileVerifiedStatus == null) 
                                 <div class="col-md-6 mb-3">
                                     <label for="phone" class="form-label">Verification Code</label>
-                                    <input type="text" class="form-control" id="phone" name="phone" value="">
+                                    <input type="text" class="form-control" id="phone-verification-code" name="phone-verification-code" value="">
                                 </div>   
                             @endif                                     
                         </div>
@@ -104,6 +105,7 @@
     <script src="{{ asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('app-assets/vendors/js/forms/cleave/cleave.min.js') }}"></script>
     <script src="{{ asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js') }}"></script>
+    <script src="{{ asset('app-assets/vendors/js/extensions/sweetalert2.all.min.js') }}"></script>
     <script>
         var accountForm = $('.accountForm');
         var btn_mobile_verification = $('#btn_mobile_verification')
@@ -150,23 +152,98 @@
 
         btn_mobile_verification.on('click', function(){
             let phone = $('#phone').val();
-            console.log(phone);
+            var countdownSeconds = 60;
+            var countdownInterval;
+
             if(phone === ''){
-                alert('input the phone number');
+                Swal.fire({
+                    title: 'Error!',
+                    text: ' Please insert Phone number!',
+                    icon: 'error',
+                    customClass: {
+                    confirmButton: 'btn btn-primary'
+                    },
+                    buttonsStyling: false
+                });
             }else{
                 $.ajax({
-                    url: "{{ route('front.account.phone-verification') }}",
+                    url: "{{ route('front.account.send-verification-code') }}",
                     type: "POST",                    
                     data: {phone: phone},
                     dataType: "json",
                     success: function (response) {
-                        console.log(response);
-                    },
+                        $(this).prop('disabled', true); // Disable the button on click
+                            countdownInterval = setInterval(function() {
+                            countdownSeconds--;
+                            btn_mobile_verification.text('Countdown: ' + countdownSeconds + 's');
+
+                            if (countdownSeconds <= 0) {
+                                clearInterval(countdownInterval);
+                                btn_mobile_verification.prop('disabled', false); // Enable the button
+                                btn_mobile_verification.text('Verify');
+                                countdownSeconds = 60;
+                            }
+                        }, 1000);
+
+                        Swal.fire({
+                            title: 'Good job!',
+                            text: 'Please check your Phone',
+                            icon: 'success',
+                            customClass: {
+                            confirmButton: 'btn btn-primary'
+                            },
+                            buttonsStyling: false
+                        });
+                    },           
                     error: function(xhr, status, error) {
                         console.log(xhr.responseText);
                     }
                 });
             }
         })
+
+        $('#phone-verification-code').keyup(function (e) { 
+            let phone_code = $(this).val()
+            let codeLength = phone_code.length;
+            if(codeLength >=6 ){
+                console.log(phone_code);
+                $.ajax({
+                    url: "{{ route('front.account.verify-phone-code') }}",
+                    type: "POST",                    
+                    data: {phone_code: phone_code},
+                    dataType: "json",
+                    success: function (response) {
+                        if(response.status == 'success'){
+                            Swal.fire({
+                                title: 'Good job!',
+                                text: 'The phone number is verified',
+                                icon: 'success',
+                                customClass: {
+                                confirmButton: 'btn btn-primary'
+                                },
+                                buttonsStyling: false
+                            });
+
+                            $("#phone").removeClass('is-invalid').addClass('is-valid')
+                            $('.phone_verified_alarm').removeClass('invalid-feedback').addClass('valid-feedback').text('Verified');
+                        }else{
+                            Swal.fire({
+                                title: 'Error!',
+                                text: ' Please insert Phone number!',
+                                icon: 'error',
+                                customClass: {
+                                confirmButton: 'btn btn-primary'
+                                },
+                                buttonsStyling: false
+                            });
+                        }
+                        
+                    },           
+                    error: function(xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            }
+        });
     </script>
 @endsection

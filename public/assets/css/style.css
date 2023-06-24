@@ -181,7 +181,7 @@ div.dataTables_wrapper div.dataTables_filter input{
   }
 
   .footer-logo{
-    width: 250px !important;
+    width: 150px !important;
   }
 
   .subscription-title{
@@ -539,8 +539,14 @@ div.dataTables_wrapper div.dataTables_filter input{
     margin: 200px 0 50px;
   }
 
-  .openposition-section{
-    margin: 50px 0;
+  .position-section{
+    padding: 20px 0 70px;
+  }
+
+  .table-title{
+    padding: 10px 0;
+    font-family: 'JostSemi';
+    text-transform: uppercase;
   }
 
   .account-nav ul{
@@ -649,8 +655,12 @@ div.dataTables_wrapper div.dataTables_filter input{
     }
 
     .navbar .navbar-nav .nav-link{
-      font-size: 16px;
+      font-size: 16px !important;
       padding-bottom: 0px;
+    }
+
+    .short-description{
+      margin-bottom: 10px;
     }
 
     .btn_login{
@@ -708,7 +718,11 @@ div.dataTables_wrapper div.dataTables_filter input{
     }
 
     .navbar{
-      padding-bottom: 20px;
+      padding-bottom: 5px;
+    }
+
+    .navbar-brand img {
+      width: 100px !important;
     }
   }
   

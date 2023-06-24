@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Models\Plan;
 use App\Models\User;
 use App\Service\SmsService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Laravel\Cashier\Subscription;
 
 class AccountController extends Controller
@@ -41,13 +44,49 @@ class AccountController extends Controller
         return redirect()->back()->with('flash_success', 'Account information has been updated');
     }
     
-    public function phoneVerification(Request $request)
+    public function sendVerificationCode(Request $request)
     {
-        $recipients = $request->input('phone');
+        $recipients = trim($request->input('phone'));
 
-        $obj = new SmsService();
-        $message = '456789';
-        return $obj->sendSMS($message, $recipients);
+        $sms_service = new SmsService();
+        $verificationCode = $this->generateVerificationCode();
+         // Store the verification code and its expiration time in the session
+        Session::put('verification_code', $verificationCode);
+        Session::put('verification_code_expires_at', now()->addSeconds(60));
+
+        $msg = 'Your verification code is: ' . $verificationCode;
+        return $sms_service->sendSMS($msg, '+1'.$recipients);
+    }
+
+    public function verifyPhoneCode(Request $request)
+    {
+        $phone_code = $request->input('phone_code');
+        
+        $verificationCode = Session::get('verification_code');
+        $expirationTime = Session::get('verification_code_expires_at');
+
+        $obj = User::findorFail(auth()->user()->id);
+        if ($obj->mobile_verified_at == null){  //if phone isn't verified
+            if (Carbon::now()->greaterThan($expirationTime)) {
+                return response()->json(['msg' => 'Time is expired', 'status' => 'error']);
+            }else{
+                if($phone_code == $verificationCode){
+                    
+                    $obj->mobile_verified_at = Carbon::now();
+                    $obj->save();
+                    return response()->json(['msg' => 'The phone is verified.' , 'status' => 'success']);
+                }
+            }
+        }else{
+
+        }
+       
+    }
+
+    private function generateVerificationCode()
+    {
+        // Generate a random 6-digit verification code
+        return mt_rand(100000, 999999);
     }
 
     public function changePassword()
@@ -81,11 +120,43 @@ class AccountController extends Controller
      * Account notification for email and phone
      */
 
-     public function notification()
+     public function membership()
      {
-        $mobileVerifiedStatus = auth()->user()->mobile_verified_at;
-        $emailVerifiedStatus = auth()->user()->email_verified_at;
-        return view('front.account-notification', 
-            compact('mobileVerifiedStatus', 'emailVerifiedStatus'));
+        $member_date =Subscription::where('user_id', auth()->user()->id)->value('created_at'); 
+        $member_date = Carbon::parse($member_date)->format('F j, Y h:i A');
+        $account_cancel_date = $membership_level = '';
+
+        $payment_type = auth()->user()->pm_type;
+
+        $plan_price = Subscription::where('user_id', auth()->user()->id)
+            ->where('stripe_status', 'active')
+            ->value('stripe_price');  
+
+        if($payment_type == 'paypal'){
+            $membership_level = Plan::where('paypal_plan', $plan_price)->value('name');
+        }else{
+            $membership_level = Plan::where('stripe_plan', $plan_price)->value('name'); 
+        }
+        
+        if($membership_level == 'Monthly'){
+            $account_cancel_date = Carbon::parse($member_date)->addMonth()->format('F j, Y h:i A');
+        }else if($membership_level == 'Quarterly'){
+            $account_cancel_date = Carbon::parse($member_date)->addQuarter()->format('F j, Y h:i A');
+        }else if ($membership_level == 'Yearly'){
+            $account_cancel_date = Carbon::parse($member_date)->addYear()->format('F j, Y h:i A');
+        }
+
+        $member_data = Subscription::where('user_id', auth()->user()->id)
+            ->where('stripe_status', 'active')
+            ->get();  
+
+        return view('front.account-membership', 
+            compact(
+                'member_date',
+                'account_cancel_date',
+                'membership_level'
+                )
+            ); 
+           
      }
 }
