@@ -1,6 +1,9 @@
 <?php
 
 //Generate Random String
+
+use App\Models\Plan;
+
 function generateRandomString($length = 10) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $randomString = '';
@@ -17,3 +20,17 @@ function dateFormat($date,$format)
 }
 
 //
+function getPaymentType($letter)
+{
+    $words = explode(" ", $letter);
+    $wordCount = count($words);
+    $middleIndex = (int) ($wordCount / 2);
+    $middleWord = $words[$middleIndex];
+
+    return $middleWord;
+}
+
+function getPlanPrice($planName)
+{
+    return Plan::where('name', $planName)->value('price');
+}

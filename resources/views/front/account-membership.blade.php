@@ -35,27 +35,32 @@
                             <div class="col-md-12">
                                 <label class="form-label">Membership level:</label> {{ $membership_level }}
                             </div>
+                            <div class="col-md-12">
+                                <a href="#" class="btn_member_cancel">Membership cancel</a>
+                            </div>
                         </div>    
 
                         <div class="table-responsive">
                             <table class="list-table table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th style="width: 5%">Order#</th>                        
-                                        <th style="width: 12.5%">Order Date</th>
-                                        <th style="width: 12.5%">Description</th>
-                                        <th style="width: 12.5%">Amount</th>
-                                        <th style="width: 12.5%">Type</th>
+                                        <th>Order#</th=>                        
+                                        <th>Order Date</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>0</td>
-                                        <td>1</td>
-                                        <td>2</td>
-                                        <td>3</td>
-                                        <td>4</td>
-                                    </tr>
+                                    @foreach ($order_datas as $data)
+                                        <tr>
+                                            <td>{{ $data->id }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($data->created_at)->format('F j, Y') }}</td>
+                                            <td>{{ $data->name }}</td>
+                                            <td>${{ getPlanPrice(getPaymentType( $data->name )) }}</td>
+                                            <td>{{ getPaymentType( $data->name ) }}</td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>    

@@ -24,7 +24,7 @@ class PaypalAgreement extends Paypal
         $agreement = new Agreement();
 
         $agreement->setName('Subscription Agreement')
-            ->setDescription($description.' Subscription Agreement')
+            ->setDescription('TlS '.$description.' Membership')
             ->setStartDate($this->getPaypalDate())
             ->setPlan($this->plan($id))
             ->setPayer($this->payer());

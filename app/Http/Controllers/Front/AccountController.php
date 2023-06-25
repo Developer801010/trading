@@ -138,6 +138,7 @@ class AccountController extends Controller
             $membership_level = Plan::where('stripe_plan', $plan_price)->value('name'); 
         }
         
+        //membership level
         if($membership_level == 'Monthly'){
             $account_cancel_date = Carbon::parse($member_date)->addMonth()->format('F j, Y h:i A');
         }else if($membership_level == 'Quarterly'){
@@ -146,7 +147,8 @@ class AccountController extends Controller
             $account_cancel_date = Carbon::parse($member_date)->addYear()->format('F j, Y h:i A');
         }
 
-        $member_data = Subscription::where('user_id', auth()->user()->id)
+        //member order data
+        $order_datas = Subscription::where('user_id', auth()->user()->id)
             ->where('stripe_status', 'active')
             ->get();  
 
@@ -154,7 +156,8 @@ class AccountController extends Controller
             compact(
                 'member_date',
                 'account_cancel_date',
-                'membership_level'
+                'membership_level',
+                'order_datas'
                 )
             ); 
            
