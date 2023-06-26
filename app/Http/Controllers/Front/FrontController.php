@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeEmail;
 use App\Models\Plan;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Subscription;
 
 class FrontController extends Controller
@@ -88,6 +91,22 @@ class FrontController extends Controller
     public function terms_conditions()
     {
         return view('front.terms');
+    }
+
+    public function emailTest()
+    {
+        $mailData = [
+            'title' => 'Mail from ItSolutionStuff.com',
+            'body' => 'This is for testing email using smtp.'
+        ];
+
+        try{
+            Mail::to('kristoffermorris80@gmail.com')->send(new WelcomeEmail($mailData));
+        }catch(Exception $ex){
+            dd($ex->getMessage());
+        }
+        
+        dd('sent');
     }
    
 }

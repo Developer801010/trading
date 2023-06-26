@@ -25,6 +25,7 @@ use App\Http\Controllers\Front\PositionmanagementController;
 |
 */  
 Route::get('/', [FrontController::class, 'homepage'])->name('front.home');
+Route::get('/email-test', [FrontController::class, 'emailTest'])->name('front.email-test');
 
 Route::get('/subscription', [FrontController::class, 'subscription'])->name('front.subscription');
 Route::get('/terms_conditions', [FrontController::class, 'terms_conditions'])->name('front.terms_conditions');
