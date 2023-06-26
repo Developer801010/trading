@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('stripe_plan');
-            $table->string('paypal_plan');
+            $table->string('stripe_plan')->nullable();
+            $table->string('paypal_plan')->nullable();
             $table->integer('price');
             $table->timestamps();
         });

@@ -17,15 +17,21 @@ class PlanDataSeeder extends Seeder
         $plans = [
             [
                 'name' => 'Monthly',
-                'price' => '147'                
+                'price' => '147',
+                'stripe_plan' => '1',
+                'paypal_plan' => '2'               
             ],
             [
                 'name' => 'Quarterly',
-                'price' => '387'                
+                'price' => '387',                
+                'stripe_plan' => '1',
+                'paypal_plan' => '2'               
             ],
             [
                 'name' => 'Yearly',
-                'price' => '787'                
+                'price' => '787',                
+                'stripe_plan' => '1',
+                'paypal_plan' => '2'               
             ],
             // Add more rows as needed
         ];
