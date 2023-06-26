@@ -134,9 +134,9 @@ class AccountController extends Controller
             ->value('stripe_price');  
 
         if($payment_type == 'paypal'){
-            $membership_level = Plan::where('paypal_plan', $plan_price)->value('name');
+            $membership_level = Plan::where('paypal_plan', $plan_price)->value('price');
         }else{
-            $membership_level = Plan::where('stripe_plan', $plan_price)->value('name'); 
+            $membership_level = Plan::where('stripe_plan', $plan_price)->value('price'); 
         }
         
         //membership level
