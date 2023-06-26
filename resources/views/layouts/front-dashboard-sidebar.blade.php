@@ -6,8 +6,9 @@
         <li class="@if(request()->is('account/change-password*')) active @endif">
             <a href="{{route('front.account-change-password')}}">Change Password</a>
         </li>
+        
         <li class="@if(request()->is('account/membership*')) active @endif">
-            <a href="{{route('front.account-membership')}}">Membership</a>
+            <a href="@role(['subscriber']) {{route('front.account-membership')}} @else {{route('front.subscription')}}  @endrole">Membership</a>
         </li>
     </ul>
 </div>

@@ -66,7 +66,7 @@
                         </li>
                     </ul>
                 </li>
-            @endcan
+            @endrole
 
             @role(['user'])
                 <li class="nav-item @if(request()->is('home')) active @endif">

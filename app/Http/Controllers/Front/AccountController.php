@@ -123,13 +123,14 @@ class AccountController extends Controller
      public function membership()
      {
         $member_date =Subscription::where('user_id', auth()->user()->id)->value('created_at'); 
+        
         $member_date = Carbon::parse($member_date)->format('F j, Y h:i A');
         $account_cancel_date = $membership_level = '';
 
         $payment_type = auth()->user()->pm_type;
 
         $plan_price = Subscription::where('user_id', auth()->user()->id)
-            ->where('stripe_status', 'active')
+            ->where('stripe_status', 'active')  
             ->value('stripe_price');  
 
         if($payment_type == 'paypal'){
