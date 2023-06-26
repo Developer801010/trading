@@ -46,7 +46,7 @@
 </div>
 
  <!-- Modal to add new user starts-->
- <div class="modal fade" id="user-modals" tabindex="-1" aria-hidden="true">
+ {{-- <div class="modal fade" id="user-modals" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-edit-user">
         <div class="modal-content">
             <div class="modal-header bg-transparent">
@@ -146,7 +146,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 
 <!-- Modal to add new user Ends-->

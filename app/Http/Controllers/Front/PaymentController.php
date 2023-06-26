@@ -40,7 +40,7 @@ class PaymentController extends Controller
                 $plan = $request->stripe_plan_id;
                 $membership_level = Plan::where('stripe_plan', $plan)->value('name');
             
-                $result = $request->user()->newSubscription('TlS '.$membership_level. 'Membership', $plan)
+                $result = $request->user()->newSubscription('TlS '.$membership_level. ' Membership', $plan)
                     ->create($paymentMethod != null ? $paymentMethod->id: '');
 
                 if ($result['stripe_status'] == 'active'){
