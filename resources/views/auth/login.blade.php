@@ -8,8 +8,7 @@
 <div class="card mb-0">
     <div class="card-body">
         @include('auth.logo')
-        <h4 class="card-title mb-1 text-center">Welcome to the System 👋</h4>
-        <p class="card-text mb-2">Please sign-in to your account and start the adventure</p>
+        
         <form class="auth-login-form mt-2" action="{{ route('login') }}" method="POST">
             @csrf
             <div class="mb-1">
@@ -37,22 +36,22 @@
                 @include('layouts.error')
             </div>
             
-            <div class="mb-1">
+            {{-- <div class="mb-1">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" 
                     id="remember" name="remember" {{ old('remember') ? 'checked' : '' }} tabindex="3" />                    
                     <label class="form-check-label" for="remember">   {{ __('Remember Me') }} </label>
                 </div>
-            </div>
+            </div> --}}
             <button class="btn btn-primary w-100" tabindex="4">Sign in</button>
         </form>
 
-        <p class="text-center mt-2">
+        {{-- <p class="text-center mt-2">
             <span>New on our platform?</span>
             <a href="{{route('register')}}">
                 <span>Create an account</span>
             </a>
-        </p>
+        </p> --}}
 
         <div class="my-2">            
         </div>

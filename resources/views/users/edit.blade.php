@@ -26,25 +26,40 @@
 
                         <div class="col-md-6 col-12">
                             <div class="mb-1">
-                                <label class="form-label" for="name">Name</label>
+                                <label class="form-label" for="name">First Name</label>
+                                {!! Form::text('first_name', null, array('placeholder' => 'First Name','class' => 'form-control', 'required')) !!}                                
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="email">Last Name</label>
+                                {!! Form::text('last_name', null, array('placeholder' => 'Last Name','class' => 'form-control')) !!}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="name">UserName</label>
                                 {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control', 'required')) !!}                                
                             </div>
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="mb-1">
                                 <label class="form-label" for="email">Email</label>
-                                {!! Form::text('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
+                                {!! Form::email('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
                             </div>
                         </div>
+
                         <div class="col-12 col-md-6 mb-1">
                             <label class="form-label" for="email">phone</label>
-                            {!! Form::text('phone', null, array('placeholder' => 'phone','class' => 'form-control phone-number-mask')) !!}                            
+                            {!! Form::text('mobile_number', null, array('placeholder' => 'Mobile Number','class' => 'form-control phone-number-mask')) !!}                            
                         </div>
     
-                        <div class="col-12 col-md-6 mb-1">
+                        {{-- <div class="col-12 col-md-6 mb-1">
                             <label class="form-label" for="email">Date of Birth</label>
                             {!! Form::text('date_of_birth', null, array('placeholder' => '','class' => 'form-control flatpickr_dates')) !!}    
-                        </div>
+                        </div> --}}
      
                         <div class="col-12 col-md-6 mb-1">
                             <label class="form-label" for="password">Password</label>
@@ -56,7 +71,7 @@
                             {!! Form::password('confirm-password', array('placeholder' => 'Confirm Password','class' => 'form-control')) !!}
                         </div>
     
-                        <div class="col-12 col-md-6 mb-1">
+                        {{-- <div class="col-12 col-md-6 mb-1">
                             <label class="form-label" for="adderss">Address</label>
                             {!! Form::text('address', null, array('placeholder' => 'Address','class' => 'form-control')) !!}    
                         </div>
@@ -95,7 +110,7 @@
                                     <label class="form-check-label" for="inlineRadio2">Female</label>
                                 </div>
                             </div>
-                        </div>                     
+                        </div>                      --}}
                         <div class="col-12 mb-1 mb-md-0">
                             <label class="form-label" for="disabledInput">Roles</label>
                             {!! Form::select('roles[]', $roles, $userRole, array('class' => 'form-control','multiple')) !!}

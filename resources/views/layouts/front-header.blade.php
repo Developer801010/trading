@@ -12,14 +12,20 @@
             <a class="nav-link @if (request()->is('/')) active @endif" href="{{ route('front.home') }}">Home</a>
          </li> 
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="#">How it works & Strategy</a>
+            <a class="nav-link" aria-current="page" href="#">News</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link @if (request()->is('subscription*')) active @endif" href="{{route('front.subscription')}}">Start Trading</a>
-          </li>          
-          <li class="nav-item">
-            <a class="nav-link">Contact</a>
+            <a class="nav-link" aria-current="page" href="#">Learn</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="#">Results</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="#">Trading Strategy</a>
+          </li>
+          {{-- <li class="nav-item">
+            <a class="nav-link @if (request()->is('subscription*')) active @endif" href="{{route('front.subscription')}}"></a>
+          </li>           --}}
         </ul>
         @auth
           <p class="login-msg">Welcome <b>{{auth()->user()->name}}</b></p>
@@ -38,8 +44,8 @@
           </form>
           
         @else
-          <a class="btn btn-sub fw-bold btn_member btn-login" href={{ route('login') }}>Login</a>
-          <a class="btn btn-out fw-bold btn_member btn-register" href={{ route('register') }}>Register</a>
+          <a class="btn btn-sub fw-bold btn_member btn-login" href={{ route('login') }}>Member Login</a>
+          <a class="btn btn-danger fw-bold btn_member" href={{ route('front.subscription') }}>Start Trading</a>
         @endauth
         
       </div>

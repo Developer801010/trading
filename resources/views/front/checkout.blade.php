@@ -40,7 +40,7 @@
         <form method="post" action="{{ route('front.payment.process') }}" id="payment-form">
             @csrf
             <section class="checkout-section">
-                <h1 class="text-center checkout-title">{{$subscription_type}} Checkout ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )</h1>
+                <h1 class="text-center checkout-title"><span class="subscription_type_title">{{$subscription_type}}</span> Checkout ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )</h1>
               
                 <input type="hidden" name="stripe_plan_id" id="stripe_plan_id" 
                 value="@if ($units == 'mo') {{$month_plan['stripe_plan']}} @elseif ($units == 'qu') {{$quarter_plan['stripe_plan']}}  @elseif($units == 'yr' ) {{$year_plan['stripe_plan']}} @endif" />
@@ -55,81 +55,141 @@
                 @include('layouts.error')
 
                 <div class="row">
-                    <div class="col-md-7">
-                        <h4 class="checkout-subtitle">Easy checkout with Stripe or PayPal. All major credit cards accepted.</h4>
-                        <div class="payment-options">
-                            <div class="stripe-option payment-option payment_active">
-                                <div class="payment_radio">
-                                    <input type="radio" name="payment_option" id="stripe" value="stripe" checked>
-                                    <label for="stripe">Credit / Debit Cards(Stripe)</label>
+                    <div class="col-md-8">
+                        <div class="account-box white-box">
+                            <h4 class="checkout-subtitle">Creae an account</h4>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="email">First Name</label>
+                                    <input type="text" name="first_name" id="first_name" class="form-control" placeholder="First Name" aria-label="" />
                                 </div>
-                                <img class="payment-image stripe-image" src="{{asset('assets/image/stripe.png')}}" />
-                            </div>
-    
-                            <div class="paypal-option payment-option">
-                                <div class="payment_radio">
-                                    <input type="radio" name="payment_option" id="paypal" value="paypal">
-                                    <label for="paypal">PayPal</label>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="email">Last Name</label>
+                                    <input type="text" name="last_name" id="last_name" class="form-control" placeholder="Last Name" aria-label="" />
                                 </div>
-                                <img class="payment-image paypal-image" src="{{asset('assets/image/paypal.png')}}" />                            
-                            </div>
-                        </div>
-                        <div class="stripe_payment">
-                            <div id="card-element"></div>
 
-                            <div id="card-errors" role="alert"></div>
-                            <img src="{{asset('assets/image/powered_stripe.png')}}" class="img_stripe" />
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="email">Email</label>
+                                    <input type="email" name="email" id="email" class="form-control" placeholder="Email Address" aria-label="john.doe" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="mobile_number">Mobile number</label>
+                                    <input type="text" name="mobile_number" id="mobile_number" class="form-control mobile-number-mask" placeholder="Mobile Number" />
+                                </div>     
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="password">Password</label>
+                                    <div class="input-group input-group-merge form-password-toggle">
+                                        <input type="password" name="password" id="password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="confirm-password">Confirm Password</label>
+                                    <div class="input-group input-group-merge form-password-toggle">
+                                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                                    </div>
+                                </div>               
+                            </div>
                         </div>
-                       
+                        <div class="checkout-box white-box">
+                            <h4 class="checkout-subtitle">Easy checkout with Stripe or PayPal. All major credit cards accepted.</h4>
+                            <div class="payment-options">
+                                <div class="stripe-option payment-option payment_active">
+                                    <div class="payment_radio">
+                                        <input type="radio" name="payment_option" id="stripe" value="stripe" checked>
+                                        <label for="stripe">Credit / Debit Cards(Stripe)</label>
+                                    </div>
+                                    <img class="payment-image stripe-image" src="{{asset('assets/image/stripe.png')}}" />
+                                </div>
+        
+                                <div class="paypal-option payment-option">
+                                    <div class="payment_radio">
+                                        <input type="radio" name="payment_option" id="paypal" value="paypal">
+                                        <label for="paypal">PayPal</label>
+                                    </div>
+                                    <img class="payment-image paypal-image" src="{{asset('assets/image/paypal.png')}}" />                            
+                                </div>
+                            </div>
+                            <div class="stripe_payment">
+                                <div id="card-element"></div>
+
+                                <div id="card-errors" role="alert"></div>                               
+                            </div>
+                            {{-- <button type="submit" id="card-button" class="btn btn_payment" data-secret="{{ $intent->client_secret }}">Pay with Credit/Debit Card</button> --}}
+                            <button type="submit" id="card-button" class="btn btn_payment">Pay with Credit/Debit Card</button>
+                            <div class="img_payment_section">
+                                <img src="{{asset('assets/image/cards-stripe.png')}}" class="img_stripe img_payment" />
+                                <img src="{{asset('assets/image/cards-paypal.png')}}" class="img_paypal img_payment d-none" />
+                            </div>
+        
+                            <div class="terms rule">
+                                <input type="checkbox" id="terms" />
+                                <label for="terms">I understand TradeInSync uses a swing trading strategy, and that results typically require three months or more due to the length of time positions are held. I also understand that the rate of alerts will fluctuate based on market conditions, where TradeinSync will always focus on quality, as opposed to quantity, of alerts.
+                                </label>
+                            </div>
     
-                        <div class="terms rule">
-                            <input type="checkbox" id="terms" />
-                            <label for="terms">I understand TradeInSync uses a swing trading strategy, and that results typically require three months or more due to the length of time positions are held. I also understand that the rate of alerts will fluctuate based on market conditions, where TradeinSync will always focus on quality, as opposed to quantity, of alerts.
-                            </label>
+                            <div class="conditions rule">
+                                <input type="checkbox" id="conditions" />
+                                <label for="conditions">By joining, I agree to these <a href="#">Terms/Conditions</a></label>
+                            </div>
                         </div>
-    
-                        <div class="conditions rule">
-                            <input type="checkbox" id="conditions" />
-                            <label for="conditions">By clicking Subscribe, you agree to the <a href="#">Terms/Conditions</a> and acknowledge reading the Privacy Policy. Products renew automatically until canceled and the payment method is saved for future purchases and subscription renewal.</label>
-                        </div>
-                        @if (count($activeSubscription) > 0)
-                            <a class="btn btn_payment" >You already subscribed.</a>
-                        @else
-                            <button type="submit" id="card-button" class="btn btn_payment" data-secret="{{ $intent->client_secret }}">Pay with Credit/Debit Card</button>
-                        @endif
                         
     
                     </div>
-                    <div class="col-md-1"></div>
                     <div class="col-md-4">
-                        <div class="memberships monthly-membership">
-                            <div class="membership_radio">
-                                <i class="fa-regular fa-circle-question"></i>
-                                <input type="radio" name="membership" id="month" value="month">
-                                <label for="month">$147.00 Monthly Membership</label>
+                        <div class="monthly-member-section member-section">
+                            <div class="memberships monthly-membership">
+                                <div class="membership_radio">
+                                    <img class="info-icon active-icon" src="{{asset('assets/image/infoicon-blue.svg')}}" />
+                                    <img class="info-icon inactive-icon" src="{{asset('assets/image/infoicon-grey.svg')}}" />
+                                    <input type="radio" name="membership" id="month" value="month">
+                                    <label for="month">$147.00 Monthly Membership</label>
+                                </div>                           
                             </div>
-                            <img src="{{ asset('assets/image/paypal.png') }}" class="membership_save_img" />
+                            @component('components.tooltip')
+                                
+                            @endcomponent
                         </div>
-                        <div class="memberships quarterly-membership">
-                            <div class="membership_radio">
-                                <i class="fa-regular fa-circle-question"></i>
-                                <input type="radio" name="membership" id="quartely" value="quartely">
-                                <label for="quartely">$387.00 Quarterly Membership</label>
+                        <div class="quarterly-member-section member-section">
+                            <div class="memberships quarterly-membership">
+                                <div class="membership_radio">
+                                    <img class="info-icon active-icon" src="{{asset('assets/image/infoicon-blue.svg')}}" />
+                                    <img class="info-icon inactive-icon" src="{{asset('assets/image/infoicon-grey.svg')}}" />
+                                    <input type="radio" name="membership" id="quartely" value="quartely">
+                                    <label for="quartely">$387.00 Quarterly Membership</label>
+                                </div>
+                                <div class="save_price_img">
+                                    <span class="save-price">Save <br> <strong>$366</strong></span>
+                                    <img src="{{ asset('assets/image/offer-icon1-01.svg') }}" class="membership_save_img"  />
+                                </div>
                             </div>
-                            <img src="{{ asset('assets/image/paypal.png') }}" class="membership_save_img"  />
+                            @component('components.tooltip')
+                                
+                            @endcomponent
                         </div>
-                        <div class="memberships yearly-membership">
-                            <div class="membership_radio flex-wrap membership_most_popular">
-                                <i class="fa-regular fa-circle-question"></i>
-                                <span class="text-uppercase">most popular</span>
-                                <input type="radio" name="membership" id="yearly" value="yearly">
-                                <label for="yearly">$787.00 Annual Membership</label>
+                        <div class="yearly-member-section member-section">
+                            <div class="yearly-member-section member-section">
+                                <div class="memberships yearly-membership">
+                                    <div class="membership_radio flex-wrap membership_most_popular">
+                                        <img class="info-icon active-icon" src="{{asset('assets/image/infoicon-blue.svg')}}" />
+                                        <img class="info-icon inactive-icon" src="{{asset('assets/image/infoicon-grey.svg')}}" />
+                                        <span class="text-uppercase">most popular</span>
+                                        <input type="radio" name="membership" id="yearly" value="yearly">
+                                        <label for="yearly" class="yearly-text">$787.00 Annual Membership</label>
+                                    </div>
+                                    <div class="save_price_img">
+                                        <span class="save-price  text-white">Save <br> <strong>$977</strong></span>
+                                        <img src="{{ asset('assets/image/offer-icon2-01.svg') }}" class="membership_save_img"  />
+                                    </div>
+                                </div>
+                            <div class="text-center secureimg-section">
+                                <img src="{{ asset('assets/image/secure-checkout.png') }}" />
+                                <p class="protected-text">Protected by</p>
+                                <img src="{{ asset('assets/image/card.png') }}" class="card-img" />
                             </div>
-                            <img src="{{ asset('assets/image/paypal.png') }}" class="membership_save_img"  />
-                        </div>
-                        <div class="text-center">
-                            <img src="{{ asset('assets/image/secure-checkout.png') }}" />
-                            <img src="{{ asset('assets/image/protected-by.png') }}" />
+                            @component('components.tooltip')
+                                
+                            @endcomponent
                         </div>
                     </div>
                 </div>
@@ -149,8 +209,62 @@
     var payment_option = $('.payment-option');
     var stripe_option = $('#stripe');
     var paypal_option = $('#paypal');
+    var img_stripe = $('.img_stripe');
+    var img_paypal = $('.img_paypal');
     var btn_payment = $('.btn_payment');
     var memberships = $('.memberships');
+    var member_section = $('.member-section');
+    var monthly_membership = $('.monthly-membership');
+    var quarterly_membership = $('.quarterly-membership');
+    var yearly_membership = $('.yearly-membership');
+
+    member_section.hover(function () {
+            $(this).find('.tooltip-text').removeClass('invisible');
+        }, function () {
+            $(this).find('.tooltip-text').addClass('invisible');
+        }
+    );
+
+    $(document).ready(function () {
+        var subscription_type_title = $('.subscription_type_title').text().toLowerCase();
+        if(subscription_type_title == 'monthly'){
+            activeMonthlyIcon();
+        }else if(subscription_type_title == 'quarterly'){
+            activeQuareterlyIcon();
+        }else if(subscription_type_title == 'yearly'){
+            activeYearlyIcon();
+        }
+    });
+
+    function activeYearlyIcon()
+    {
+        monthly_membership.find('.active-icon').addClass('d-none');
+        monthly_membership.find('.inactive-icon').removeClass('d-none');
+        quarterly_membership.find('.active-icon').addClass('d-none');
+        quarterly_membership.find('.inactive-icon').removeClass('d-none');
+        yearly_membership.find('.active-icon').removeClass('d-none');
+        yearly_membership.find('.inactive-icon').addClass('d-none');
+    }
+
+    function activeMonthlyIcon()
+    {
+        monthly_membership.find('.active-icon').removeClass('d-none');
+        monthly_membership.find('.inactive-icon').addClass('d-none');
+        quarterly_membership.find('.active-icon').addClass('d-none');
+        quarterly_membership.find('.inactive-icon').removeClass('d-none');
+        yearly_membership.find('.active-icon').addClass('d-none');
+        yearly_membership.find('.inactive-icon').removeClass('d-none');
+    }
+
+    function activeQuareterlyIcon()
+    {
+        monthly_membership.find('.active-icon').addClass('d-none');
+        monthly_membership.find('.inactive-icon').removeClass('d-none');
+        quarterly_membership.find('.active-icon').removeClass('d-none');
+        quarterly_membership.find('.inactive-icon').addClass('d-none');
+        yearly_membership.find('.active-icon').addClass('d-none');
+        yearly_membership.find('.inactive-icon').removeClass('d-none');
+    }
 
     payment_option.click(function(){
         if (!$(this).hasClass('payment_active')){
@@ -164,9 +278,13 @@
             if($(this).hasClass('stripe-option')){
                 stripe_option.prop('checked', true);
                 paypal_option.prop('checked', false);
+                img_stripe.removeClass('d-none');
+                img_paypal.addClass('d-none');
             }else{
                 stripe_option.prop('checked', false);
                 paypal_option.prop('checked', true);
+                img_stripe.addClass('d-none');
+                img_paypal.removeClass('d-none');
             }            
         }
 
@@ -203,33 +321,43 @@
     var stripe_plan_id = $('#stripe_plan_id');
     var paypal_plan_id = $('#paypal_plan_id');
 
+    //if right side bar is clicking... 
     memberships.click(function(){
         var membership_type = 'monthly';
 
-        if ($(this).hasClass('monthly-membership')){
-            updateCheckoutAttributes(147, 'mo');
+        if ($(this).hasClass('monthly-membership'))
+        {
+            updateCheckoutAttributes('monthly', 147, 'mo');
             clearMembershipClass();
             $('.monthly-membership').addClass('membership_active');
             stripe_plan_id.val(month_plan_stripe);
             paypal_plan_id.val(month_plan_paypal);
-        }else if ($(this).hasClass('quarterly-membership')){
-            updateCheckoutAttributes(387, 'qu');
+            activeMonthlyIcon();
+        }
+        else if ($(this).hasClass('quarterly-membership'))
+        {
+            updateCheckoutAttributes('quarterly', 387, 'qu');
             clearMembershipClass();
             $('.quarterly-membership').addClass('membership_active');    
             stripe_plan_id.val(quarter_plan_stripe);    
             paypal_plan_id.val(quarter_plan_paypal);    
-        }else if ($(this).hasClass('yearly-membership')){
-            updateCheckoutAttributes(787, 'yr');
+            activeQuareterlyIcon();
+        }
+        else if ($(this).hasClass('yearly-membership'))
+        {
+            updateCheckoutAttributes('yearly',787, 'yr');
             clearMembershipClass();
             $('.yearly-membership').addClass('membership_active');            
             stripe_plan_id.val(year_plan_stripe);
             paypal_plan_id.val(year_plan_paypal);
+            activeYearlyIcon();
         }
 
     })
 
-    function updateCheckoutAttributes(price, period){
+    function updateCheckoutAttributes(title, price, period){
         //for the title
+        $('.subscription_type_title').text(title);
         $('.price').text(price);
         $('.period').text(period);
         //input type's value

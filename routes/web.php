@@ -29,13 +29,12 @@ Route::get('/email-test', [FrontController::class, 'emailTest'])->name('front.em
 
 Route::get('/subscription', [FrontController::class, 'subscription'])->name('front.subscription');
 Route::get('/terms_conditions', [FrontController::class, 'terms_conditions'])->name('front.terms_conditions');
-
-Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
-    Route::get('/checkout/{subscription_type}', [FrontController::class, 'checkout'])->name('front.checkout');
-    Route::post('/payment/process', [PaymentController::class, 'process'])->name('front.payment.process');
-    Route::get('/thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
+Route::get('/checkout/{subscription_type}', [FrontController::class, 'checkout'])->name('front.checkout');
+Route::post('/payment/process', [PaymentController::class, 'process'])->name('front.payment.process');
+Route::get('/thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
   
 
+Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
     Route::get('/account/profile', [AccountController::class, 'index'])->name('front.account-profile');
     Route::post('/account/store', [AccountController::class, 'store'])->name('front.account.store');
     Route::post('/account/send-verification-code', [AccountController::class, 'sendVerificationCode'])->name('front.account.send-verification-code');

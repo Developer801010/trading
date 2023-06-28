@@ -60,13 +60,13 @@ class FrontController extends Controller
             $units = 'mo';
         }
 
-        $activeSubscription = Subscription::where([
-            'user_id'=> auth()->user()->id,
-            'stripe_status' => 'active'
-        ])->get();
+        // $activeSubscription = Subscription::where([
+        //     'user_id'=> auth()->user()->id,
+        //     'stripe_status' => 'active'
+        // ])->get();
 
         //Payment Methods For Subscriptions
-        $intent = auth()->user()->createSetupIntent();
+        // $intent = auth()->user()->createSetupIntent();
 
         //plan_id
         $month_plan = Plan::where('name', 'Monthly')->first();  
@@ -77,11 +77,10 @@ class FrontController extends Controller
             compact('subscription_type', 
             'price', 
             'units', 
-            'intent',
+            // 'intent',
             'month_plan',
             'quarter_plan',
             'year_plan',
-            'activeSubscription'
         ));
     }
 
