@@ -1,5 +1,5 @@
 @extends('layouts.front-master')
-@section('title', 'Open Position')
+@section('title', 'Open Options Trades')
 
 @section('page-style')
 <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css') }}">
@@ -15,7 +15,6 @@
 @section('content')
     <div class="container">
         <section class="dashboard-section">        
-            @include('layouts.front-dashboard-header')
     
             @if(Session::has('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -26,23 +25,23 @@
         </section>
         <section class="open-position-section  position-section">
             <div class="table-responsive">
-                <h1 class="table-title">Closed Positions</h1>
+                <h1 class="table-title">Open Options Trades</h1>
                 <table class="list-table table">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 5%">Symbol</th>                        
-                            <th style="width: 12.5%">Long/Short</th>
+                            <th style="width: 5%">No</th>                        
+                            <th style="width: 12.5%">Symbol</th>
                             <th style="width: 12.5%">Entry Date</th>
+                            <th style="width: 12.5%">BUY/SELL</th>
+                            <th style="width: 12.5%">Option</th>
+                            <th style="width: 12.5%">Position Size</th>
                             <th style="width: 12.5%">Entry Price</th>
-                            <th style="width: 12.5%">Exit Date</th>
-                            <th style="width: 12.5%">Exit Price</th>
-                            <th style="width: 12.5%">Portfolio(%)</th>
-                            <th style="width: 12.5%">Profit(%)</th>
+                            <th style="width: 20%">Stop Price</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>0</td>
+                            <td></td>
                             <td>1</td>
                             <td>2</td>
                             <td>3</td>

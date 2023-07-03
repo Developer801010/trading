@@ -5,8 +5,10 @@
     <div class="card-body">
         @include('auth.logo')
 
-        {{-- <h4 class="card-title mb-1">Reset Password 🔒</h4> --}}
-        <p class="card-text mb-2">Please enter your email address* to reset your password.</p>
+        <h4 class="card-title mb-1">Choose New Password🔒</h4>
+        <p class="card-text mb-2">
+            Your new password must be 8 or more characters, at least 1 upper and lowercase letter, 1 number and 1 special character ($#@!%?*-+).\
+        </p>
 
         <form class="auth-reset-password-form mt-2" action="{{ route('password.update') }}" method="POST">
             @csrf

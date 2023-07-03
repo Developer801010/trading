@@ -7,18 +7,28 @@ use Illuminate\Http\Request;
 
 class PositionManagementController extends Controller
 {
-    public function openPosition()
-    {
-        return view('front.open-position');
-    }
-
-    public function closedPosition()
-    {
-        return view('front.closed-position');
-    }
-
     public function mainFeed()
     {
-        return view('front.main-feed');
+        return view('front.trades.main-feed');
+    }
+    
+    public function openStockTrades()
+    {
+        return view('front.trades.open-stock-trades');
+    }
+
+    public function closedStockTrades()
+    {
+        return view('front.trades.closed-stock-trades');
+    }
+
+    public function openOptionsTrades()
+    {
+        return view('front.trades.open-options-trades');
+    }
+
+    public function closedOptionsTrades()
+    {
+        return view('front.trades.closed-options-trades');
     }
 }

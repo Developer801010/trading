@@ -1,5 +1,5 @@
 @extends('layouts.front-master')
-@section('title', 'Open Position')
+@section('title', 'Open Stock Trades')
 
 @section('page-style')
 <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css') }}">
@@ -15,7 +15,6 @@
 @section('content')
     <div class="container">
         <section class="dashboard-section">        
-            @include('layouts.front-dashboard-header')
     
             @if(Session::has('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -26,18 +25,20 @@
         </section>
         <section class="open-position-section  position-section">
             <div class="table-responsive">
-                <h1 class="table-title">Open Positions</h1>
+                <h1 class="table-title">Open Stock Trades</h1>
                 <table class="list-table table">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 5%">No</th>                        
-                            <th style="width: 12.5%">Symbol</th>
-                            <th style="width: 12.5%">Buy/Short</th>
-                            <th style="width: 12.5%">Entry Date</th>
-                            <th style="width: 12.5%">Averge Price</th>
-                            <th style="width: 12.5%">Stop</th>
-                            <th style="width: 12.5%">Target</th>
-                            <th style="width: 20%">Recommend % of Portfolio</th>
+                            <th>No</th>                        
+                            <th>Long/Short</th>
+                            <th>BUY/SELL</th>
+                            <th>Entry Date</th>
+                            <th>Entry Price</th>
+                            <th>Buy Position Size</th>
+                            <th>Total Position in Stock</th>
+                            <th>Average Price</th5%>
+                            <th>Stop Price</th>
+                            <th>Projected Target Price</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,6 +50,8 @@
                             <td>4</td>
                             <td>5</td>
                             <td>6</td>
+                            <td>7</td>
+                            <td>7</td>
                             <td>7</td>
                         </tr>
                     </tbody>

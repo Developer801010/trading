@@ -26,7 +26,7 @@ class VerificationController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/account/profile';
+    protected $redirectTo = '/dashboard/main-feed';
 
 
     /**
@@ -46,7 +46,7 @@ class VerificationController extends Controller
         if (auth()->user()->role === 'admin') {
             return '/home';
         } else {
-            return '/account/profile';
+            return '/dashboard/main-feed';
         }
     }
 }

@@ -1,5 +1,5 @@
 @extends('layouts.front-master')
-@section('title', 'My Account')
+@section('title', 'Notification Setup')
 
 @section('page-style')
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/toastr.min.css') }}">
@@ -11,7 +11,6 @@
 @section('content')
     <div class="container">
         <section class="dashboard-section">        
-            @include('layouts.front-dashboard-header')
     
             @include('layouts.front-email-verify')
         </section>

@@ -93,9 +93,7 @@
                             <label for="conditions">By clicking Subscribe, you agree to the <a href="#">Terms/Conditions</a> and acknowledge reading the Privacy Policy. Products renew automatically until canceled and the payment method is saved for future purchases and subscription renewal.</label>
                         </div>
 
-                        {{-- <button type="submit" id="card-button" class="btn btn_payment" data-secret="{{ $intent->client_secret }}">Pay with Credit/Debit Card</button> --}}
-                        <button type="submit" id="card-button" class="btn btn_payment">Pay with Credit/Debit Card</button>
-                        
+                        <button type="submit" id="card-button" class="btn btn_payment" data-secret="{{ $intent->client_secret }}">Pay with Credit/Debit Card</button>
     
                     </div>
                     <div class="col-md-1"></div>

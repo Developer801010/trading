@@ -6,8 +6,8 @@
     <div class="card-body">
         @include('auth.logo')
 
-        <h4 class="card-title mb-1">Forgot Password? 🔒</h4>
-        <p class="card-text mb-2">Enter your email and we'll send you instructions to reset your password</p>
+        {{-- <h4 class="card-title mb-1">Forgot Password? 🔒</h4> --}}
+        <p class="card-text mb-2">Please enter your email address* to reset your password</p>
 
         @if (session('status'))
             <div class="alert alert-success" role="alert">
@@ -29,6 +29,9 @@
 
         <p class="text-center mt-2">
             <a href="{{ route('login')}}"> <i data-feather="chevron-left"></i> Back to login </a>
+        </p>
+        <p class="card-text mb-2 text-danger">
+            * Must be associated with an active subscription to TradeInSync.
         </p>
     </div>
 </div>

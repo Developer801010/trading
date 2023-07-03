@@ -3,35 +3,11 @@
 
 @section('page-style')
 <style>
-    .StripeElement {
-        background-color: white;
-        padding: 20px 14px;
-        border-radius: 4px;
-        border: 1px solid #E4E4E4;
-    }
-
-    .StripeElement--focus {
-        border-color: #00CCFF;
-    }
-
-    .StripeElement--invalid {
-        border-color: #FF0033;
-    }
-
-    .StripeElement--webkit-autofill {
-        background-color: #F9F9F9 !important;
-    }
-
-    #card-errors{
-        color: red;
-        word-break: break-word;
-    }
-
-    .error{
-        color:red;
-        word-break: break-word;
+    .input-group-text{
+        padding: 0;
     }
 </style>
+<link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/plugins/forms/form-validation.css')}}">
 @endsection
 
 
@@ -40,7 +16,7 @@
         <form method="post" action="{{ route('front.payment.process') }}" id="payment-form">
             @csrf
             <section class="checkout-section">
-                <h1 class="text-center checkout-title"><span class="subscription_type_title">{{$subscription_type}}</span> Checkout ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )</h1>
+                <h1 class="text-center checkout-title "><span class="subscription_type_title">{{$subscription_type}}</span> Checkout ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )</h1>
               
                 <input type="hidden" name="stripe_plan_id" id="stripe_plan_id" 
                 value="@if ($units == 'mo') {{$month_plan['stripe_plan']}} @elseif ($units == 'qu') {{$quarter_plan['stripe_plan']}}  @elseif($units == 'yr' ) {{$year_plan['stripe_plan']}} @endif" />
@@ -61,32 +37,35 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="email">First Name</label>
-                                    <input type="text" name="first_name" id="first_name" class="form-control" placeholder="First Name" aria-label="" />
+                                    <input type="text" name="first_name" id="first_name" class="form-control" placeholder="First Name" value="{{old('first_name')}}" />
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="email">Last Name</label>
-                                    <input type="text" name="last_name" id="last_name" class="form-control" placeholder="Last Name" aria-label="" />
+                                    <input type="text" name="last_name" id="last_name" class="form-control" placeholder="Last Name" value="{{old('last_name')}}" />
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="email">Email</label>
-                                    <input type="email" name="email" id="email" class="form-control" placeholder="Email Address" aria-label="john.doe" />
+                                    <input type="email" name="email" id="email" class="form-control" placeholder="Email Address" value="{{old('email')}}" />
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="mobile_number">Mobile number</label>
-                                    <input type="text" name="mobile_number" id="mobile_number" class="form-control mobile-number-mask" placeholder="Mobile Number" />
+                                    <input type="text" name="mobile_number" id="mobile_number" class="form-control mobile-number-mask" placeholder="Mobile Number" value="{{old('mobile_number')}}" />
                                 </div>     
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="password">Password</label>
                                     <div class="input-group input-group-merge form-password-toggle">
-                                        <input type="password" name="password" id="password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                                        <input type="password" name="password" id="password" class="form-control"  value="{{old('password')}}"
+                                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="confirm-password">Confirm Password</label>
                                     <div class="input-group input-group-merge form-password-toggle">
-                                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" 
+                                        value="{{old('password_confirmation')}}"
+                                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                                     </div>
                                 </div>               
                             </div>
@@ -111,11 +90,35 @@
                                 </div>
                             </div>
                             <div class="stripe_payment">
-                                <div id="card-element"></div>
+                                <div class="row">
+                                    <div class="col-12 col-md-6 mb-1">
+                                        <label class="form-label" for="addCardNumber">Card Number</label>
+                                        <div class="input-group input-group-merge">
+                                            <input id="card-number" name="card-number" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" aria-describedby="addCard" data-msg="Please enter your credit card number" />
+                                            <span class="input-group-text cursor-pointer p-25" id="addCard">
+                                                <span class="card-type"></span>
+                                            </span>
+                                        </div>
+                                    </div>
 
-                                <div id="card-errors" role="alert"></div>                               
+                                    <div class="col-12 col-md-3 mb-1">
+                                        <label class="form-label" for="addCardCvv">CVC</label>
+                                        <input type="text" id="card-cvv" name="card-cvc" class="form-control cvv-code-mask" maxlength="4" placeholder="654" />
+                                    </div>
+
+                                    <div class="col-12 col-md-3 mb-1">
+                                        <label class="form-label" for="addCardExpiryDate">Exp. Date</label>
+                                        <input type="text" id="card-expire-date" name="card-expire-date" class="form-control expiry-date-mask" placeholder="MM/YY" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <span class="payment-errors" style="color: red;margin-top:10px;"></span>
+                                    </div>
+                                </div>
+
                             </div>
-                            {{-- <button type="submit" id="card-button" class="btn btn_payment" data-secret="{{ $intent->client_secret }}">Pay with Credit/Debit Card</button> --}}
+                            
                             <button type="submit" id="card-button" class="btn btn_payment">Pay with Credit/Debit Card</button>
                             <div class="img_payment_section">
                                 <img src="{{asset('assets/image/cards-stripe.png')}}" class="img_stripe img_payment" />
@@ -124,7 +127,7 @@
         
                             <div class="terms rule">
                                 <input type="checkbox" id="terms" />
-                                <label for="terms">I understand TradeInSync uses a swing trading strategy, and that results typically require three months or more due to the length of time positions are held. I also understand that the rate of alerts will fluctuate based on market conditions, where TradeinSync will always focus on quality, as opposed to quantity, of alerts.
+                                <label for="terms">I understand that my personal data will be used to process this order, support my experience throughout this website, and for other purposes described in our <a href="#">privacy policy</a>.
                                 </label>
                             </div>
     
@@ -203,7 +206,10 @@
 
 
 @section('page-script')
-<script src="https://js.stripe.com/v3/"></script>
+<script src="{{asset('app-assets/vendors/js/forms/cleave/cleave.min.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js')}}"></script>
+<script src="https://js.stripe.com/v2/"></script>
 <script>
     var stripe_payment = $('.stripe_payment');
     var payment_option = $('.payment-option');
@@ -217,6 +223,25 @@
     var monthly_membership = $('.monthly-membership');
     var quarterly_membership = $('.quarterly-membership');
     var yearly_membership = $('.yearly-membership');
+    var creditCard = $('.credit-card-mask');
+    var expiryDateMask = $('.expiry-date-mask');
+    var cvvMask = $('.cvv-code-mask');
+    var phoneMask = $('.mobile-number-mask');
+
+    var month_plan_stripe = '{{$month_plan['stripe_plan']}}';
+    var month_plan_paypal = '{{$month_plan['paypal_plan']}}';
+
+    var quarter_plan_stripe = '{{$quarter_plan['stripe_plan']}}';
+    var quarter_plan_paypal = '{{$quarter_plan['paypal_plan']}}';
+
+    var year_plan_stripe = '{{$year_plan['stripe_plan']}}';    
+    var year_plan_paypal = '{{$year_plan['paypal_plan']}}';    
+
+    var stripe_plan_id = $('#stripe_plan_id');
+    var paypal_plan_id = $('#paypal_plan_id');
+
+    var assetsPath = '{{ asset("assets") }}';
+    console.log(assetsPath);
 
     member_section.hover(function () {
             $(this).find('.tooltip-text').removeClass('invisible');
@@ -309,17 +334,7 @@
         $('.yearly-membership').addClass('membership_active');
     }
 
-    var month_plan_stripe = '{{$month_plan['stripe_plan']}}';
-    var month_plan_paypal = '{{$month_plan['paypal_plan']}}';
-
-    var quarter_plan_stripe = '{{$quarter_plan['stripe_plan']}}';
-    var quarter_plan_paypal = '{{$quarter_plan['paypal_plan']}}';
-
-    var year_plan_stripe = '{{$year_plan['stripe_plan']}}';    
-    var year_plan_paypal = '{{$year_plan['paypal_plan']}}';    
-
-    var stripe_plan_id = $('#stripe_plan_id');
-    var paypal_plan_id = $('#paypal_plan_id');
+   
 
     //if right side bar is clicking... 
     memberships.click(function(){
@@ -369,96 +384,87 @@
         $('.memberships').removeClass('membership_active');
     }
 
-    var stripe = Stripe('{{ config('services.stripe.publish_key') }}');
-
-    // Create an instance of Elements
-    var elements = stripe.elements();
-    const cardButton = document.getElementById('card-button');
-    const clientSecret = cardButton.dataset.secret;
+    // var stripe = Stripe('{{ config('services.stripe.publish_key') }}');
     var payment_method;
 
-    // Custom styling can be passed to options when creating an Element.
-    // (Note that this demo uses a wider set of styles than the guide below.)
-    var style = {
-        base: {
-            color: '#242424',
-            lineHeight: '24px',
-            fontFamily: '"Lato", sans-serif',
-            fontSmoothing: 'antialiased',
-            fontSize: '16px',
-            '::placeholder': {
-            color: '#D4D4D4'
-            }
-        },
-        invalid: {
-            color: '#FF0033',
-            iconColor: '#FF0033'
-        }
-    };
+    //Phone Number
+    if (phoneMask.length) {
+        new Cleave(phoneMask, {
+        phone: true,
+        phoneRegionCode: 'US'
+        });
+    }
 
-    // Create an instance of the card Element
-    var card = elements.create('card', {
-        style: style,
-        hidePostalCode: true
-    });
-
-    // Add an instance of the card Element into the `card-element` <div>
-    card.mount('#card-element');
-
-    // Handle real-time validation errors from the card Element.
-    card.addEventListener('change', function(event) {
-        var displayError = document.getElementById('card-errors');
-        if (event.error) {
-            displayError.textContent = event.error.message;
-        } else {
-            displayError.textContent = '';
-        }
-    });
-
-    cardButton.addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        var paymentOption = $('input[name="payment_option"]:checked').val();
-
-        if(paymentOption == 'stripe'){
-                const { setupIntent, error } = await stripe.confirmCardSetup(
-                clientSecret, {
-                    payment_method: {
-                        card: card
+    // Credit Card
+    if (creditCard.length) {
+        creditCard.each(function () {
+            new Cleave($(this), {
+                creditCard: true,
+                onCreditCardTypeChanged: function (type) {
+                const elementNodeList = document.querySelectorAll('.card-type');
+                    if (type != '' && type != 'unknown') {
+                        //! we accept this approach for multiple credit card masking
+                        for (let i = 0; i < elementNodeList.length; i++) {
+                        elementNodeList[i].innerHTML =
+                            '<img src="' + assetsPath + '/image/icons/payments/' + type + '-cc.png" height="24"/>';
+                        }
+                    } else {
+                        for (let i = 0; i < elementNodeList.length; i++) {
+                        elementNodeList[i].innerHTML = '';
+                        }
                     }
                 }
-            );
+            });
+        });
+    }
+
+    // Expiry Date Mask
+    if (expiryDateMask.length) {
+        new Cleave(expiryDateMask, {
+            date: true,
+            delimiter: '/',
+            datePattern: ['m', 'y']
+        });
+    }
+
+    // CVV
+    if (cvvMask.length) {
+        new Cleave(cvvMask, {
+            numeral: true,
+            numeralPositiveOnly: true
+        });
+    }
     
-            if (error) {
-                // Display "error.message" to the user...
-                var errorElement = document.getElementById('card-errors');
-                errorElement.textContent = error.message;
-            } else {
-                // The card has been verified successfully...                
-                stripeTokenHandler(setupIntent.payment_method);
-            }
-        }else{
-            PayPalHandler();
-        }
-    });
     // Handle form submission
-    var form = document.getElementById('payment-form');
-    form.addEventListener('submit', function(event) {
+    var pyament_form = document.getElementById('payment-form');
+
+    Stripe.setPublishableKey('{{ config('services.stripe.publish_key') }}');
+
+    pyament_form.addEventListener('submit', function(event) {
         event.preventDefault();
         
         var paymentOption = $('input[name="payment_option"]:checked').val();
+        $('#card-button').prop('disabled', true);
 
         if(paymentOption == 'stripe'){
-            stripe.createToken(card).then(function(result) {                
-                if (result.error) {
-                    // Inform the user if there was an error
-                    var errorElement = document.getElementById('card-errors');
-                    errorElement.textContent = result.error.message;
-                } else {
-                    // Send the token to your server
-                    stripeTokenHandler(result.token);
-                }
-            });
+
+            var card_number = $('#card-number');
+            var card_cvc = $('#card-cvc');
+            var card_date = $('#card-expire-date');
+            console.log(card_date.val());
+            if(card_number == ''){
+                card_number.addClass('error');
+            }
+
+            Stripe.card.createToken({
+              number: $('#card-number').val(),
+              cvc: $('#card-cvc').val(),
+              exp_month: $('#card-expiry-month').val(),
+              exp_year: $('#card-expiry-year').val()
+            }, stripeTokenHandler);
+
+            // Prevent the form from submitting with the default action
+            return false;            
         }else{
             PayPalHandler();
         }
@@ -466,22 +472,26 @@
     }); 
 
 
-    function stripeTokenHandler(payment_method) {
-        // Insert the token ID into the form so it gets submitted to the server
-        var form = document.getElementById('payment-form');
-        var hiddenInput = document.createElement('input');
-        hiddenInput.setAttribute('type', 'hidden');
-        hiddenInput.setAttribute('name', 'payment_method');
-        hiddenInput.setAttribute('value', payment_method);
-        form.appendChild(hiddenInput);
-        // Submit the form
-        form.submit();
+    function stripeTokenHandler(status, response) 
+    {
+        if (response.error) {
+
+            console.log(response.error.message);
+        }else{
+            var token = response.id;
+            // Insert the token ID into the form so it gets submitted to the server        
+            var pyament_form = document.getElementById('payment-form');     
+            // Submit the form
+            pyament_form.submit();
+        }
+        
+       
     }
 
     function PayPalHandler(){
         
-        var form = document.getElementById('payment-form');
-        form.submit();
+        var pyament_form = document.getElementById('payment-form');
+        pyament_form.submit();
     }
 
     

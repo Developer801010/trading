@@ -9,6 +9,7 @@ use App\Paypal\PaypalAgreement;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionItem;
 use PayPal\Exception\PayPalConnectionException;
@@ -20,57 +21,103 @@ class PaymentController extends Controller
 {
     public function process(Request $request)
     {
-        dd($request->all());
-        $payment_option = $request->input('payment_option');
-        // $user = auth()->user();
+        dd($request->stripeToken);
+        // dd($request->all());
 
-        // if($payment_option == 'stripe')
-        // {
-        //     try{
-        //         Stripe::setApiKey(config('services.stripe.secret_key'));
+        $messages = [
+            'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
+        ];
 
-        //         $user->createOrGetStripeCustomer();  
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email|unique:users',
+            'mobile_number' => 'required',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
+            ],
+        ], $messages);
 
-        //         $paymentMethod = null;
-        //         $paymentMethod = $request->payment_method;
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-        //         if($paymentMethod != null) {
-        //             $paymentMethod = $user->addPaymentMethod($paymentMethod);
-        //         }
+        $firstName = $request->first_name;
+        $lastName = $request->last_name;
+        $email = $request->email;
+        $mobileNumber = $request->mobile_number;
+        $password = $request->password;
+        $username = strtolower(substr($firstName, 0, 1) . $lastName);
+       
+        try{
+            DB::beginTransaction();
 
-        //         $plan = $request->stripe_plan_id;
-        //         $membership_level = Plan::where('stripe_plan', $plan)->value('name');
+             //the workflow to create an account
+             User::create([
+                'first_name' => $firstName, 
+                'last_name' => $lastName,
+                'email' => $email,
+                'mobile_number' => $mobileNumber,
+                'password' => bcrypt($password),
+                'name' => $username               
+             ]);
+
+
+            $payment_option = $request->input('payment_option');
+
+            // if($payment_option == 'stripe')
+            // {
+
+            //     Stripe::setApiKey(config('services.stripe.secret_key'));
+
+                // $user->createOrGetStripeCustomer();  
+
+                // $paymentMethod = null;
+                // $paymentMethod = $request->payment_method;
+
+                // if($paymentMethod != null) {
+                //     $paymentMethod = $user->addPaymentMethod($paymentMethod);
+                // }
+
+                // $plan = $request->stripe_plan_id;
+                // $membership_level = Plan::where('stripe_plan', $plan)->value('name');
             
-        //         $result = $request->user()->newSubscription('TlS '.$membership_level. ' Membership', $plan)
-        //             ->create($paymentMethod != null ? $paymentMethod->id: '');
+                // $result = $request->user()->newSubscription('TlS '.$membership_level. ' Membership', $plan)
+                //     ->create($paymentMethod != null ? $paymentMethod->id: '', [
+                //         auth()->user()->email
+                //     ]);
 
-        //         if ($result['stripe_status'] == 'active'){
-        //             // if status is active, add a subscribe role. 
-        //             $role = Role::where('name', 'subscriber')->first(); 
-        //             $user->roles()->attach($role->id);
-        //         }
+                // if ($result['stripe_status'] == 'active'){
+                //     // if status is active, add a subscribe role. 
+                //     $role = Role::where('name', 'subscriber')->first(); 
+                //     $user->roles()->attach($role->id);
+                // }
 
-        //         return redirect()->route('front.thanks')
-        //         ->with('success','You are subscribed to this plan. You can see real time trade.');
+                // return redirect()->route('front.thanks')
+                // ->with('success','You are subscribed to this plan. You can see real time trade.');
+            // }
+            // else
+            // {
+                // $paypal_plan_id = $request->paypal_plan_id;
+                // $description = Plan::where('paypal_plan', $paypal_plan_id)->value('name');
 
-        //     }catch(Exception $e){            
-        //         return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);          
-        //     }
-        // }
-        // else
-        // {
-        //     try{
-        //         $paypal_plan_id = $request->paypal_plan_id;
-        //         $description = Plan::where('paypal_plan', $paypal_plan_id)->value('name');
+                // $agreement = new PaypalAgreement();
 
-        //         $agreement = new PaypalAgreement();
-        //         return $agreement->create($request->paypal_plan_id, $description);
+                // return $agreement->create($request->paypal_plan_id, $description);
+            // }     
 
-        //     }catch(PayPalConnectionException $e){            
-        //         return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);          
-        //     }
-        // }     
-        
+            DB::commit();
+
+            // dd(auth()->user()->id);
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);  
+        }
     }
 
     /**

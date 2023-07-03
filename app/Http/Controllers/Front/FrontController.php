@@ -45,7 +45,7 @@ class FrontController extends Controller
      */
     public function checkout($subscription_type)
     {
-
+        
         if($subscription_type == 'y'){
             $subscription_type = 'Yearly';
             $price = 787;

@@ -40,9 +40,6 @@ Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
     Route::post('/account/send-verification-code', [AccountController::class, 'sendVerificationCode'])->name('front.account.send-verification-code');
     Route::post('/account/verify-phone-code', [AccountController::class, 'verifyPhoneCode'])->name('front.account.verify-phone-code');
 
-    Route::get('/account/change-password', [AccountController::class, 'changePassword'])->name('front.account-change-password');
-    Route::post('/account/change-password/process', [AccountController::class, 'changePasswordProcess'])->name('front.account-change-password-process');
-
     Route::get('/account/membership', [AccountController::class, 'membership'])->name('front.account-membership');    
 
     Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement'])->name('front.execute-agreement-paypal');
@@ -50,9 +47,11 @@ Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
     
 
     Route::group(['middleware' => ['verified']], function() {  //'role:subscriber'
-        Route::get('/dashboard/open-position', [PositionManagementController::class, 'openPosition'])->name('front.open-position');
-        Route::get('/dashboard/closed-position', [PositionManagementController::class, 'closedPosition'])->name('front.closed-position');
         Route::get('/dashboard/main-feed', [PositionManagementController::class, 'mainFeed'])->name('front.main-feed');
+        Route::get('/dashboard/open-stock-trades', [PositionManagementController::class, 'openStockTrades'])->name('front.open-stock-trades');
+        Route::get('/dashboard/closed-stock-trades', [PositionManagementController::class, 'closedStockTrades'])->name('front.closed-stock-trades');        
+        Route::get('/dashboard/open-options-trades', [PositionManagementController::class, 'openOptionsTrades'])->name('front.open-options-trades');
+        Route::get('/dashboard/closed-options-trades', [PositionManagementController::class, 'closedOptionsTrades'])->name('front.closed-options-trades');        
     });
 });
 

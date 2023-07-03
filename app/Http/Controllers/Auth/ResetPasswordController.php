@@ -33,7 +33,8 @@ class ResetPasswordController extends Controller
         if (auth()->user()->hasRole('admin')){
             return '/home';
         }else{
-            return '/account/profile';
+            return '/dashboard/main-feed';
         }
     }
+    
 }

@@ -151,7 +151,7 @@ div.dataTables_wrapper div.dataTables_filter input{
   #navbarSupportedContent .nav-link {
     color: #000;
     font-weight: bold;
-    font-size:20px;
+    font-size:17px;
     font-family: JostSemi;
     text-transform: uppercase;
   }
@@ -728,6 +728,37 @@ div.dataTables_wrapper div.dataTables_filter input{
 
   .img_payment_section{
     padding-top: 20px;
+  }
+
+  .top-bar{
+    background: #617694;
+  }
+
+  .logout-link{
+    text-decoration: none;
+    padding-left: 30px;
+  }
+
+  .navbar-toggler{
+    padding: 0 5px;
+  }
+
+  .top-bar-section{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+  }
+
+  .account_display_name{
+    font-size: 12px;
+  }
+
+  .password_box{
+    padding: 20px 0;
+  }
+
+  .password_change_title{
+    padding-bottom: 15px; 
   }
 
   @media screen and (max-width: 1399px) {

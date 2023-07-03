@@ -40,7 +40,7 @@ class LoginController extends Controller
                 return redirect('/home');  //it redirects to the dashboard
             }
     
-            return redirect('/account/profile');
+            return redirect('/dashboard/main-feed');
         }
         
     }

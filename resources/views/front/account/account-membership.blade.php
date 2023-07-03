@@ -10,7 +10,6 @@
 @section('content')
     <div class="container">
         <section class="dashboard-section">        
-            @include('layouts.front-dashboard-header')
             @include('layouts.front-email-verify')
            
         </section>

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Cashier\Subscription;
 
 class AccountController extends Controller
@@ -21,7 +22,7 @@ class AccountController extends Controller
         $mobileVerifiedStatus = auth()->user()->mobile_verified_at;
         $emailVerifiedStatus = auth()->user()->email_verified_at;
 
-        return view('front.account-profile', 
+        return view('front.account.account-profile', 
             compact('member_date', 'mobileVerifiedStatus', 'emailVerifiedStatus'));
     }
 
@@ -31,14 +32,46 @@ class AccountController extends Controller
         $obj->first_name = $request->first_name;
         $obj->last_name = $request->last_name;
         $obj->name = $request->name;
-        if($obj->email !== $request->email){
-            $obj->email = $request->email;
-            $obj->email_verified_at = null;
+
+        if($request->current_password !== null){
+
+            $messages = [
+                'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
+            ];
+
+            $validator = Validator::make($request->all(), [
+                'current_password' => 'required',
+                'password' => [
+                    'required',
+                    'string',
+                    'min:8',
+                    'confirmed',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
+                ],
+            ], $messages);
+
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+            
+            // Verify the old password
+            $user = Auth::user();
+            $isPasswordValid = Hash::check($request->current_password, $user->password);
+
+            if (!$isPasswordValid) {
+                return redirect()->back()->withErrors(['current_password' => 'The current password is invalid.']);
+            }
+
+            // Hash the new password
+            $hashedPassword = Hash::make($request->password);
+
+            // Update the user's password
+            $user = Auth::user();
+            $user->password = $hashedPassword;        
+            $user->save();
         }
-        if($obj->mobile_number !== $request->mobile_number){
-            $obj->mobile_number = $request->mobile_number;
-            $obj->mobile_verified_at = null;
-        }
+        
+
         $obj->save();
 
         return redirect()->back()->with('flash_success', 'Account information has been updated');
@@ -89,33 +122,6 @@ class AccountController extends Controller
         return mt_rand(100000, 999999);
     }
 
-    public function changePassword()
-    {
-        return view('front.account-change-password');    
-    }
-
-    public function changePasswordProcess(Request $request)
-    {
-         // Verify the old password
-         $user = Auth::user();
-         $isPasswordValid = Hash::check($request->current_password, $user->password);
-        
-         if (!$isPasswordValid) {
-             return redirect()->back()->withErrors(['current_password' => 'The current password is invalid.']);
-         }
- 
-         // Hash the new password
-         $hashedPassword = Hash::make($request->new_password);
- 
-         // Update the user's password
-         $user = Auth::user();
-         $user->password = $hashedPassword;        
-         $user->save();
- 
-         // Redirect the user to the dashboard or profile page
-         return redirect()->back()->with('flash_success', 'Your password has been updated.');
-    }
-
     /**
      * Account notification for email and phone
      */
@@ -153,7 +159,7 @@ class AccountController extends Controller
             ->where('stripe_status', 'active')
             ->get();  
 
-        return view('front.account-membership', 
+        return view('front.account.account-membership', 
             compact(
                 'member_date',
                 'account_cancel_date',

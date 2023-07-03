@@ -8,7 +8,6 @@
 @section('content')
     <div class="container">
         <section class="dashboard-section">        
-            @include('layouts.front-dashboard-header')
     
             @if(Session::has('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
