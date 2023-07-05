@@ -38,19 +38,23 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="email">First Name</label>
                                     <input type="text" name="first_name" id="first_name" class="form-control" placeholder="First Name" value="{{old('first_name')}}" />
+                                    <span class="first-name-error error d-none">This field is required.</span>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="email">Last Name</label>
                                     <input type="text" name="last_name" id="last_name" class="form-control" placeholder="Last Name" value="{{old('last_name')}}" />
+                                    <span class="last-name-error error d-none">This field is required.</span>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="email">Email</label>
                                     <input type="email" name="email" id="email" class="form-control" placeholder="Email Address" value="{{old('email')}}" />
+                                    <span class="email-error error d-none">This field is required.</span>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="mobile_number">Mobile number</label>
                                     <input type="text" name="mobile_number" id="mobile_number" class="form-control mobile-number-mask" placeholder="Mobile Number" value="{{old('mobile_number')}}" />
+                                    <span class="mobile-number-error error d-none">This field is required.</span>
                                 </div>     
 
                                 <div class="col-md-6 mb-3">
@@ -59,6 +63,7 @@
                                         <input type="password" name="password" id="password" class="form-control"  value="{{old('password')}}"
                                         placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                                     </div>
+                                    <span class="password-error error d-none">This field is required.</span>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="confirm-password">Confirm Password</label>
@@ -67,6 +72,7 @@
                                         value="{{old('password_confirmation')}}"
                                         placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                                     </div>
+                                    <span class="password-confirmation-error error d-none">This field is required.</span>
                                 </div>               
                             </div>
                         </div>
@@ -94,21 +100,25 @@
                                     <div class="col-12 col-md-6 mb-1">
                                         <label class="form-label" for="addCardNumber">Card Number</label>
                                         <div class="input-group input-group-merge">
-                                            <input id="card-number" name="card-number" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" aria-describedby="addCard" data-msg="Please enter your credit card number" />
+                                            <input id="card-number" name="card-number" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" 
+                                            aria-describedby="addCard" data-msg="Please enter your credit card number" value="{{old('card-number')}}" />
                                             <span class="input-group-text cursor-pointer p-25" id="addCard">
                                                 <span class="card-type"></span>
                                             </span>
                                         </div>
+                                        <span class="error card-error d-none">This field is required.</span>
                                     </div>
 
                                     <div class="col-12 col-md-3 mb-1">
                                         <label class="form-label" for="addCardCvv">CVC</label>
-                                        <input type="text" id="card-cvv" name="card-cvc" class="form-control cvv-code-mask" maxlength="4" placeholder="654" />
+                                        <input type="text" id="card-cvc" name="card-cvc" class="form-control cvv-code-mask"  value="{{old('card-cvc')}}"  maxlength="4" placeholder="654" />
+                                        <span class="error card-cvc-error d-none">This field is required.</span>
                                     </div>
 
                                     <div class="col-12 col-md-3 mb-1">
                                         <label class="form-label" for="addCardExpiryDate">Exp. Date</label>
-                                        <input type="text" id="card-expire-date" name="card-expire-date" class="form-control expiry-date-mask" placeholder="MM/YY" />
+                                        <input type="text" id="card-expire-date" name="card-expire-date" class="form-control expiry-date-mask"  value="{{old('card-expire-date')}}" placeholder="MM/YY" />
+                                        <span class="error card-exp-error d-none">This field is required.</span>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -209,7 +219,6 @@
 <script src="{{asset('app-assets/vendors/js/forms/cleave/cleave.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js')}}"></script>
-<script src="https://js.stripe.com/v2/"></script>
 <script>
     var stripe_payment = $('.stripe_payment');
     var payment_option = $('.payment-option');
@@ -384,14 +393,13 @@
         $('.memberships').removeClass('membership_active');
     }
 
-    // var stripe = Stripe('{{ config('services.stripe.publish_key') }}');
     var payment_method;
 
     //Phone Number
     if (phoneMask.length) {
         new Cleave(phoneMask, {
-        phone: true,
-        phoneRegionCode: 'US'
+            phone: true,
+            phoneRegionCode: 'US'
         });
     }
 
@@ -438,62 +446,156 @@
     // Handle form submission
     var pyament_form = document.getElementById('payment-form');
 
-    Stripe.setPublishableKey('{{ config('services.stripe.publish_key') }}');
 
     pyament_form.addEventListener('submit', function(event) {
         event.preventDefault();
-        
+                
         var paymentOption = $('input[name="payment_option"]:checked').val();
-        $('#card-button').prop('disabled', true);
+        var isValid = true;
+        var cardButton = $('#card-button');
+        var termsChecked = $('#terms').is(':checked');  
+        var conditionsChecked = $('#conditions').is(':checked');
+        var first_name = $('#first_name');
+        var last_name = $('#last_name');
+        var email = $('#email');
+        var mobile_number = $('#mobile_number');
+        var password = $('#password');
+        var password_confirmation = $('#password_confirmation');
 
-        if(paymentOption == 'stripe'){
+        if(first_name.val() == ''){
+            isValid = false;
+            first_name.addClass('error');
+            $('.first-name-error').removeClass('d-none');
+        }else{
+            first_name.removeClass('error');
+        }
+
+        if(last_name.val() == ''){
+            isValid = false;
+            last_name.addClass('error');
+            $('.last-name-error').removeClass('d-none');
+        }else{
+            last_name.removeClass('error');
+        }
+
+        if(email.val() == ''){
+            isValid = false;
+            email.addClass('error');
+            $('.email-error').removeClass('d-none');
+        }else{
+            email.removeClass('error');
+        }
+
+        if(mobile_number.val() == ''){
+            isValid = false;
+            mobile_number.addClass('error');
+            $('.mobile-number-error').removeClass('d-none');
+        }else{
+            mobile_number.removeClass('error');
+        }
+
+        if(password.val() == ''){
+            isValid = false;
+            password.addClass('error');
+            $('.password-error').removeClass('d-none');
+        }else{
+            password.removeClass('error');
+        }
+
+        if(password_confirmation.val() == ''){
+            isValid = false;
+            password_confirmation.addClass('error');
+            $('.password-confirmation-error').removeClass('d-none');
+        }else{
+            password_confirmation.removeClass('error');
+        }
+
+        cardButton.prop('disabled', true);
+
+        if(paymentOption == 'stripe')
+        {
 
             var card_number = $('#card-number');
             var card_cvc = $('#card-cvc');
             var card_date = $('#card-expire-date');
-            console.log(card_date.val());
-            if(card_number == ''){
+          
+            if(card_number.val() == ''){
+                isValid = false;
                 card_number.addClass('error');
+                $('.card-error').removeClass('d-none');
+            }else{
+                card_number.removeClass('error');
             }
 
-            Stripe.card.createToken({
-              number: $('#card-number').val(),
-              cvc: $('#card-cvc').val(),
-              exp_month: $('#card-expiry-month').val(),
-              exp_year: $('#card-expiry-year').val()
-            }, stripeTokenHandler);
+            if(card_cvc.val() == ''){
+                isValid = false;
+                card_cvc.addClass('error');
+                $('.card-cvc-error').removeClass('d-none');
+            }else{
+                card_cvc.removeClass('error');
+            }
+
+            if(card_date.val() == ''){
+                isValid = false;
+                card_date.addClass('error');
+                $('.card-exp-error').removeClass('d-none');
+            }else{
+                card_date.removeClass('error');
+            }
+            
+            if (!termsChecked) {
+                isValid = false;
+                $('.terms').addClass('error');
+            } else {
+                $('.terms').removeClass('error');
+            }
+
+            if (!conditionsChecked) {
+                isValid = false;
+                $('.conditions').addClass('error');
+            } else {
+                $('.conditions').removeClass('error');
+            }
+
+            if(isValid){
+                FormHandler();                
+            }else{
+                cardButton.prop('disabled', false);
+            }
+            
 
             // Prevent the form from submitting with the default action
             return false;            
         }else{
-            PayPalHandler();
+
+            if (!termsChecked) {
+                isValid = false;
+                $('.terms').addClass('error');
+            } else {
+                $('.terms').removeClass('error');
+            }
+
+            if (!conditionsChecked) {
+                isValid = false;
+                $('.conditions').addClass('error');
+            } else {
+                $('.conditions').removeClass('error');
+            }
+
+            if(isValid){
+                FormHandler();
+            }else{
+                cardButton.prop('disabled', false);
+            }
         }
        
     }); 
 
-
-    function stripeTokenHandler(status, response) 
-    {
-        if (response.error) {
-
-            console.log(response.error.message);
-        }else{
-            var token = response.id;
-            // Insert the token ID into the form so it gets submitted to the server        
-            var pyament_form = document.getElementById('payment-form');     
-            // Submit the form
-            pyament_form.submit();
-        }
-        
-       
-    }
-
-    function PayPalHandler(){
-        
+   
+    function FormHandler(){
         var pyament_form = document.getElementById('payment-form');
         pyament_form.submit();
     }
-
     
 </script>
 @endsection

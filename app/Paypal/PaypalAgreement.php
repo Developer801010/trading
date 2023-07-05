@@ -14,26 +14,33 @@ use PayPal\Api\ShippingAddress;
 
 class PaypalAgreement extends Paypal
 {
-    public function create($id, $description) 
+    public function create($data, $description) 
     {
-        return redirect($this->agreement($id, $description));
+        return redirect($this->agreement($data, $description));
     }
 
-    protected function agreement($id, $description)
+    protected function agreement($data, $description)
     {
-        $agreement = new Agreement();
-
+        $agreement = new Agreement(); 
+        
         $agreement->setName('Subscription Agreement')
             ->setDescription('TlS '.$description.' Membership')
             ->setStartDate($this->getPaypalDate())
-            ->setPlan($this->plan($id))
+            ->setPlan($this->plan($data['paypal_plan_id']))
             ->setPayer($this->payer());
 
         // $agreement->setShippingAddress($this->shippingAddress());
 
         $agreement = $agreement->create($this->apiContext);
 
-        Session::flash('planId', $id);
+        
+        Session::flash('planId', $data['paypal_plan_id']);
+        Session::flash('first_name', $data['first_name']);
+        Session::flash('last_name', $data['last_name']);
+        Session::flash('email', $data['email']);
+        Session::flash('mobile_number', $data['mobile_number']);
+        Session::flash('password', $data['password']);
+        Session::flash('user_name', $data['user_name']);
 
         return $agreement->getApprovalLink();
 

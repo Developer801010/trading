@@ -1,3 +1,4 @@
+@@ -1,357 +0,0 @@
 @extends('layouts.front-master')
 @section('title', 'Checkout')
 

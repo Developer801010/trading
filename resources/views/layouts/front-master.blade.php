@@ -39,7 +39,7 @@
     
     @yield('page-script')
     <script>
-      
+       window.csrfToken = "{{ csrf_token() }}";
     </script>
 </body>
 <!-- END: Body-->

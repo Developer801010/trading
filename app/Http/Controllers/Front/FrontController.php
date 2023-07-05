@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
-use App\Mail\WelcomeEmail;
 use App\Models\Plan;
 use Exception;
 use Illuminate\Http\Request;

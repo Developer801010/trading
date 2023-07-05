@@ -3,27 +3,32 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Mail\Welcome;
 use App\Models\Plan;
 use App\Models\User;
 use App\Paypal\PaypalAgreement;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionItem;
 use PayPal\Exception\PayPalConnectionException;
 use Spatie\Permission\Models\Role;
+use Stripe\Exception\CardException;
+use Stripe\PaymentMethod;
 use Stripe\Stripe;
 
+use function PHPSTORM_META\type;
 
 class PaymentController extends Controller
 {
     public function process(Request $request)
     {
-        dd($request->stripeToken);
-        // dd($request->all());
-
+        // User validation
         $messages = [
             'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
         ];
@@ -52,71 +57,103 @@ class PaymentController extends Controller
         $mobileNumber = $request->mobile_number;
         $password = $request->password;
         $username = strtolower(substr($firstName, 0, 1) . $lastName);
+
+         //Get the payment option
+         $payment_option = $request->input('payment_option');
        
+         // Start the database transaction
+        DB::beginTransaction();
+
         try{
-            DB::beginTransaction();
+            if($payment_option == 'stripe')
+            {
+                //the workflow to create an account
+                $user = User::create([
+                    'first_name' => $firstName, 
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'mobile_number' => $mobileNumber,
+                    'password' => bcrypt($password),
+                    'name' => $username               
+                ]);
 
-             //the workflow to create an account
-             User::create([
-                'first_name' => $firstName, 
-                'last_name' => $lastName,
-                'email' => $email,
-                'mobile_number' => $mobileNumber,
-                'password' => bcrypt($password),
-                'name' => $username               
-             ]);
+                Stripe::setApiKey(config('services.stripe.secret_key'));
 
+                 //card validation and get the payment method
+                $cardNumber = $request->input('card-number');
+                $expDate = $request->input('card-expire-date');
+                list($expMonth, $expYear) = explode('/', $expDate);
+                $cvc = $request->input('card-cvc');
 
-            $payment_option = $request->input('payment_option');
+                $paymentMethod = PaymentMethod::create([
+                    'type' => 'card',
+                    'card' => [
+                        'number' => $cardNumber,
+                        'exp_month' => $expMonth,
+                        'exp_year' => $expYear,
+                        'cvc' => $cvc,
+                    ],
+                ]);  
 
-            // if($payment_option == 'stripe')
-            // {
+                $user->createOrGetStripeCustomer();  
 
-            //     Stripe::setApiKey(config('services.stripe.secret_key'));
+                if($paymentMethod != null) {
+                    $paymentMethod = $user->addPaymentMethod($paymentMethod);
+                }
 
-                // $user->createOrGetStripeCustomer();  
-
-                // $paymentMethod = null;
-                // $paymentMethod = $request->payment_method;
-
-                // if($paymentMethod != null) {
-                //     $paymentMethod = $user->addPaymentMethod($paymentMethod);
-                // }
-
-                // $plan = $request->stripe_plan_id;
-                // $membership_level = Plan::where('stripe_plan', $plan)->value('name');
+                $plan = $request->stripe_plan_id;
+                $membership_level = Plan::where('stripe_plan', $plan)->value('name');
             
-                // $result = $request->user()->newSubscription('TlS '.$membership_level. ' Membership', $plan)
-                //     ->create($paymentMethod != null ? $paymentMethod->id: '', [
-                //         auth()->user()->email
-                //     ]);
+                $result = $user->newSubscription('TlS '.$membership_level. ' Membership', $plan)
+                    ->create($paymentMethod != null ? $paymentMethod->id: '', [
+                        $user->email
+                    ]);
 
-                // if ($result['stripe_status'] == 'active'){
-                //     // if status is active, add a subscribe role. 
-                //     $role = Role::where('name', 'subscriber')->first(); 
-                //     $user->roles()->attach($role->id);
-                // }
+                if ($result['stripe_status'] == 'active'){
+                    // if status is active, add a subscribe role. 
+                    $role = Role::where('name', 'subscriber')->first(); 
+                    $user->roles()->attach($role->id);
+                }
 
-                // return redirect()->route('front.thanks')
-                // ->with('success','You are subscribed to this plan. You can see real time trade.');
-            // }
-            // else
-            // {
-                // $paypal_plan_id = $request->paypal_plan_id;
-                // $description = Plan::where('paypal_plan', $paypal_plan_id)->value('name');
+                // Commit the database transaction
+                DB::commit();
 
-                // $agreement = new PaypalAgreement();
+                // Authenticate the user
+                Auth::attempt(['email' => $email, 'password' => $password]);
 
-                // return $agreement->create($request->paypal_plan_id, $description);
-            // }     
+                //Welcome Email
+                $data = [
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'user_name' => 'JDae'
+                ];
+                Mail::to($email)->queue(new Welcome($data));
 
-            DB::commit();
+                return redirect()->route('front.main-feed')->with('success', 'Subscription successful! You are now logged in.');
+                // return redirect()->route('front.thanks')->with('success','You can see the trade alert page real time');
+            }
+            else
+            {
+                $paypal_plan_id = $request->paypal_plan_id;
+                $description = Plan::where('paypal_plan', $paypal_plan_id)->value('name');
 
-            // dd(auth()->user()->id);
-            
+                $data = [
+                    'paypal_plan_id' => $paypal_plan_id,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'mobile_number' => $mobileNumber,
+                    'password' => $password,
+                    'user_name' => $username                    
+                ];
+               
+                $agreement = new PaypalAgreement();
+                return $agreement->create($data, $description);
+            }    
+
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);  
+            return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);              
         }
     }
 
@@ -142,11 +179,12 @@ class PaymentController extends Controller
     
 
     public function executeAgreement($status) 
-    {
-        if($status = 'true'){
+    {  
+        if($status == 'true')
+        { 
             $agreement = new PaypalAgreement();
             $executePayment = $agreement->execute(request('token'));
-
+            
             $subscriptionId = $executePayment->id;
             $state = $executePayment->state;            
             $description = $executePayment->description;
@@ -155,10 +193,19 @@ class PaymentController extends Controller
             DB::beginTransaction();
 
             try{
+
+                $user = User::create([
+                    'first_name' => session('first_name'), 
+                    'last_name' => session('last_name'),
+                    'email' => session('email'),
+                    'mobile_number' => session('mobile_number'),
+                    'password' => bcrypt(session('password')),
+                    'name' => session('user_name')               
+                ]);
                 
                 //save PayPal subscription data into the database 
                 $subscription = new Subscription();
-                $subscription->user_id = auth()->user()->id;
+                $subscription->user_id = $user->id;
                 $subscription->name = $description;
                 $subscription->stripe_id = $subscriptionId;
                 $subscription->stripe_status = $state;
@@ -167,32 +214,39 @@ class PaymentController extends Controller
                 $subscription->save();
            
                 //user table update with PayPal status
-                $user = User::find(auth()->user()->id);
+                $user = User::find($user->id);
                 $user->pm_type = 'paypal';
                 $user->save();
                 
-                $user = auth()->user();
                 // Add a subscribe role. 
                 $role = Role::where('name', 'subscriber')->first(); 
                 $user->roles()->attach($role->id);
                 
                 DB::commit();
 
-                return redirect()->route('front.thanks')
-                ->with('success','You are subscribed to this plan. You can see real time trade.');                     
+                Auth::attempt(['email' => session('email'), 'password' => bcrypt(session('password'))]);
+
+                //Welcome Email
+                $data = [
+                    'first_name' => session('first_name'),
+                    'last_name' => session('last_name'),
+                    'user_name' => session('user_name')
+                ];
+                Mail::to(session('email'))->queue(new Welcome($data));
+
+                return redirect()->route('front.main-feed')->with('success', 'Subscription successful! You are now logged in.');
 
             }catch(Exception $ex){
 
                 DB::rollBack();
-                return back()->with('error', $ex->getMessage());
-
+                return redirect()->route('front.checkout', ['subscription_type' => 'm'])
+                ->withErrors([ 'error' => 'Unable to create subscription due to this issue'.$ex->getMessage() ]);        
             }
-           
 
-        }else{
-            return redirect()->route('front.checkout')
-            ->with('error','There is a problem with your payment.');
-
+        }
+        else 
+        {
+            return redirect()->route('front.checkout', ['subscription_type' => 'm']);
         }
     }
     

@@ -31,6 +31,7 @@ Route::get('/subscription', [FrontController::class, 'subscription'])->name('fro
 Route::get('/terms_conditions', [FrontController::class, 'terms_conditions'])->name('front.terms_conditions');
 Route::get('/checkout/{subscription_type}', [FrontController::class, 'checkout'])->name('front.checkout');
 Route::post('/payment/process', [PaymentController::class, 'process'])->name('front.payment.process');
+Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement'])->name('front.execute-agreement-paypal');  //PayPal execute agreement 
 Route::get('/thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
   
 
@@ -42,16 +43,16 @@ Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
 
     Route::get('/account/membership', [AccountController::class, 'membership'])->name('front.account-membership');    
 
-    Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement'])->name('front.execute-agreement-paypal');
     Route::get('pause-agreement/{id}', [PaymentController::class, 'pauseSubscription'])->name('front.pause-agreement-paypal');
     
+    Route::get('/dashboard/main-feed', [PositionManagementController::class, 'mainFeed'])->name('front.main-feed');
+    Route::get('/dashboard/open-stock-trades', [PositionManagementController::class, 'openStockTrades'])->name('front.open-stock-trades');
+    Route::get('/dashboard/closed-stock-trades', [PositionManagementController::class, 'closedStockTrades'])->name('front.closed-stock-trades');        
+    Route::get('/dashboard/open-options-trades', [PositionManagementController::class, 'openOptionsTrades'])->name('front.open-options-trades');
+    Route::get('/dashboard/closed-options-trades', [PositionManagementController::class, 'closedOptionsTrades'])->name('front.closed-options-trades');  
 
     Route::group(['middleware' => ['verified']], function() {  //'role:subscriber'
-        Route::get('/dashboard/main-feed', [PositionManagementController::class, 'mainFeed'])->name('front.main-feed');
-        Route::get('/dashboard/open-stock-trades', [PositionManagementController::class, 'openStockTrades'])->name('front.open-stock-trades');
-        Route::get('/dashboard/closed-stock-trades', [PositionManagementController::class, 'closedStockTrades'])->name('front.closed-stock-trades');        
-        Route::get('/dashboard/open-options-trades', [PositionManagementController::class, 'openOptionsTrades'])->name('front.open-options-trades');
-        Route::get('/dashboard/closed-options-trades', [PositionManagementController::class, 'closedOptionsTrades'])->name('front.closed-options-trades');        
+              
     });
 });
 
