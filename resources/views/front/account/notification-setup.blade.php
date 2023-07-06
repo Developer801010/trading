@@ -32,15 +32,17 @@
                                 <div class="input-group">                                    
                                     <input type="text" class="form-control phone-number-mask"
                                     id="phone" name="phone" value="{{auth()->user()->mobile_number}}">               
-                                    <span class="phone-error error d-none">This field is required.</span>                     
+                                    <span class="phone-error error d-none">This field is required.</span>      
+
                                     <input type="hidden" value="{{$mobileVerifiedStatus}}" name="mobileVerifiedStatus" id="mobileVerifiedStatus">                                   
+                                    <input type="hidden" value="{{$mobileNotificationSetting}}" name="mobileNotificationSetting" id="mobileNotificationSetting">                                   
                                 </div>
                             </div>     
                         </div>
                         <div class="row">
                             <div class="col-md-12 text-center">
-                                <button class="btn @if($mobileVerifiedStatus =='no') btn-sub @else btn-danger @endif text-uppercase btn_subscribe">
-                                    @if($mobileVerifiedStatus =='no') Subscribe @else Unsubscribe @endif
+                                <button class="btn @if($mobileNotificationSetting == 1) btn-danger @else btn-sub @endif text-uppercase btn_subscribe">
+                                    @if($mobileNotificationSetting == 1) Unsubscribe @else Subscribe @endif
                                 </button>
                             </div>
                         </div>
@@ -66,7 +68,6 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Confirm</button>
         </div>
       </div>
     </div>
@@ -97,12 +98,14 @@
             var countdownSeconds = 60;
             var countdownInterval;
             var mobileVerifiedStatus = $("#mobileVerifiedStatus").val();
+            var mobileNotificationSetting = $("#mobileNotificationSetting").val();
             SMSForm.submit(function(e) {               
 
                 e.preventDefault(); // Prevent the form from submitting normally
                 var data = {
                     _token: window.csrfToken,
                     mobileVerifiedStatus: mobileVerifiedStatus,
+                    mobileNotificationSetting: mobileNotificationSetting,
                     phone: $('#phone').val()
                 }
 
@@ -118,31 +121,100 @@
 
 
                 // Perform AJAX request to process the form
-                if(isValid){
-                    $.ajax({
-                        url: $(this).attr('action'),
-                        type: $(this).attr('method'),
-                        data: data,
-                        success: function(response) {                            
-                            // Open the modal box
-                            openModal();
-                            countdownInterval = setInterval(function() {
-                                countdownSeconds--;
-                                $('.verification_text').text('The Code was sent to your phone number.  it will be available for : ' + countdownSeconds + 's');
+                if(isValid)
+                {
+                    if(mobileNotificationSetting == 1)
+                    {
+                         //if mobile notificaiton was set, it will unsubscribe.  
+                         Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to get the notfication!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, confirm it!',
+                            customClass: {
+                                confirmButton: 'btn btn-primary',
+                                cancelButton: 'btn btn-outline-danger ms-1'
+                            },
+                            buttonsStyling: false
+                        }).then(function (result) {
+                            if (result.value) {
+                                $.ajax({
+                                    url: "{{route('front.account.send-verification-code')}}",
+                                    type: 'POST',
+                                    data: data,
+                                    success: function(response) {   
+                                        if(response.status == 'success'){
+                                            Swal.fire({
+                                                title: 'Good job!',
+                                                text: response.msg,
+                                                icon: 'success',
+                                                customClass: {
+                                                    confirmButton: 'btn btn-primary'
+                                                },
+                                                buttonsStyling: false
+                                            });
 
-                                if (countdownSeconds <= 0) {
-                                    clearInterval(countdownInterval);
-                                    $('.verification_text').text('');
-                                    countdownSeconds = 60;
-                                    closeModal();
-                                    btn_subscribe.prop('disabled', false);
-                                }
-                            }, 1000);
-                        },
-                        error: function(xhr, status, error) {
-                            // Handle error
-                        }
-                    });
+                                            setTimeout(() => {
+                                                location.reload();
+                                            }, 2000);
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        // Handle error
+                                    }
+                                });
+                            }else{
+                                btn_subscribe.prop('disabled', false);
+                            }
+                        });
+                    }else{
+                        $.ajax({
+                            url: $(this).attr('action'),
+                            type: $(this).attr('method'),
+                            data: data,
+                            success: function(response) {   
+                                btn_subscribe.prop('disabled', false);
+                                if(mobileVerifiedStatus == 'no'){
+                                    // Open the modal box
+                                    openModal();
+                                    countdownInterval = setInterval(function() {
+                                        countdownSeconds--;
+                                        $('.verification_text').text('The Code was sent to your phone number.  it will be available for : ' + countdownSeconds + 's');
+
+                                        if (countdownSeconds <= 0) {
+                                            clearInterval(countdownInterval);
+                                            $('.verification_text').text('');
+                                            countdownSeconds = 60;
+                                            closeModal();
+                                            btn_subscribe.prop('disabled', false);
+                                        }
+                                    }, 1000);                                 
+                                }else{
+                                    //if mobile is already verified
+                                    Swal.fire({
+                                        title: 'Good job!',
+                                        text: response.msg,
+                                        icon: 'success',
+                                        customClass: {
+                                            confirmButton: 'btn btn-primary'
+                                        },
+                                        buttonsStyling: false
+                                    });
+
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 2000);
+                                }                 
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle error
+                            }
+                        });
+                    }
+                    
+                   
+                    
                 }else{
                     btn_subscribe.prop('disabled', false);
                 }
@@ -176,18 +248,18 @@
                     success: function (response) {                        
                         if(response.status == 'success'){
                             closeModal();
-                            $('#mobileVerifiedStatus').val('yes');
-                            $('.btn_subscribe').text('Unsubscribe').removeClass('btn-sub').addClass('btn-danger');
-
                             Swal.fire({
                                 title: 'Good job!',
                                 text: response.msg,
                                 icon: 'success',
                                 customClass: {
-                                confirmButton: 'btn btn-primary'
+                                    confirmButton: 'btn btn-primary'
                                 },
                                 buttonsStyling: false
                             });
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2000);
                         }else{
                             Swal.fire({
                                 title: 'Error!',
