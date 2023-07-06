@@ -12,38 +12,38 @@
     </div>
     <div class="shadow-bottom"></div>
     <div class="main-menu-content">
-        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">                              
+        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
             @role(['admin'])
                 <li class="navigation-header">
-                    <span>Dashboard</span>               
+                    <span>Dashboard</span>
                 </li>
                 <li class="nav-item @if(request()->is('home')) active @endif">
                     <a class="d-flex align-items-center" href="{{ route('admin.home') }}">
                         <i data-feather="home"></i>
                         <span class="menu-title text-truncate">Dashboard</span>
-                    </a> 
+                    </a>
                 </li>
-            
+
                 <li class="navigation-header">
-                    <span>User &amp Role management</span>               
+                    <span>User &amp Role management</span>
                 </li>
 
                 <li class="nav-item  @if(request()->is('users*')) active @endif">
                     <a class="d-flex align-items-center" href="{{ route('users.index') }}">
                         <i data-feather="user"></i>
                         <span class="menu-title text-truncate">User</span>
-                    </a> 
+                    </a>
                 </li>
 
                 <li class="nav-item @if(request()->is('roles*')) active @endif">
                     <a class="d-flex align-items-center" href="{{ route('roles.index') }}">
                         <i data-feather="shield"></i>
                         <span class="menu-title text-truncate">Role</span>
-                    </a> 
+                    </a>
                 </li>
 
                 <li class="navigation-header">
-                    <span>Payment management</span>               
+                    <span>Payment management</span>
                 </li>
 
                 <li class="nav-item">
@@ -66,6 +66,17 @@
                         </li>
                     </ul>
                 </li>
+
+                <li class="navigation-header">
+                    <span>Trade</span>
+                </li>
+
+                <li class="nav-item @if(request()->is('trade_alert')) active @endif">
+                    <a class="d-flex align-items-center" href="{{ route('trade_alert.index')}}">
+                        <i data-feather="mail"></i>
+                        <span class="menu-title text-truncate">Alerts</span>
+                    </a>
+                </li>
             @endrole
 
             @role(['user'])
@@ -73,11 +84,11 @@
                     <a class="d-flex align-items-center" href="{{ route('home') }}">
                         <i data-feather="home"></i>
                         <span class="menu-title text-truncate">Dashboard</span>
-                    </a> 
+                    </a>
                 </li>
 
             @endrole
-            
+
 
         </ul>
     </div>
