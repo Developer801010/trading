@@ -12,12 +12,64 @@
 
 
 @section('content')
-    <div class="container">
-        <form method="post" action="{{ route('front.payment.process') }}" id="payment-form">
-            @csrf
-            <section class="checkout-section">
-                <h1 class="text-center checkout-title "><span class="subscription_type_title">{{$subscription_type}}</span> Checkout ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )</h1>
-              
+    <div class="container">        
+        <section class="checkout-section">
+            <h1 class="text-center checkout-title ">
+                <span class="subscription_type_title">
+                    {{$subscription_type}}</span> Checkout 
+                    ($<span class="price">{{$price}}</span>/<span class="period">{{$units}}</span> )
+            </h1>
+            <div class="row">
+                <div class="col-md-12">
+                    <p>
+                        <a class="text-danger" data-bs-toggle="collapse" href="#LoginForm" role="button" aria-expanded="false" aria-controls="LoginForm">
+                            Click here to login
+                        </a>
+                    </p>
+                    <div class="collapse {{ old('isLoginFormExpanded') ? 'show' : '' }}" id="LoginForm">
+                        <div class="card card-body">
+                            <p>If you have shopped with us before, please enter your details below. If you are a new customer, please proceed to the Billing section.</p>
+                            
+                            <form class="auth-login-form mt-2" action="{{ route('login') }}" method="POST">
+                                @csrf
+                                <div class="row mb-3">
+                                    <div class="col-md-5">
+                                        <label for="login-email" class="form-label">Email</label>
+                                        <input type="email" class="form-control"
+                                                            id="email" placeholder="Email" name="email"
+                                                            value="{{ old('email') }}" required autofocus>
+                                    </div>
+                        
+                                    <div class="col-md-5">
+                                        <div class="d-flex justify-content-between">
+                                            <label class="form-label" for="login-password">Password</label>
+                                            <a href="{{ url('/password/reset') }}">
+                                                <small>Forgot Password?</small>
+                                            </a>
+                                        </div>
+                                        <div class="input-group input-group-merge form-password-toggle">
+                                            <input type="password" class="form-control form-control-merge" required
+                                                id="password" name="password" 
+                                                aria-describedby="login-password" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <input type="hidden" name="isLoginFormExpanded" value="{{ old('isLoginFormExpanded') ? 'true' : 'false' }}">
+                                        <button class="btn btn-primary w-100">Sign in</button>
+                                    </div>
+                                </div>
+                            </form>    
+                            
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <form method="post" action="{{ route('front.payment.process') }}" id="payment-form">
+                @csrf
+                
                 <input type="hidden" name="stripe_plan_id" id="stripe_plan_id" 
                 value="@if ($units == 'mo') {{$month_plan['stripe_plan']}} @elseif ($units == 'qu') {{$quarter_plan['stripe_plan']}}  @elseif($units == 'yr' ) {{$year_plan['stripe_plan']}} @endif" />
 
@@ -140,14 +192,14 @@
                                 <label for="terms">I understand that my personal data will be used to process this order, support my experience throughout this website, and for other purposes described in our <a href="#">privacy policy</a>.
                                 </label>
                             </div>
-    
+
                             <div class="conditions rule">
                                 <input type="checkbox" id="conditions" />
                                 <label for="conditions">By joining, I agree to these <a href="#">Terms/Conditions</a></label>
                             </div>
                         </div>
                         
-    
+
                     </div>
                     <div class="col-md-4">
                         <div class="monthly-member-section member-section">
@@ -206,8 +258,9 @@
                         </div>
                     </div>
                 </div>
-            </section>
-        </form>
+                
+            </form>
+        </section>
     </div>
        
   
@@ -260,7 +313,7 @@
     );
 
     $(document).ready(function () {
-        var subscription_type_title = $('.subscription_type_title').text().toLowerCase();
+        var subscription_type_title = $('.subscription_type_title').text().toLowerCase().trim();  
         if(subscription_type_title == 'monthly'){
             activeMonthlyIcon();
         }else if(subscription_type_title == 'quarterly'){

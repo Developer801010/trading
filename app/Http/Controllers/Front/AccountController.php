@@ -76,19 +76,41 @@ class AccountController extends Controller
 
         return redirect()->back()->with('flash_success', 'Account information has been updated');
     }
+
+    public function notificationSetup()
+    {
+        if (auth()->user()->mobile_verified_at == null){  //mobile isn't verified
+            $mobileVerifiedStatus = 'no';
+        }else{
+            $mobileVerifiedStatus = 'yes';
+        }
+
+        return view('front.account.notification-setup', compact(
+            'mobileVerifiedStatus'
+        ));
+    }
     
     public function sendVerificationCode(Request $request)
-    {
+    { 
         $recipients = trim($request->input('phone'));
+        $mobileVerifiedStatus = trim($request->input('mobileVerifiedStatus'));
 
-        $sms_service = new SmsService();
-        $verificationCode = $this->generateVerificationCode();
-         // Store the verification code and its expiration time in the session
-        Session::put('verification_code', $verificationCode);
-        Session::put('verification_code_expires_at', now()->addSeconds(60));
-
-        $msg = 'Your verification code is: ' . $verificationCode;
-        return $sms_service->sendSMS($msg, '+1'.$recipients);
+        if($mobileVerifiedStatus == 'no'){  //if the mobile isn't verified. 
+            $sms_service = new SmsService();
+            $verificationCode = $this->generateVerificationCode();
+             // Store the verification code and its expiration time in the session
+            Session::put('verification_code', $verificationCode);
+            Session::put('verification_code_expires_at', now()->addSeconds(60));
+    
+            $msg = 'Your verification code is: ' . $verificationCode;
+            return $sms_service->sendSMS($msg, '+1'.$recipients);
+        }else{
+            //if mobile is alredy verified, it unsubscribes 
+            $obj = User::findorFail(auth()->user()->id);
+            $obj->mobile_notification_setting = 0;  //1:subscription. 0: unsubscription
+            $obj->save();
+        }
+      
     }
 
     public function verifyPhoneCode(Request $request)
@@ -99,21 +121,21 @@ class AccountController extends Controller
         $expirationTime = Session::get('verification_code_expires_at');
 
         $obj = User::findorFail(auth()->user()->id);
-        if ($obj->mobile_verified_at == null){  //if phone isn't verified
+        if ($obj->mobile_verified_at == null) //if phone isn't verified
+        {  
             if (Carbon::now()->greaterThan($expirationTime)) {
                 return response()->json(['msg' => 'Time is expired', 'status' => 'error']);
             }else{
                 if($phone_code == $verificationCode){
-                    
                     $obj->mobile_verified_at = Carbon::now();
+                    $obj->mobile_notification_setting = 1; //set mobile setting 1
                     $obj->save();
                     return response()->json(['msg' => 'The phone is verified.' , 'status' => 'success']);
+                }else{
+                    return response()->json(['msg' => 'The code is wrong.' , 'status' => 'error']);
                 }
             }
-        }else{
-
         }
-       
     }
 
     private function generateVerificationCode()

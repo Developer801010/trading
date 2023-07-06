@@ -17,9 +17,15 @@
                 My Account
             </a>
             <div class="dropdown-menu top-bar-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Notification Setup</a>
-                <a class="dropdown-item @if (request()->is('account/*')) active @endif" href="{{route('front.account-profile')}}">Account Details</a>
-                <a class="dropdown-item" href="#">My Subscription</a>
+                <a class="dropdown-item @if (request()->is('notify/*')) active @endif" href="{{route('front.account-notificaiton-setup')}}">
+                    Notification Setup
+                </a>
+                <a class="dropdown-item @if (request()->is('account/*')) active @endif" href="{{route('front.account-profile')}}">
+                    Account Details
+                </a>
+                <a class="dropdown-item" href="#">
+                    My Subscription
+                </a>
             </div>
             
         </div>

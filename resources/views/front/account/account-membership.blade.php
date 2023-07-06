@@ -10,7 +10,7 @@
 @section('content')
     <div class="container">
         <section class="dashboard-section">        
-            @include('layouts.front-email-verify')
+            {{-- @include('layouts.front-email-verify') --}}
            
         </section>
         <section class="account-section">
