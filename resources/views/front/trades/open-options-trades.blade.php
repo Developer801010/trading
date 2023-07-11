@@ -29,19 +29,17 @@
                 <table class="list-table table">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 5%">No</th>                        
-                            <th style="width: 12.5%">Symbol</th>
-                            <th style="width: 12.5%">Entry Date</th>
-                            <th style="width: 12.5%">BUY/SELL</th>
-                            <th style="width: 12.5%">Option</th>
-                            <th style="width: 12.5%">Position Size</th>
-                            <th style="width: 12.5%">Entry Price</th>
-                            <th style="width: 20%">Stop Price</th>
+                            <th>Symbol</th>
+                            <th>Entry Date</th>
+                            <th>BUY/SELL</th>
+                            <th>Option</th>
+                            <th>Position Size</th>
+                            <th>Entry Price</th>
+                            <th>Stop Price</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
                             <td>1</td>
                             <td>2</td>
                             <td>3</td>

@@ -30,7 +30,7 @@ class UserController extends Controller
         $data = User::get();
         $roles = Role::pluck('name','name')->all();
 
-        return view('users.index', compact('data', 'roles'));
+        return view('admin.users.index', compact('data', 'roles'));
     }
 
     /**
@@ -91,7 +91,7 @@ class UserController extends Controller
         $roles = Role::pluck('name','name')->all();
         $userRole = $user->roles->pluck('name','name')->all();
 
-        return view('users.edit',compact('user','roles','userRole'));
+        return view('admin.users.edit',compact('user','roles','userRole'));
     }
 
     /**

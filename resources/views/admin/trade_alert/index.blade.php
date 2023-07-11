@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="table-responsive">
-        <table class="table">
+        <table class="table trade-alert-table">
             <thead class="table-light">
                 <tr>
                     <th>No</th>

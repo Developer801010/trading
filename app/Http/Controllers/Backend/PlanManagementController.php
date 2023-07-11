@@ -15,7 +15,7 @@ class PlanManagementController extends Controller
     public function index()
     {
         $datas = Plan::all();
-        return view('plans.index', compact('datas'));
+        return view('admin.plans.index', compact('datas'));
     }
 
     /**
@@ -101,7 +101,7 @@ class PlanManagementController extends Controller
         $plan = new SubscriptionPlan();
         $plans = $plan->listPlan();
 
-        return view('plans.list-paypal-plan', compact('plans'));
+        return view('admin.plans.list-paypal-plan', compact('plans'));
     }
 
     /**
@@ -112,7 +112,7 @@ class PlanManagementController extends Controller
         $plan = new SubscriptionPlan();
         $plan = $plan->planDetail($id);
         
-        return view('plans.show-paypal-plan', compact('plan'));
+        return view('admin.plans.show-paypal-plan', compact('plan'));
     }
 
    

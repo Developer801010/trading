@@ -34,7 +34,7 @@ class RoleController extends Controller
     public function index(Request $request): View
     {
         $roles = Role::get();
-        return view('roles.index',compact('roles'));
+        return view('admin.roles.index',compact('roles'));
             // ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
@@ -46,7 +46,7 @@ class RoleController extends Controller
     public function create(): View
     {
         $permission = Permission::get();
-        return view('roles.create',compact('permission'));
+        return view('admin.roles.create',compact('permission'));
     }
 
     /**
@@ -82,7 +82,7 @@ class RoleController extends Controller
             ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
             ->all();
 
-        return view('roles.show',compact('role','permission', 'rolePermissions'));
+        return view('admin.roles.show',compact('role','permission', 'rolePermissions'));
     }
 
     /**
@@ -99,7 +99,7 @@ class RoleController extends Controller
             ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
             ->all();
 
-        return view('roles.edit',compact('role','permission','rolePermissions'));
+        return view('admin.roles.edit',compact('role','permission','rolePermissions'));
     }
 
     /**

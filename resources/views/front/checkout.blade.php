@@ -21,7 +21,7 @@
             </h1>
             <div class="row">
                 <div class="col-md-12">
-                    <p>
+                    <p> Returning customer?
                         <a class="text-danger" data-bs-toggle="collapse" href="#LoginForm" role="button" aria-expanded="false" aria-controls="LoginForm">
                             Click here to login
                         </a>
@@ -32,15 +32,15 @@
                             
                             <form class="auth-login-form mt-2" action="{{ route('login') }}" method="POST">
                                 @csrf
-                                <div class="row mb-3">
-                                    <div class="col-md-5">
+                                <div class="row">
+                                    <div class="col-md-5  mb-3">
                                         <label for="login-email" class="form-label">Email</label>
                                         <input type="email" class="form-control"
                                                             id="email" placeholder="Email" name="email"
                                                             value="{{ old('email') }}" required autofocus>
                                     </div>
                         
-                                    <div class="col-md-5">
+                                    <div class="col-md-5  mb-3">
                                         <div class="d-flex justify-content-between">
                                             <label class="form-label" for="login-password">Password</label>
                                             <a href="{{ url('/password/reset') }}">
@@ -284,11 +284,12 @@
     var member_section = $('.member-section');
     var monthly_membership = $('.monthly-membership');
     var quarterly_membership = $('.quarterly-membership');
-    var yearly_membership = $('.yearly-membership');
+    var yearly_membership = $('.yearly-membership');   
+    var phoneMask = $('.mobile-number-mask');
     var creditCard = $('.credit-card-mask');
     var expiryDateMask = $('.expiry-date-mask');
     var cvvMask = $('.cvv-code-mask');
-    var phoneMask = $('.mobile-number-mask');
+    var assetsPath = '{{ asset("assets") }}';
 
     var month_plan_stripe = '{{$month_plan['stripe_plan']}}';
     var month_plan_paypal = '{{$month_plan['paypal_plan']}}';
@@ -302,8 +303,6 @@
     var stripe_plan_id = $('#stripe_plan_id');
     var paypal_plan_id = $('#paypal_plan_id');
 
-    var assetsPath = '{{ asset("assets") }}';
-    console.log(assetsPath);
 
     member_section.hover(function () {
             $(this).find('.tooltip-text').removeClass('invisible');
@@ -458,26 +457,26 @@
 
     // Credit Card
     if (creditCard.length) {
-        creditCard.each(function () {
-            new Cleave($(this), {
-                creditCard: true,
-                onCreditCardTypeChanged: function (type) {
-                const elementNodeList = document.querySelectorAll('.card-type');
-                    if (type != '' && type != 'unknown') {
-                        //! we accept this approach for multiple credit card masking
-                        for (let i = 0; i < elementNodeList.length; i++) {
-                        elementNodeList[i].innerHTML =
-                            '<img src="' + assetsPath + '/image/icons/payments/' + type + '-cc.png" height="24"/>';
-                        }
-                    } else {
-                        for (let i = 0; i < elementNodeList.length; i++) {
-                        elementNodeList[i].innerHTML = '';
+            creditCard.each(function () {
+                new Cleave($(this), {
+                    creditCard: true,
+                    onCreditCardTypeChanged: function (type) {
+                    const elementNodeList = document.querySelectorAll('.card-type');
+                        if (type != '' && type != 'unknown') {
+                            //! we accept this approach for multiple credit card masking
+                            for (let i = 0; i < elementNodeList.length; i++) {
+                            elementNodeList[i].innerHTML =
+                                '<img src="' + assetsPath + '/image/icons/payments/' + type + '-cc.png" height="24"/>';
+                            }
+                        } else {
+                            for (let i = 0; i < elementNodeList.length; i++) {
+                            elementNodeList[i].innerHTML = '';
+                            }
                         }
                     }
-                }
+                });
             });
-        });
-    }
+        }
 
     // Expiry Date Mask
     if (expiryDateMask.length) {

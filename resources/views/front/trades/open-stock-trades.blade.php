@@ -29,7 +29,7 @@
                 <table class="list-table table">
                     <thead class="table-light">
                         <tr>
-                            <th>No</th>                        
+                            <th>Symbol</th>                       
                             <th>Long/Short</th>
                             <th>BUY/SELL</th>
                             <th>Entry Date</th>
@@ -43,7 +43,6 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
                             <td>1</td>
                             <td>2</td>
                             <td>3</td>
@@ -51,8 +50,9 @@
                             <td>5</td>
                             <td>6</td>
                             <td>7</td>
-                            <td>7</td>
-                            <td>7</td>
+                            <td>8</td>
+                            <td>9</td>
+                            <td>10</td>
                         </tr>
                     </tbody>
                 </table>

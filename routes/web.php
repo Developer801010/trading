@@ -26,6 +26,10 @@ use App\Http\Controllers\Front\PositionmanagementController;
 |
 */
 Route::get('/', [FrontController::class, 'homepage'])->name('front.home');
+Route::get('/news', [FrontController::class, 'news'])->name('front.news');
+Route::get('/learn', [FrontController::class, 'learn'])->name('front.learn');
+Route::get('/result', [FrontController::class, 'result'])->name('front.results');
+Route::get('/trading-strategy', [FrontController::class, 'tradingStrategy'])->name('front.trading-strategy');
 Route::get('/email-test', [FrontController::class, 'emailTest'])->name('front.email-test');
 
 Route::get('/subscription', [FrontController::class, 'subscription'])->name('front.subscription');
@@ -44,9 +48,9 @@ Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
     Route::post('/account/verify-phone-code', [AccountController::class, 'verifyPhoneCode'])->name('front.account.verify-phone-code');
 
     Route::get('/account/membership', [AccountController::class, 'membership'])->name('front.account-membership');
-
-    Route::get('/account/membership', [AccountController::class, 'membership'])->name('front.account-membership');    
-
+    Route::get('/account/payment-method-management', [AccountController::class, 'paymentMethodManagement'])->name('front.account-payment-method-management');
+    Route::delete('/account/delete-card/{id}', [AccountController::class, 'deleteCard'])->name('front.account-delete-card');
+    Route::post('/account/add-card', [AccountController::class, 'addCard'])->name('front.account-add-card');
 
     Route::get('/notify/notification-setup', [AccountController::class, 'notificationSetup'])->name('front.account-notificaiton-setup');    
     Route::post('/notify/send-verification-code', [AccountController::class, 'sendVerificationCode'])->name('front.account.send-verification-code');
@@ -80,6 +84,8 @@ Route::group(['middleware' => ['auth', 'role:admin'], ['prefix' => 'admin']], fu
 
     Route::resource('profiles', ProfileController::class);
 
+    Route::resource('trades', TradeAlertController::class);
+
     Route::resource('plans', PlanManagementController::class);
     Route::post('/paypal/plan/create', [PlanManagementController::class, 'createPlanPaypal'])->name('admin.create-plan-paypal');
     Route::get('/paypal/plan/list', [PlanManagementController::class, 'listPlanPaypal'])->name('admin.list-plan-paypal');
@@ -87,9 +93,6 @@ Route::group(['middleware' => ['auth', 'role:admin'], ['prefix' => 'admin']], fu
     Route::get('/paypal/plan/{id}/activate', [PlanManagementController::class, 'activatePlanPaypal'])->name('admin.activate-plan-paypal');
     Route::delete('/paypal/plan/{id}/delete', [PlanManagementController::class, 'deletePlanPaypal'])->name('admin.delete-plan-paypal');
 
-    Route::group(['prefix' => 'trade_alert'], function () {
-        Route::get('/', [TradeAlertController::class, 'index'])->name('trade_alert.index');
-        Route::post('/create', [TradeAlertController::class, 'create'])->name('trade_alert.create');
-    });
+   
 });
 

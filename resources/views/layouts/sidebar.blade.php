@@ -71,8 +71,8 @@
                     <span>Trade</span>
                 </li>
 
-                <li class="nav-item @if(request()->is('trade_alert')) active @endif">
-                    <a class="d-flex align-items-center" href="{{ route('trade_alert.index')}}">
+                <li class="nav-item @if(request()->is('trades*')) active @endif">
+                    <a class="d-flex align-items-center" href="{{ route('trades.index')}}">
                         <i data-feather="mail"></i>
                         <span class="menu-title text-truncate">Alerts</span>
                     </a>

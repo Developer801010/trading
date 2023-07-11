@@ -29,7 +29,6 @@
                 <table class="list-table table">
                     <thead class="table-light">
                         <tr>
-                            <th>No</th>                        
                             <th>Symbol</th>
                             <th>Entry Date</th>
                             <th>Exit Date</th>
@@ -39,11 +38,11 @@
                             <th>Exit Price</th5%>
                             <th>Gain/loss</th>
                             <th>Gain/loss(%)</th>
+                            <th>Position size</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>0</td>
                             <td>1</td>
                             <td>2</td>
                             <td>3</td>
@@ -53,6 +52,7 @@
                             <td>7</td>
                             <td>8</td>
                             <td>9</td>
+                            <td>10</td>
                         </tr>
                     </tbody>
                 </table>

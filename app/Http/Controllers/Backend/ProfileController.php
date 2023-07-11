@@ -15,7 +15,7 @@ class ProfileController extends Controller
     public function index()
     {
         //
-        return view('profile.change-password');
+        return view('admin.profile.change-password');
         
     }
 

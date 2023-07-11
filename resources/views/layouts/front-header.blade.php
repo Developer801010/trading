@@ -30,16 +30,16 @@
               <a class="nav-link @if (request()->is('/')) active @endif" href="{{ route('front.home') }}">Home</a>
             </li> 
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="#">News</a>
+              <a class="nav-link  @if (request()->is('/news')) active @endif" aria-current="page" href="{{route('front.news')}}">News</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="#">Learn</a>
+              <a class="nav-link  @if (request()->is('/learn')) active @endif" aria-current="page" href="{{route('front.learn')}}">Learn</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="#">Results</a>
+              <a class="nav-link  @if (request()->is('/result')) active @endif" aria-current="page" href="{{route('front.results')}}">Results</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="#">Trading Strategy</a>
+              <a class="nav-link  @if (request()->is('/trading-strategy')) active @endif" aria-current="page" href="{{route('front.trading-strategy')}}">Trading Strategy</a>
             </li>       
           @endauth
         </ul>

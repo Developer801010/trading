@@ -19,6 +19,26 @@ class FrontController extends Controller
         return view('front.homepage');
     }
 
+    public function news()
+    {
+        return view('front.news');
+    }
+
+    public function learn()
+    {
+        return view('front.learn');
+    }
+
+    public function result()
+    {
+        return view('front.result');
+    }
+
+    public function tradingStrategy()
+    {
+        return view('front.trading-strategy');
+    }
+
     /**
      * Subscription page
      */

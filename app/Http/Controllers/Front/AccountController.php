@@ -7,12 +7,17 @@ use App\Models\Plan;
 use App\Models\User;
 use App\Service\SmsService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
+use Stripe\PaymentMethod;
+use Stripe\Stripe;
+use Stripe\Subscription as StripeSubscription;
 
 class AccountController extends Controller
 {
@@ -162,6 +167,14 @@ class AccountController extends Controller
 
      public function membership()
      {
+        // Retrieve the user's Stripe customer ID
+        $customerId = auth()->user()->stripe_id;
+        Stripe::setApiKey(config('services.stripe.secret_key'));
+        // Retrieve the subscription history for the customer from Stripe
+        $subscriptions = StripeSubscription::all(['customer' => $customerId]);
+
+        dd($subscriptions->data);
+        //get the member date
         $member_date =Subscription::where('user_id', auth()->user()->id)->value('created_at'); 
         
         $member_date = Carbon::parse($member_date)->format('F j, Y h:i A');
@@ -202,5 +215,93 @@ class AccountController extends Controller
                 )
             ); 
            
+     }
+
+     public function paymentMethodManagement()
+     {
+        $user = User::find(auth()->user()->id);
+        $paymentMethods = $user->paymentMethods();    
+        $defaultPaymentMethod = null;
+        if ($user->hasPaymentMethod()) {
+            $defaultPaymentMethod = $user->defaultPaymentMethod();  
+        }     
+
+        return view('front.account.account-payment-method-management', 
+            compact(               
+                'paymentMethods',
+                'defaultPaymentMethod'
+            )
+        );
+     }
+
+     public function addCard(Request $request)
+     {  
+
+        try{
+            $user = User::find(auth()->user()->id);
+
+            Stripe::setApiKey(config('services.stripe.secret_key'));
+
+            $cardName = $request->input('card-name');
+            $cardNumber = $request->input('card-number');
+            $cardCVC = $request->input('card-cvc');
+            $expDate = $request->input('card-expire-date');
+            list($expMonth, $expYear) = explode('/', $expDate);
+
+            $paymentMethod = PaymentMethod::create([
+                'type' => 'card',
+                'card' => [
+                    'number' => $cardNumber, // Replace with the actual card number
+                    'exp_month' => $expMonth, // Replace with the actual expiration month
+                    'exp_year' => $expYear, // Replace with the actual expiration year
+                    'cvc' => $cardCVC
+                ],
+                'billing_details' => [
+                    'name' => $cardName
+                ]
+            ]); 
+
+
+            $user->addPaymentMethod($paymentMethod);
+            $user->updateDefaultPaymentMethod($paymentMethod);
+
+            $user->pm_type = $paymentMethod['card']['brand'];
+            $user->pm_last_four = $paymentMethod['card']['last4'];
+            $user->save();
+
+            return redirect()->back()->with('flash_success', 'Payment method is updated successfully!');
+
+        }catch(Exception $ex){
+            return redirect()->back()->withInput()->withErrors($ex->getMessage());
+        }
+       
+     }
+
+    
+
+     public function deleteCard(Request $request, $id)
+     {
+        $user = USer::find(auth()->user()->id);
+
+        try{
+
+            // Check if the payment method to be deleted is the default payment method
+            $paymentMethod = $user->findPaymentMethod($id);
+            $isDefaultPaymentMethod = $user->defaultPaymentMethod()->id === $id;
+
+            // Delete the payment method
+            $user->deletePaymentMethod($id);
+
+            // Update default payment method if the deleted method was the default
+            if ($isDefaultPaymentMethod && $user->hasPaymentMethod()) {
+                $newDefaultPaymentMethod = $user->paymentMethods()->first();
+                $user->updateDefaultPaymentMethod($newDefaultPaymentMethod->id);
+            }
+
+            return redirect()->back()->with('flash_success', 'Payment method is deleted successfully');
+        }catch(Exception $ex){
+            return redirect()->back()->with('error', $ex->getMessage());
+        }
+        
      }
 }

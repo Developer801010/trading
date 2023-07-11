@@ -48,30 +48,31 @@
                         </div>
                     </form>
                 </div>
-            </div>
-           
+            </div>           
         </section>
+
+        <div class="modal fade" id="verificationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Verification</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="phone" class="form-label">Verification Code</label>
+                    <input type="text" class="form-control" id="phone-verification-code" name="phone-verification-code" value="">            
+                    <span class="text-danger account_display_name verification_text">The Code was send to your phone number.  it will be available for 60s</span>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
     </div>    
 @endsection
 
-<div class="modal fade" id="verificationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Verification</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <label for="phone" class="form-label">Verification Code</label>
-            <input type="text" class="form-control" id="phone-verification-code" name="phone-verification-code" value="">            
-            <span class="text-danger account_display_name verification_text">The Code was send to your phone number.  it will be available for 60s</span>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
 
 @section('page-script')

@@ -765,6 +765,15 @@ div.dataTables_wrapper div.dataTables_filter input{
     margin-bottom: 30px;
   }
 
+  .login-section{
+    max-width: 600px;
+    margin: 250px auto 100px;
+  }
+
+  .login-section .card-body{
+    padding: 45px 40px;
+  }
+
   @media screen and (max-width: 1399px) {
     #navbarSupportedContent .nav-link, 
     .btn_member{
@@ -881,7 +890,7 @@ div.dataTables_wrapper div.dataTables_filter input{
     }
 
     .checkout-title{
-      font-size: 24px;
+      font-size: 22px;
     }
 
     .checkout-subtitle{
