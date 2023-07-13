@@ -188,7 +188,7 @@
                             </div>
         
                             <div class="terms rule">
-                                <input type="checkbox" id="terms" />
+                                <input type="checkbox" id="terms"  />
                                 <label for="terms">I understand that my personal data will be used to process this order, support my experience throughout this website, and for other purposes described in our <a href="#">privacy policy</a>.
                                 </label>
                             </div>
@@ -496,10 +496,10 @@
     }
     
     // Handle form submission
-    var pyament_form = document.getElementById('payment-form');
+    var payment_form = document.getElementById('payment-form');
 
 
-    pyament_form.addEventListener('submit', function(event) {
+    payment_form.addEventListener('submit', function(event) {
         event.preventDefault();
                 
         var paymentOption = $('input[name="payment_option"]:checked').val();
@@ -507,12 +507,12 @@
         var cardButton = $('#card-button');
         var termsChecked = $('#terms').is(':checked');  
         var conditionsChecked = $('#conditions').is(':checked');
-        var first_name = $('#first_name');
-        var last_name = $('#last_name');
-        var email = $('#email');
-        var mobile_number = $('#mobile_number');
-        var password = $('#password');
-        var password_confirmation = $('#password_confirmation');
+        var first_name = $('#payment-form #first_name');
+        var last_name = $('#payment-form #last_name');
+        var email = $('#payment-form #email');
+        var mobile_number = $('#payment-form #mobile_number');
+        var password = $('#payment-form #password');
+        var password_confirmation = $('#payment-form #password_confirmation');
 
         if(first_name.val() == ''){
             isValid = false;
@@ -645,8 +645,8 @@
 
    
     function FormHandler(){
-        var pyament_form = document.getElementById('payment-form');
-        pyament_form.submit();
+        var payment_form = document.getElementById('payment-form');
+        payment_form.submit();
     }
     
 </script>

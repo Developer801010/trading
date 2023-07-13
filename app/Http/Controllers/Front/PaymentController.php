@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Mail\StripeSubscriptionCancelEmail;
 use App\Mail\Welcome;
 use App\Models\Plan;
 use App\Models\User;
@@ -170,10 +171,28 @@ class PaymentController extends Controller
      */
     public function cancelSubscription(Request $request)
     {
-        $subscriptionName = $request->subscriptionName;
-        if($subscriptionName){
-            $user = auth()->user();
-            $user->subscription($subscriptionName)->cancel();
+        $membership_level = $request->membership_level;
+        $user = auth()->user();
+        $subscription = $user->subscription($membership_level);   
+        
+        if($subscription){
+            try{
+                $subscription->cancel();
+
+                //Subscription cancel Email
+                $data = [
+                    'first_name' => auth()->user()->first_name,
+                    'last_name' => auth()->user()->last_name,
+                ];
+
+                Mail::to(auth()->user->email)->queue(new StripeSubscriptionCancelEmail($data));
+
+                return redirect()->back()->with('flash_success', 'Subscription cancelation requested successfully.');
+            }catch(Exception $ex){
+                return redirect()->back()->with('error', $ex->getMessage());
+            }            
+        } else {
+            return redirect()->back()->with('error', 'No active subscription found.');
         }
     }
     

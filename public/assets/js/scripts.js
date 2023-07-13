@@ -271,30 +271,30 @@ if (newBillingPlanForm.length) {
 var dtTradeAlertTable = $('.trade-alert-table');  
 var EditTradeAlertForm = $('.trade-edit-form');
 
-var dt_trade_alert = dtTradeAlertTable.DataTable({      
-    // order: [[2, 'desc']],
-    dom:
-    '<"d-flex justify-content-between align-items-center header-actions mx-2 row mt-75"' +
-    '<"col-sm-12 col-lg-4 d-flex justify-content-center justify-content-lg-start" l>' +
-    '<"col-sm-12 col-lg-8 ps-xl-75 ps-0"<"dt-action-buttons d-flex align-items-center justify-content-center justify-content-lg-end flex-lg-nowrap flex-wrap"<"me-1"f>B>>' +
-    '>t' +
-    '<"d-flex justify-content-between mx-2 row mb-1"' +
-    '<"col-sm-12 col-md-6"i>' +
-    '<"col-sm-12 col-md-6"p>' +
-    '>',
-    buttons: [
-    {
-        text: feather.icons['plus'].toSvg({ class: 'me-50 font-small-4' }) + 'Add New Trade',
-        className: 'create-new-trade btn btn-success',
-        attr: {
-          'href': createTradeUrl
-        },
-        init: function (api, node, config) {
-          $(node).removeClass('btn-secondary');
-        }
-    }
-    ]
-});    
+// var dt_trade_alert = dtTradeAlertTable.DataTable({      
+//     // order: [[2, 'desc']],
+//     dom:
+//     '<"d-flex justify-content-between align-items-center header-actions mx-2 row mt-75"' +
+//     '<"col-sm-12 col-lg-4 d-flex justify-content-center justify-content-lg-start" l>' +
+//     '<"col-sm-12 col-lg-8 ps-xl-75 ps-0"<"dt-action-buttons d-flex align-items-center justify-content-center justify-content-lg-end flex-lg-nowrap flex-wrap"<"me-1"f>B>>' +
+//     '>t' +
+//     '<"d-flex justify-content-between mx-2 row mb-1"' +
+//     '<"col-sm-12 col-md-6"i>' +
+//     '<"col-sm-12 col-md-6"p>' +
+//     '>',
+//     buttons: [
+//     {
+//         text: feather.icons['plus'].toSvg({ class: 'me-50 font-small-4' }) + 'Add New Trade',
+//         className: 'create-new-trade btn btn-success',
+//         attr: {
+//           'href': createTradeUrl
+//         },
+//         init: function (api, node, config) {
+//           $(node).removeClass('btn-secondary');
+//         }
+//     }
+//     ]
+// });    
 
 //action to go to the create page when the button is clicked. 
 $('.create-new-role, .create-new-trade').click(function (e) {

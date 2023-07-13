@@ -21,21 +21,30 @@
                 <div class="col-md-9">
                     <h2 class="heading pb-3 pt-3">Membership</h2>
                     
-                    @if ($member_date)
+                    @include('layouts.error')
+                    @if ($subscriptions->data)
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label for="last_name" class="form-label">Member Since: </label> 
-                                {{ $member_date }}
+                                {{ \Carbon\Carbon::parse($subscriptions->data[0]['created'])->format('F j, Y') }}
                             </div>
                             <div class="col-md-12">
                                 <label for="last_name" class="form-label">Account will cancel on </label> 
-                                {{ $account_cancel_date }}
+                                {{ \Carbon\Carbon::parse($subscriptions->data[0]['current_period_end'])->format('F j, Y') }}
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label">Membership level:</label> {{ $membership_level }}
+                                <label class="form-label">Membership level: {{ $membership_level }}</label> 
                             </div>
                             <div class="col-md-12">
-                                <a href="#" class="btn_member_cancel">Membership cancel</a>
+                                <form method="post" action={{route('front.cancel-card-subscription')}} class="mt-3">
+                                    <input type="hidden" name="membership_level" value="{{ $membership_level }}" />
+                                    @csrf
+                                    @if (auth()->user()->subscription($membership_level)->onGracePeriod())
+                                        <button type="submit" disabled class="btn btn-danger">Membership Cancelation Requested</button>
+                                    @else
+                                        <button type="submit" class="btn btn-danger">Membership Cancelation</button>
+                                    @endif                                    
+                                </form>                                
                             </div>
                         </div>    
 
@@ -44,20 +53,24 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Order#</th=>                        
-                                        <th>Order Date</th>
+                                        <th>Billing Start</th>
+                                        <th>Billing End</th>
                                         <th>Description</th>
                                         <th>Amount</th>
                                         <th>Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($order_datas as $data)
+                                    @foreach ($subscriptions->data as $subscription)
                                         <tr>
-                                            <td>{{ $data->id }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($data->created_at)->format('F j, Y') }}</td>
-                                            <td>{{ $data->name }}</td>
-                                            <td>${{ getPlanPrice(getPaymentType( $data->name )) }}</td>
-                                            <td>{{ getPaymentType( $data->name ) }}</td>
+                                            <td>{{ $subscription->id }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($subscription->current_period_start)->format('F j, Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($subscriptions->current_period_end)->format('F j, Y') }}</td>
+                                            <td>{{ getSubscriptionTitle($subscription->id) }}</td>
+                                            <td>
+                                                ${{ $subscription['plan']['amount']/100 }}
+                                            </td>
+                                            <td>{{ $subscription['plan']['interval'] }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

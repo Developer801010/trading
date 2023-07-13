@@ -3,6 +3,7 @@
 //Generate Random String
 
 use App\Models\Plan;
+use Laravel\Cashier\Subscription;
 
 function generateRandomString($length = 10) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -33,4 +34,15 @@ function getPaymentType($letter)
 function getPlanPrice($planName)
 {
     return Plan::where('name', $planName)->value('price');
+}
+
+function getSubscriptionTitle($stripe_id)
+{
+    return Subscription::where('user_id', auth()->user()->id)
+        ->where('stripe_id', $stripe_id)->value('name');
+}
+
+function getSubscriptionType($interval, $interval_count)
+{
+   
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Mail\StripeSubscriptionCancelEmail;
 use App\Models\Plan;
 use App\Models\User;
 use App\Service\SmsService;
@@ -11,6 +12,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Cashier\Cashier;
@@ -170,51 +172,21 @@ class AccountController extends Controller
         // Retrieve the user's Stripe customer ID
         $customerId = auth()->user()->stripe_id;
         Stripe::setApiKey(config('services.stripe.secret_key'));
-        // Retrieve the subscription history for the customer from Stripe
-        $subscriptions = StripeSubscription::all(['customer' => $customerId]);
+       
+        try{
+            // Retrieve the subscription history for the customer from Stripe
+            $subscriptions = StripeSubscription::all(['customer' => $customerId]);    //dd($subscriptions->data);  
+            $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name');
 
-        dd($subscriptions->data);
-        //get the member date
-        $member_date =Subscription::where('user_id', auth()->user()->id)->value('created_at'); 
-        
-        $member_date = Carbon::parse($member_date)->format('F j, Y h:i A');
-        $account_cancel_date = $membership_level = '';
-
-        $payment_type = auth()->user()->pm_type;
-
-        $plan_price = Subscription::where('user_id', auth()->user()->id)
-            ->where('stripe_status', 'active')  
-            ->value('stripe_price');  
-
-        if($payment_type == 'paypal'){
-            $membership_level = Plan::where('paypal_plan', $plan_price)->value('name');
-        }else{
-            $membership_level = Plan::where('stripe_plan', $plan_price)->value('name'); 
-        }
-        
-        //membership level
-        if($membership_level == 'Monthly'){
-            $account_cancel_date = Carbon::parse($member_date)->addMonth()->format('F j, Y h:i A');
-        }else if($membership_level == 'Quarterly'){
-            $account_cancel_date = Carbon::parse($member_date)->addQuarter()->format('F j, Y h:i A');
-        }else if ($membership_level == 'Yearly'){
-            $account_cancel_date = Carbon::parse($member_date)->addYear()->format('F j, Y h:i A');
-        }
-
-        //member order data
-        $order_datas = Subscription::where('user_id', auth()->user()->id)
-            ->where('stripe_status', 'active')
-            ->get();  
-
-        return view('front.account.account-membership', 
+            return view('front.account.account-membership', 
             compact(
-                'member_date',
-                'account_cancel_date',
-                'membership_level',
-                'order_datas'
+                    'subscriptions',
+                    'membership_level'
                 )
             ); 
-           
+        }catch(Exception $ex){
+            return redirect()->route('front.account-membership')->withErrors($ex->getMessage());
+        }
      }
 
      public function paymentMethodManagement()

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Trade;
 
 class TradeAlertController extends Controller
 {
@@ -20,7 +21,9 @@ class TradeAlertController extends Controller
      */
     public function index()
     {
-        return view('admin.trade_alert.index');
+        $parentTrades = Trade::with('tradeDetail')->get();
+
+        return view('admin.trade_alert.index', compact('parentTrades'));
     }
 
     /**

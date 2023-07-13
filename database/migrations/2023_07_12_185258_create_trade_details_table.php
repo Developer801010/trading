@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('trades', function (Blueprint $table) {
+        Schema::create('trade_details', function (Blueprint $table) {
             $table->id();
-            $table->string('trade_type')->comment('stock, option');
-            $table->string('trade_symbol');
-            $table->string('trade_direction')->comment('buy, sell');
-            $table->string('trade_option')->comment('call, put')->comment('Only for option trades');      
-            $table->date('expiration_date');
+            $table->unsignedBigInteger('trade_id');
+            $table->date('expiration_date')->nullable();
             $table->decimal('strike_price', 10, 2);
             $table->decimal('entry_price', 10, 2);
             $table->decimal('stop_price', 10, 2);
@@ -28,6 +25,8 @@ return new class extends Migration
             $table->string('chart_image')->nullable()->comment('The path or URL to the uploaded chart image');
             $table->dateTime('scheduled_at')->nullable()->comment('The date and time for scheduled posting');
             $table->timestamps();
+
+            $table->foreign('trade_id')->references('id')->on('trades')->onDelete('cascade');
         });
     }
 
@@ -36,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trades');
+        Schema::dropIfExists('trade_details');
     }
 };

@@ -42,8 +42,10 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/extensions/ext-component-toastr.css') }}">
 
     <!-- BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">    
     <!-- END: Vendor CSS-->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     @yield('page-style')
 </head>

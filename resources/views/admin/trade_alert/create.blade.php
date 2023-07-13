@@ -34,14 +34,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-2 col-12 mb-50">
-                                        <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button">
-                                            <i data-feather="x" class="me-25"></i>
-                                            <span>Delete</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
                                             <label class="form-label" for="itemname">Symbol</label>
@@ -49,21 +41,15 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-3 col-12">
-                                        <div class="mb-1">
-                                            <label class="form-label mb-1" for="itemname">Trade Direction</label><br>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="trade_direction" id="trade_direction_buy" value="buy" checked />
-                                                <label class="form-check-label" for="trade_direction_buy">Buy</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="trade_direction" id="trade_direction_sell" value="sell" />
-                                                <label class="form-check-label" for="trade_direction_sell">Sell</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 col-12">
+                                    {{-- <div class="col-md-2 col-12 mb-50">
+                                        <button class="btn btn-outline-danger text-nowrap px-1" data-repeater-delete type="button">
+                                            <i data-feather="x" class="me-25"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </div> --}}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-12 option_column d-none">
                                         <div class="mb-1">
                                             <label class="form-label mb-1" for="itemname">Trade Option</label><br>
                                             <div class="form-check form-check-inline">
@@ -79,114 +65,84 @@
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label mb-1" for="itemname">Trade Long/Short</label><br>
+                                            <label class="form-label mb-1" for="itemname">Direction</label><br>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="trade_long_shirt" id="trade_long" value="long" checked />
-                                                <label class="form-check-label" for="trade_long">Long</label>
+                                                <input class="form-check-input" type="radio" name="trade_direction" id="trade_direction_buy" value="buy" checked />
+                                                <label class="form-check-label" for="trade_direction_buy">Buy</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="trade_long_shirt" id="trade_short" value="shirt" />
-                                                <label class="form-check-label" for="trade_short">Shirt</label>
+                                                <input class="form-check-input" type="radio" name="trade_direction" id="trade_direction_sell" value="sell" />
+                                                <label class="form-check-label" for="trade_direction_sell">Sell</label>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 col-12  option_column d-none">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="itemname">Expiration Date (DD/MM/YYYY)</label>
+                                            <input type="text" class="form-control picker" name="expiration_date" id="expiration_date" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 col-12  option_column d-none">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="itemname">Strike Price($)</label>
+                                            <input type="text" class="form-control" name="strike_price" id="strike_price" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Entry Date (yyyy-mm-dd)</label>
-                                            <input type="text" class="form-control picker" name="entry_date" id="entry_date" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 col-12">
-                                        <div class="mb-1">
-                                            <label class="form-label" for="itemname">Entry Price</label>
+                                            <label class="form-label" for="itemname">Entry Price($)</label>
                                             <input type="text" class="form-control" name="entry_price" id="entry_price" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Position Size(%)</label>
-                                            <input type="text" class="form-control" name="position_size" id="position_size" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 col-12">
-                                        <div class="mb-1">
-                                            <label class="form-label" for="itemname">Stop Price</label>
+                                            <label class="form-label" for="itemname">Stop Price($)</label>
                                             <input type="text" class="form-control" name="stop_price" id="stop_price" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Target Price</label>
+                                            <label class="form-label" for="itemname">Target Price($)</label>
                                             <input type="text" class="form-control" name="projected_target_price" id="projected_target_price" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Total Position In Stock</label>
-                                            <input type="text" class="form-control" name="total_position_in_stock" id="total_position_in_stock" />
+                                            <label class="form-label" for="itemname">Entry Date (DD/MM/YYYY)</label>
+                                            <input type="text" class="form-control picker" name="entry_date" id="entry_date" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Average Price</label>
-                                            <input type="text" class="form-control" name="average_price" id="average_price" />
+                                            <label class="form-label" for="itemname">Position Size(%)</label>
+                                            <select class="form-select" name="position_size" id="position_size">
+                                                @for ($i = 0.5; $i <= 10; $i += 0.5)
+                                                    <option value="{{$i}}">{{$i}}</option>
+                                                @endfor                                                
+                                            </select>
                                         </div>
                                     </div>
-
-                                    <div class="col-md-3 col-12">
-                                        <div class="mb-1">
-                                            <label class="form-label" for="itemname">Exit Price</label>
-                                            <input type="text" class="form-control" name="exit_price" id="exit_price" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 col-12">
-                                        <div class="mb-1">
-                                            <label class="form-label" for="itemname">Exit Date(yyyy-mm-dd)</label>
-                                            <input type="text" class="form-control picker" name="exit_date" id="exit_date" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 col-12">
-                                        <div class="mb-1">
-                                            <label class="form-label" for="itemname">Profit(%)</label>
-                                            <input type="text" class="form-control" name="profit_percentage" id="profit_percentage" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 col-12">
-                                        <div class="mb-1">
-                                            <label class="form-label" for="itemname">Gain Loss</label>
-                                            <input type="text" class="form-control" name="gain_loss" id="gain_loss" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 col-12">
-                                        <div class="mb-1">
-                                            <label class="form-label" for="itemname">Gain Loss(%)</label>
-                                            <input type="text" class="form-control" name="gain_loss_percentage" id="gain_loss_percentage" />
-                                        </div>
-                                    </div>
+                                  
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 mb-1">
-                                        <label class="form-label" for="itemname">Trade Description</label>
+                                        <label class="form-label" for="itemname">Comment on Trade</label>
                                         <textarea class="form-control" name="trade_description" id="trade_description" rows="3"></textarea>
                                     </div>
 
-                                    <div class="col-6 mb-1">
+                                    <div class="col-12 mb-1">
                                         <label for="customFile" class="form-label">Chart Image</label>
                                         <input class="form-control" type="file" id="chart_image" name="chart_image" />
                                     </div>
 
-                                    <div class="col-6 mb-1">
+                                    <div class="col-12 mb-1 d-none">
                                         <label class="form-label" for="itemname">Trade Date (yyyy-mm-dd)</label>
                                         <input type="text" class="form-control picker" name="trade_date" id="trade_date" />
                                     </div>
@@ -197,11 +153,12 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button class="btn btn-icon btn-primary" type="button" data-repeater-create>
+                                {{-- <button class="btn btn-icon btn-primary" type="button" data-repeater-create>
                                     <i data-feather="plus" class="me-25"></i>
                                     <span>Add New</span>
-                                </button>
-                                <button type="submit" class="btn btn-success">Save</button>
+                                </button> --}}
+                                <button type="submit" class="btn btn-success" style="margin-right:15px;">Save</button>
+                                <a href="" class="btn btn-outline-primary">Cancel</a>
                             </div>
                         </div>
                     </form>
@@ -212,32 +169,53 @@
 </section>
 @endsection
 @section('page-script')
-<script src="{{asset('app-assets/vendors/js/forms/repeater/jquery.repeater.min.js')}}"></script>
+{{-- <script src="{{asset('app-assets/vendors/js/forms/repeater/jquery.repeater.min.js')}}"></script> --}}
 <script src="{{asset('app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js')}}"></script>
 <script>
-    $('.trade-repeater, .repeater-default').repeater({
-        show: function () {
-            $(this).slideDown();
-            // Feather Icons
-                if (feather) {
-                    feather.replace({ width: 14, height: 14 });
-                }
-            },
-        hide: function (deleteElement) {
-            if (confirm('Are you sure you want to delete this element?')) {
-                $(this).slideUp(deleteElement);
+
+    // $('.trade-repeater, .repeater-default').repeater({
+    //     show: function () {
+    //         $(this).slideDown();
+    //         // Feather Icons
+    //             if (feather) {
+    //                 feather.replace({ width: 14, height: 14 });
+    //             }
+    //         },
+    //     hide: function (deleteElement) {
+    //         if (confirm('Are you sure you want to delete this element?')) {
+    //             $(this).slideUp(deleteElement);
+    //         }
+    //     }
+    // });
+
+    $(document).ready(function () {
+        
+    });
+
+    var option_column = $('.option_column');
+
+    $('input[name="trade_type"]').change(function() {
+        // Get the value of the selected radio button
+        var selectedValue = $(this).val(); 
+        
+        // Perform actions based on the selected value
+        if (selectedValue === "stock") 
+        {
+            option_column.addClass('d-none');
+        } else if (selectedValue === "option") {
+            option_column.removeClass('d-none');
+          
+        }      
+    });
+
+    picker = $('.picker');
+    picker.flatpickr({
+        allowInput: true,
+        onReady: function (selectedDates, dateStr, instance) {
+            if (instance.isMobile) {
+            $(instance.mobileInput).attr('step', null);
             }
         }
-  });
-
-  picker = $('.picker');
-  picker.flatpickr({
-      allowInput: true,
-      onReady: function (selectedDates, dateStr, instance) {
-        if (instance.isMobile) {
-          $(instance.mobileInput).attr('step', null);
-        }
-      }
-  });
+    });
 </script>
 @endsection
