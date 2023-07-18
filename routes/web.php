@@ -86,6 +86,8 @@ Route::group(['middleware' => ['auth', 'role:admin'], ['prefix' => 'admin']], fu
     Route::resource('profiles', ProfileController::class);
 
     Route::resource('trades', TradeAlertController::class);
+    Route::post('trades/close', [TradeAlertController::class, 'tradeClose'])->name('admin.trade-close');
+    Route::post('trades/add', [TradeAlertController::class, 'tradeAdd'])->name('admin.trade-add');
 
     Route::resource('plans', PlanManagementController::class);
     Route::post('/paypal/plan/create', [PlanManagementController::class, 'createPlanPaypal'])->name('admin.create-plan-paypal');

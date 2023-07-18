@@ -774,6 +774,16 @@ div.dataTables_wrapper div.dataTables_filter input{
     padding: 45px 40px;
   }
 
+  .pagination{
+    justify-content: flex-end;
+    margin-right: 15px;
+    margin-top: 20px
+  }
+
+  .modal_trade_title{
+    margin-bottom: 20px;
+  }
+
   @media screen and (max-width: 1399px) {
     #navbarSupportedContent .nav-link, 
     .btn_member{
@@ -897,6 +907,7 @@ div.dataTables_wrapper div.dataTables_filter input{
       margin-bottom: 20px;
       text-align: center;
     }
+
 
   }
   

@@ -71,11 +71,19 @@
                     <span>Trade</span>
                 </li>
 
-                <li class="nav-item @if(request()->is('trades*')) active @endif">
-                    <a class="d-flex align-items-center" href="{{ route('trades.index')}}">
+                <li class="nav-item">
+                    <a class="d-flex align-items-center" href="#">
                         <i data-feather="mail"></i>
                         <span class="menu-title text-truncate">Alerts</span>
                     </a>
+                    <ul class="menu-content">
+                        <li class="nav-item @if(request()->is('trades*')) active @endif">
+                            <a class="d-flex align-items-center" href="{{ route('trades.index') }}">
+                                <i data-feather="circle"></i>
+                                <span class="menu-item text-truncate">Open Trades</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             @endrole
 
@@ -86,10 +94,7 @@
                         <span class="menu-title text-truncate">Dashboard</span>
                     </a>
                 </li>
-
             @endrole
-
-
         </ul>
     </div>
 </div>

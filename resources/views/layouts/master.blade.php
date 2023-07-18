@@ -45,7 +45,9 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">    
     <!-- END: Vendor CSS-->
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+    <script src="{{ asset('app-assets/vendors/js/vendors.min.js') }}"></script>
+    
 
     @yield('page-style')
 </head>
@@ -82,7 +84,6 @@
 <div class="drag-target"></div>
 
 <!-- BEGIN: Vendor JS-->
-<script src="{{ asset('app-assets/vendors/js/vendors.min.js') }}"></script>
 <script src="{{ asset('app-assets/js/core/app-menu.js') }}"></script>
 <script src="{{ asset('app-assets/js/core/app.js') }}"></script>
 <!-- BEGIN Vendor JS-->
@@ -97,8 +98,6 @@
 <script src="{{ asset('app-assets/vendors/js/forms/select/select2.full.min.js') }}"></script>
 <script src="{{ asset('app-assets/vendors/js/tables/datatable/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('app-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js') }}"></script>
-{{-- <script src="{{ asset('app-assets/vendors/js/tables/datatable/dataTables.responsive.min.js') }}"></script>
-<script src="{{ asset('app-assets/vendors/js/tables/datatable/responsive.bootstrap5.min.js') }}"></script> --}}
 <script src="{{ asset('app-assets/vendors/js/tables/datatable/datatables.buttons.min.js') }}"></script>
 <script src="{{ asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js') }}"></script>
 

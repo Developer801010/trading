@@ -57,20 +57,20 @@
                                         <th>Billing End</th>
                                         <th>Description</th>
                                         <th>Amount</th>
-                                        <th>Type</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($subscriptions->data as $subscription)
+                                    @foreach ($invoices->data as $invoice)
                                         <tr>
-                                            <td>{{ $subscription->id }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($subscription->current_period_start)->format('F j, Y') }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($subscriptions->current_period_end)->format('F j, Y') }}</td>
-                                            <td>{{ getSubscriptionTitle($subscription->id) }}</td>
+                                            <td>{{ $invoice->id }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($invoice->period_start)->format('F j, Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($invoice->period_end)->format('F j, Y') }}</td>
+                                            <td>{{ getSubscriptionTitle($invoice->subscription) }}</td>
                                             <td>
-                                                ${{ $subscription['plan']['amount']/100 }}
+                                                ${{ $invoice->total/100 }}
                                             </td>
-                                            <td>{{ $subscription['plan']['interval'] }}</td>
+                                            <td>{{$invoice->status}}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

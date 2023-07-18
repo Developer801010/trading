@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('trade_id');
             $table->date('expiration_date')->nullable();
-            $table->decimal('strike_price', 10, 2);
+            $table->decimal('strike_price', 10, 2)->nullable();
             $table->decimal('entry_price', 10, 2);
-            $table->decimal('stop_price', 10, 2);
+            $table->string('stop_price'); 
             $table->decimal('target_price', 10, 2)->nullable()->comment('Only for open stock trades');            
             $table->date('entry_date');
             $table->decimal('position_size', 10, 2);
