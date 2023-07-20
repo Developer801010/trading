@@ -4,10 +4,17 @@ namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Mail\TradeAddAlertMail;
+use App\Mail\TradeCloseAlertMail;
+use App\Mail\TradeCreationAlertMail;
 use App\Models\Trade;
 use App\Models\TradeDetail;
+use App\Models\User;
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class TradeAlertController extends Controller
 {
@@ -24,7 +31,9 @@ class TradeAlertController extends Controller
      */
     public function index()
     {
-        $parentTrades = Trade::with('tradeDetail')->orderBy('created_at','desc')->paginate(10);
+        $parentTrades = Trade::with('tradeDetail')
+            ->whereNull('exit_price')->whereNull('exit_date')  //open trade
+            ->orderBy('created_at','desc')->paginate(10);
 
         return view('admin.trade_alert.index', compact('parentTrades'));
     }
@@ -34,6 +43,7 @@ class TradeAlertController extends Controller
      */
     public function create()
     {
+       
         return view('admin.trade_alert.create');
     }
 
@@ -89,6 +99,31 @@ class TradeAlertController extends Controller
             $tradeObj->save();
             DB::commit();
 
+            //Bulk trade creation email to activated users 
+            $activeSubscribers = $this->getActiveSubscriptionUsers();
+
+            $trade_mail_title = ucfirst($trade_direction).' '.$trade_symbol.' '.ucfirst($trade_option);
+            $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('yMYd').' '
+                .$strike_price.' '.ucfirst($trade_option).' @ $'.$entry_price.' or better';
+
+            $data = [
+                'title' => $trade_mail_title,
+                'body' => [
+                    'title' => $body_title,
+                    'trade_entry_date' => Carbon::parse($entry_date)->format('d/m/Y'),
+                    'position_size' => $position_size,
+                    'stop_price' => $stop_price,
+                    'target_price' => $target_price,
+                    'comments' => $trade_description,
+                    'visit' => route('front.trade-detail', ['id'=>$tradeObj->id])                
+                ]
+            ];
+    
+            foreach($activeSubscribers as $subscriber){            
+                Mail::to($subscriber->email)->queue(new TradeCreationAlertMail($data));
+            }
+    
+
             return back()->with('flash_success', 'Trade was created successfully!')->withInput();
         }catch(Exception $ex){
             DB::rollBack();
@@ -133,6 +168,10 @@ class TradeAlertController extends Controller
     public function tradeAdd(Request $request) 
     {
         $addFormID = $request->addFormID;
+        $addTradeSymbol = $request->addTradeSymbol;
+        $addTradeOption = $request->addTradeOption;
+        $addTradeStrikePrice = $request->addTradeStrikePrice;
+        $addTradeDirection = $request->addTradeDirection;
         $addEntryDate = $request->addEntryDate;
         $addBuyPrice = $request->addBuyPrice;
         $addPositionSize = $request->addPositionSize;
@@ -144,6 +183,7 @@ class TradeAlertController extends Controller
         try{
             $tradeObj = new TradeDetail();
             $tradeObj->trade_id = $addFormID;
+            $tradeObj->trade_direction = 'Add';
             $tradeObj->entry_date = $addEntryDate;
             $tradeObj->entry_price = $addBuyPrice;            
             $tradeObj->position_size = $addPositionSize;
@@ -166,6 +206,30 @@ class TradeAlertController extends Controller
 
             $tradeObj->save();
             DB::commit();
+
+             //Bulk Trade add email to activated users 
+             $activeSubscribers = $this->getActiveSubscriptionUsers();
+
+             $trade_mail_title = $addTradeDirection.' (Add) '.$addTradeSymbol.' '.ucfirst($addTradeOption);
+             $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('yMYd').' '
+                 .$addTradeStrikePrice.' '.ucfirst($addTradeOption).' @ $'.$addBuyPrice.' or better';
+ 
+             $data = [
+                 'title' => $trade_mail_title,
+                 'body' => [
+                     'title' => $body_title,
+                     'trade_entry_date' => Carbon::parse($addEntryDate)->format('d/m/Y'),
+                     'position_size' => $addPositionSize,
+                     'stop_price' => $addStopPrice,
+                     'target_price' => $addTargetPrice,
+                     'comments' => $addComments,
+                     'visit' => route('front.trade-detail', ['id'=>$tradeObj->id])
+                 ]
+             ];
+     
+             foreach($activeSubscribers as $subscriber){            
+                 Mail::to($subscriber->email)->queue(new TradeAddAlertMail($data));
+             }
 
             return back()->with('flash_success', 'Trade was added successfully!')->withInput();
         }catch(Exception $ex){
@@ -178,45 +242,71 @@ class TradeAlertController extends Controller
     public function tradeClose(Request $request) 
     {
         $closeFormID = $request->closeFormID;
-        $addEntryDate = $request->addEntryDate;
-        $addBuyPrice = $request->addBuyPrice;
-        $addPositionSize = $request->addPositionSize;
-        $addStopPrice = $request->addStopPrice;
-        $addTargetPrice = $request->addTargetPrice;
-        $addComments = $request->addComments;
+        $closeExitDate = $request->closeExitDate;
+        $closeExitPrice = $request->closeExitPrice;
+        $closeTradeEntryPrice = $request->closeTradeEntryPrice;
+        $closedComments = $request->closedComments;
+        $closeTradeSymbol = $request->closeTradeSymbol;
+        $closeTradeOption = $request->closeTradeOption;
+        $closeTradeStrikePrice = $request->closeTradeStrikePrice;
+        $closeTradeDirection = $request->closeTradeDirection;
        
         DB::beginTransaction();
         try{
-            $tradeObj = new TradeDetail();
-            $tradeObj->trade_id = $closeFormID;
-            $tradeObj->entry_date = $addEntryDate;
-            $tradeObj->entry_price = $addBuyPrice;            
-            $tradeObj->position_size = $addPositionSize;
-            $tradeObj->stop_price = $addStopPrice;
-            $tradeObj->target_price = $addTargetPrice;
-            $tradeObj->trade_description = $addComments;
+            $tradeObj = Trade::findorFail($closeFormID);
+            $tradeObj->exit_date = $closeExitDate;
+            $tradeObj->exit_price = $closeExitPrice;
+            $tradeObj->close_comment = $closedComments;
        
-            // if($trade_type == 'option'){
-            //     $tradeObj->trade_option = $trade_option;    
-            //     $tradeObj->expiration_date = $expiration_date;
-            //     $tradeObj->strike_price = $strike_price;
-            // }
+            if($request->hasFile('closeImage')){
+                $imageName = time().'.'.$request->closeImage->extension();    
+                $request->closeImage->move(public_path('uploads/trade'), $imageName);
 
-            if($request->hasFile('addImage')){
-                $imageName = time().'.'.$request->addImage->extension();    
-                $request->addImage->move(public_path('uploads/trade'), $imageName);
-
-                $tradeObj->chart_image = 'uploads/trade/' . $imageName;
+                $tradeObj->close_image = 'uploads/trade/' . $imageName;
             }
 
             $tradeObj->save();
             DB::commit();
 
-            return back()->with('flash_success', 'Trade was added successfully!')->withInput();
+             //Bulk Trade add email to activated users 
+             $activeSubscribers = $this->getActiveSubscriptionUsers();
+
+             if($closeTradeDirection == 'buy') $closeTradeDirection = 'Sell';
+             else $closeTradeDirection = 'Buy';
+
+             $trade_mail_title = $closeTradeDirection.' (Close) '.$closeTradeSymbol.' '.ucfirst($closeTradeOption);
+             $body_title = strtoupper($closeTradeDirection).' '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('yMYd').' '
+                 .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better';
+ 
+             $data = [
+                 'title' => $trade_mail_title,
+                 'body' => [
+                     'title' => $body_title,
+                     'trade_exit_date' => Carbon::parse($closeExitDate)->format('d/m/Y'),
+                     'exit_price' => $closeExitPrice,
+                     'comments' => $closedComments,
+                     'visit' => route('front.trade-detail', ['id'=>$tradeObj->id])
+                 ]
+             ];
+     
+             foreach($activeSubscribers as $subscriber){            
+                 Mail::to($subscriber->email)->queue(new TradeCloseAlertMail($data));
+             }
+
+            return back()->with('flash_success', 'Trade was closed successfully!')->withInput();
         }catch(Exception $ex){
             DB::rollBack();
             return back()->withErrors($ex->getMessage());
         }
+    }
+
+    private function getActiveSubscriptionUsers()
+    {
+        $activeSubscribers = User::whereHas('subscriptions', function ($query) {
+            $query->where('stripe_status', 'active');
+        })->get();
+        
+        return $activeSubscribers;
     }
 }
 

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('trade_details', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('trade_id');
+            $table->string('trade_direction')->comment('add');
             $table->date('expiration_date')->nullable();
             $table->decimal('strike_price', 10, 2)->nullable();
             $table->decimal('entry_price', 10, 2);

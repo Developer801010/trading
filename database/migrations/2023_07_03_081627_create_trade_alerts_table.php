@@ -23,6 +23,10 @@ return new class extends Migration
             $table->string('stop_price');
             $table->decimal('target_price', 10, 2)->nullable()->comment('Only for open stock trades');            
             $table->date('entry_date');
+            $table->date('exit_date')->nullable();
+            $table->decimal('exit_price', 10, 2)->nullable();            
+            $table->text('close_comment')->nullable();      
+            $table->string('close_image')->nullable();      
             $table->decimal('position_size', 10, 2);
             $table->text('trade_description')->nullable();
             $table->string('chart_image')->nullable()->comment('The path or URL to the uploaded chart image');

@@ -19,6 +19,7 @@
                 <tr>
                     <th></th>
                     <th>Trade</th>
+                    <th>Trade Type</th>
                     <th>Trade Date</th>
                     <th>Average Price</th>
                     <th>Actions</th>
@@ -32,11 +33,12 @@
                                 <i class="expand-toggle fa-solid fa-chevron-right" style="cursor: pointer;"></i>
                             @endif
                         </td>
-                        <td class="parent-trade text-primary" data-trade-id="{{ $parentTrade->id }}"  style="width: 25%">
+                        <td class="parent-trade text-primary" data-trade-id="{{ $parentTrade->id }}"  style="width: 20%">
                             {{ $parentTrade->trade_symbol }}
                         </td>
-                        <td  style="width: 15%">{{ $parentTrade->entry_date }}</td>
-                        <td style="width: 35%" class="average-price">
+                        <td style="width:10%">{{ $parentTrade->trade_type }}</td>
+                        <td style="width: 15%">{{ $parentTrade->entry_date }}</td>
+                        <td style="width: 30%" class="average-price">
                             @if($parentTrade->trade_direction == 'sell')
                                 <span class="price">(${{ $parentTrade->entry_price }})</span>
                             @else
@@ -80,6 +82,7 @@
                         <tr class="child-trade child-trade-{{ $parentTrade->id }}" style="display: none;">
                             <td></td>
                             <td></td>
+                            <td></td>
                             <td>{{ $parentTrade->entry_date }}</td>
                             <td>
                                 <span>${{ $parentTrade->entry_price }}</span>
@@ -93,6 +96,7 @@
                                 $totalPercentage += $childTrade->position_size / 100;
                             @endphp
                             <tr class="child-trade child-trade-{{ $parentTrade->id }}" style="display: none;">
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td>{{ $childTrade->entry_date }}</td>
@@ -159,6 +163,11 @@
                     <form id="addTradeForm" method="post" action="{{route('admin.trade-add')}}" class="row gy-1 pt-75" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="addFormID" id="addFormID" value="" />
+                        <input type="hidden" name="addTradeSymbol" id="addTradeSymbol" value="" />
+                        <input type="hidden" name="addTradeOption" id="addTradeOption" value="" />
+                        <input type="hidden" name="addTradeDirection" id="addTradeDirection" value="" />
+                        <input type="hidden" name="addTradeStrikePrice" id="addTradeStrikePrice" value="" />
+                        
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="AddEntryDate">Entry Date</label>
                             <input type="text" id="addEntryDate" name="addEntryDate" class="form-control picker" value="{{old('addEntryDate')}}" />
@@ -228,26 +237,32 @@
                     <form id="closeTradeForm" method="post" action="{{route('admin.trade-close')}}" class="row gy-1 pt-75" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="closeFormID" id="closeFormID" value="" />
-                        <div class="col-12 col-md-6">
+                        <input type="hidden" name="closeTradeSymbol" id="closeTradeSymbol" value="" />
+                        <input type="hidden" name="closeTradeOption" id="closeTradeOption" value="" />
+                        <input type="hidden" name="closeTradeDirection" id="closeTradeDirection" value="" />
+                        <input type="hidden" name="closeTradeStrikePrice" id="closeTradeStrikePrice" value="" />
+                        <input type="hidden" name="closeTradeEntryPrice" id="closeTradeEntryPrice" value="" />
+                        
+
+                        <div class="col-12 col-md-4">
                             <label class="form-label" for="closeExitDate">Exit Date</label>
-                            <input type="text" id="closeExitDate" name="closeExitDate" class="form-control picker" value="{{old('closeExitDate')}}" />
+                            <input type="text" class="form-control" value="<?php echo date('Y-m-d'); ?>" disabled />
+                            <input type="hidden" id="closeExitDate" name="closeExitDate"  value="<?php echo date('Y-m-d'); ?>" />
                         </div>
 
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-4">
                             <label class="form-label" for="closeExitPrice">Exit Price</label>
                             <input type="text" id="closeExitPrice" name="closeExitPrice" class="form-control numeral-mask" value="{{old('closeExitPrice')}}" />
                         </div>
 
                         <div class="col-12 col-md-4">
                             <label class="form-label" for="itemname">Position Size(%)</label>
-                            <select class="form-select" name="PositionSize" id="addPositionSize">
-                                <option value="All">All</option>
-                            </select>
+                            <input type="text" id="PositionSize" name="PositionSize" class="form-control" value="All" disabled />
                         </div>
 
                         <div class="col-12 col-md-12">
                             <label class="form-label" for="itemname">Comment on Trade</label>
-                            <textarea class="form-control" name="addComments" id="addComments" rows="3">{{ old('addComments') }}</textarea>
+                            <textarea class="form-control" name="closedComments" id="closedComments" rows="3">{{ old('closedComments') }}</textarea>
                         </div>
 
                         <div class="col-12 col-md-12">
@@ -298,6 +313,10 @@
             $('#addTrade').modal('show');
             $('.tradeAddTitle').text(tradeTitle);
             $('#addFormID').val(id);
+            $('#addTradeSymbol').val(symbol);
+            $('#addTradeOption').val(option);
+            $('#addTradeDirection').val(direction);
+            $('#addTradeStrikePrice').val(strikeprice);
         });
 
         $('body').on('click', '.btnClose', function(e) {
@@ -326,6 +345,11 @@
             $('#closeTrade').modal('show');
             $('.tradeCloseTitle').text(tradeTitle);
             $('#closeFormID').val(id);
+            $('#closeTradeSymbol').val(symbol);
+            $('#closeTradeOption').val(option);
+            $('#closeTradeDirection').val(direction);
+            $('#closeTradeStrikePrice').val(strikeprice);
+            $('#closeTradeEntryPrice').val(entryprice);
         });
 
         $.validator.addMethod('filesize', function(value, element, param) {
@@ -399,7 +423,7 @@
             }
         });
 
-        var fields = ['#addBuyPrice', '#addTargetPrice'];
+        var fields = ['#addBuyPrice', '#addTargetPrice', '#closeExitPrice'];
         var options = {
             numeral: true,
             numeralThousandsGroupStyle: 'thousand'

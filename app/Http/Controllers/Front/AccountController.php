@@ -19,6 +19,7 @@ use Laravel\Cashier\Subscription;
 use Stripe\Invoice;
 use Stripe\PaymentMethod;
 use Stripe\Stripe;
+use Stripe\Subscription as StripeSubscription;
 
 class AccountController extends Controller
 {
@@ -174,10 +175,13 @@ class AccountController extends Controller
        
         try{
             // Retrieve the subscription history for the customer from Stripe
+            $subscriptions = StripeSubscription::all([
+                'customer' => $customerId,
+            ]);    
+
             $invoices = Invoice::all([
                 'customer' => $customerId,
                 'limit' => 100, // Maximum allowed by Stripe
-
             ]);    
             
             $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name');
@@ -185,6 +189,7 @@ class AccountController extends Controller
             return view('front.account.account-membership', 
             compact(
                     'invoices',
+                    'subscriptions',
                     'membership_level'
                 )
             ); 

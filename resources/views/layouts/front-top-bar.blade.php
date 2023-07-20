@@ -23,9 +23,11 @@
                 <a class="dropdown-item @if (request()->is('account/*')) active @endif" href="{{route('front.account-profile')}}">
                     Account Details
                 </a>
-                <a class="dropdown-item" href="#">
-                    My Subscription
-                </a>
+                @role('admin')
+                    <a class="dropdown-item" href="{{route('admin.home')}}">
+                        Dashboard
+                    </a>
+                @endrole
             </div>
             
         </div>

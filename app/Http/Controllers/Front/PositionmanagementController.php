@@ -33,4 +33,9 @@ class PositionManagementController extends Controller
     {
         return view('front.trades.closed-options-trades');
     }
+
+    public function tradeDetail($id)
+    {
+        
+    }
 }
