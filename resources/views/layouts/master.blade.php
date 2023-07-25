@@ -45,7 +45,6 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">    
     <!-- END: Vendor CSS-->
 
-    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
     <script src="{{ asset('app-assets/vendors/js/vendors.min.js') }}"></script>
     
 

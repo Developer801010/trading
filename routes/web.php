@@ -44,9 +44,6 @@ Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
     Route::get('/account/profile', [AccountController::class, 'index'])->name('front.account-profile');
     Route::post('/account/store', [AccountController::class, 'store'])->name('front.account.store');
 
-    Route::post('/account/send-verification-code', [AccountController::class, 'sendVerificationCode'])->name('front.account.send-verification-code');
-    Route::post('/account/verify-phone-code', [AccountController::class, 'verifyPhoneCode'])->name('front.account.verify-phone-code');
-
     Route::get('/account/membership', [AccountController::class, 'membership'])->name('front.account-membership');    
     Route::get('/account/payment-method-management', [AccountController::class, 'paymentMethodManagement'])->name('front.account-payment-method-management');
     Route::delete('/account/delete-card/{id}', [AccountController::class, 'deleteCard'])->name('front.account-delete-card');

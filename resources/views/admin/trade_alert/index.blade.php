@@ -37,7 +37,7 @@
                             {{ $parentTrade->trade_symbol }}
                         </td>
                         <td style="width:10%">{{ $parentTrade->trade_type }}</td>
-                        <td style="width: 15%">{{ $parentTrade->entry_date }}</td>
+                        <td style="width: 15%">{{ \Carbon\Carbon::parse($parentTrade->entry_date)->format('m/d/Y') }}</td>
                         <td style="width: 30%" class="average-price">
                             @if($parentTrade->trade_direction == 'sell')
                                 <span class="price">(${{ $parentTrade->entry_price }})</span>
@@ -83,7 +83,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td>{{ $parentTrade->entry_date }}</td>
+                            <td>{{ \Carbon\Carbon::parse($parentTrade->entry_date)->format('m/d/Y') }}</td>
                             <td>
                                 <span>${{ $parentTrade->entry_price }}</span>
                                 <span>({{ rtrim(rtrim(number_format($parentTrade->position_size, 1), '0'), '.') }}%)</span>
@@ -99,10 +99,10 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td>{{ $childTrade->entry_date }}</td>
+                                <td>{{ \Carbon\Carbon::parse($childTrade->entry_date)->format('m/d/Y') }}</td>
                                 <td>
                                     <span>${{ $childTrade->entry_price }}</span>
-                                    <span>({{ rtrim(rtrim(number_format($parentTrade->position_size, 1), '0'), '.') }}%)</span>
+                                    <span>({{ rtrim(rtrim(number_format($childTrade->position_size, 1), '0'), '.') }}%)</span>
                                 </td>
                                 <td></td>
                             </tr>
@@ -238,11 +238,10 @@
                         @csrf
                         <input type="hidden" name="closeFormID" id="closeFormID" value="" />
                         <input type="hidden" name="closeTradeSymbol" id="closeTradeSymbol" value="" />
-                        <input type="hidden" name="closeTradeOption" id="closeTradeOption" value="" />
                         <input type="hidden" name="closeTradeDirection" id="closeTradeDirection" value="" />
                         <input type="hidden" name="closeTradeStrikePrice" id="closeTradeStrikePrice" value="" />
                         <input type="hidden" name="closeTradeEntryPrice" id="closeTradeEntryPrice" value="" />
-                        
+                        <input type="hidden" name="closeTradePositionSize" id="closeTradePositionSize" value="" />
 
                         <div class="col-12 col-md-4">
                             <label class="form-label" for="closeExitDate">Exit Date</label>
@@ -329,12 +328,14 @@
             if(position_size == undefined)
                 position_size = parseFloat($(this).data('position'))+'%';
 
-            var symbol = $(this).data('symbol');
-            var strikeprice = $(this).data('strikeprice');
-            var option = $(this).data('option');
             var entryprice = $(this).closest('tr').find('.average-price').find('.price').text();
             if(entryprice == undefined)
                 entryprice = $(this).data('entryprice');
+
+            var symbol = $(this).data('symbol');
+            var strikeprice = $(this).data('strikeprice');
+            var option = $(this).data('option');
+          
             var expirationdate = $(this).data('expirationdate');
             if(direction =='sell') direction = 'Buy';
             else direction = 'Sell'
@@ -346,10 +347,11 @@
             $('.tradeCloseTitle').text(tradeTitle);
             $('#closeFormID').val(id);
             $('#closeTradeSymbol').val(symbol);
-            $('#closeTradeOption').val(option);
             $('#closeTradeDirection').val(direction);
+            $('#closeTradeEntryPrice').val(entryprice);  //average price
+            $('#closeTradePositionSize').val(position_size);
             $('#closeTradeStrikePrice').val(strikeprice);
-            $('#closeTradeEntryPrice').val(entryprice);
+            $('#closeTradeOption').val(option);
         });
 
         $.validator.addMethod('filesize', function(value, element, param) {

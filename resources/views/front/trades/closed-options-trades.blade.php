@@ -2,26 +2,14 @@
 @section('title', 'Closed Options Trades')
 
 @section('page-style')
-<link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/tables/datatable/dataTables.bootstrap5.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/tables/datatable/buttons.bootstrap5.min.css') }}">
-<style>
-    #DataTables_Table_0_length select{
-        width: 80px;
-    }
-</style>
+
 @endsection
 
 
 @section('content')
     <div class="container">
-        <section class="dashboard-section">        
-    
-            @if(Session::has('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{Session::get('success')}}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
+        <section class="dashboard-section">            
+           
         </section>
         <section class="open-position-section  position-section">
             <div class="table-responsive">
@@ -63,12 +51,6 @@
 
 
 @section('page-script')    
-<script src="{{ asset('app-assets/vendors/js/tables/datatable/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('app-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js') }}"></script>
-    <script>
-        $('.list-table').DataTable({
 
-        });
-    </script>
     
 @endsection

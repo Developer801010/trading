@@ -100,8 +100,8 @@
             var countdownInterval;
             var mobileVerifiedStatus = $("#mobileVerifiedStatus").val();
             var mobileNotificationSetting = $("#mobileNotificationSetting").val();
-            SMSForm.submit(function(e) {               
 
+            SMSForm.submit(function(e) {               
                 e.preventDefault(); // Prevent the form from submitting normally
                 var data = {
                     _token: window.csrfToken,
@@ -119,7 +119,6 @@
                 }else{
                     $('#phone').removeClass('error');
                 }
-
 
                 // Perform AJAX request to process the form
                 if(isValid)
@@ -145,8 +144,7 @@
                                     type: 'POST',
                                     data: data,
                                     success: function(response) {   
-                                        if(response.status == 'success'){
-                                            Swal.fire({
+                                        Swal.fire({
                                                 title: 'Good job!',
                                                 text: response.msg,
                                                 icon: 'success',
@@ -156,13 +154,25 @@
                                                 buttonsStyling: false
                                             });
 
-                                            setTimeout(() => {
-                                                location.reload();
-                                            }, 2000);
-                                        }
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 2000);
                                     },
                                     error: function(xhr, status, error) {
-                                        // Handle error
+                                        Swal.fire({
+                                            title: 'Good job!',
+                                            text: response.msg,
+                                            icon: 'success',
+                                        customClass: {
+                                            confirmButton: 'btn btn-primary'
+                                        },
+                                        buttonsStyling: false
+                                    });
+
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 2000);
+                                        btn_subscribe.prop('disabled', false);
                                     }
                                 });
                             }else{
@@ -174,7 +184,8 @@
                             url: $(this).attr('action'),
                             type: $(this).attr('method'),
                             data: data,
-                            success: function(response) {   
+                            success: function(response) 
+                            {   
                                 btn_subscribe.prop('disabled', false);
                                 if(mobileVerifiedStatus == 'no'){
                                     // Open the modal box
@@ -209,12 +220,21 @@
                                 }                 
                             },
                             error: function(xhr, status, error) {
-                                // Handle error
+                                var errorTxt = $.parseJSON(xhr.responseText).error;
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: errorTxt,
+                                    icon: 'error',
+                                    customClass: {
+                                    confirmButton: 'btn btn-primary'
+                                },
+                                    buttonsStyling: false
+                                });
+                                btn_subscribe.prop('disabled', false);
+
                             }
                         });
                     }
-                    
-                   
                     
                 }else{
                     btn_subscribe.prop('disabled', false);
@@ -233,7 +253,7 @@
         }
 
         $('#phone-verification-code').keyup(function (e) { 
-            let phone_code = $(this).val()
+            let phone_code = $(this).val();
             let codeLength = phone_code.length;
             if(codeLength >=6 )
             {
@@ -246,9 +266,8 @@
                     type: "POST",                    
                     data: data,
                     dataType: "json",
-                    success: function (response) {                        
-                        if(response.status == 'success'){
-                            closeModal();
+                    success: function (response) {  
+                        closeModal();
                             Swal.fire({
                                 title: 'Good job!',
                                 text: response.msg,
@@ -260,22 +279,21 @@
                             });
                             setTimeout(() => {
                                 location.reload();
-                            }, 2000);
-                        }else{
-                            Swal.fire({
-                                title: 'Error!',
-                                text: response.msg,
-                                icon: 'error',
-                                customClass: {
-                                confirmButton: 'btn btn-primary'
-                                },
-                                buttonsStyling: false
-                            });
-                        }
+                            }, 2000);                                             
                         btn_subscribe.prop('disabled', false);
                     },           
                     error: function(xhr, status, error) {
-                        console.log(xhr.responseText);
+                        var errorTxt = $.parseJSON(xhr.responseText).error;
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: errorTxt,
+                                    icon: 'error',
+                                    customClass: {
+                                    confirmButton: 'btn btn-primary'
+                                },
+                                    buttonsStyling: false
+                                });
+                            btn_subscribe.prop('disabled', false);
                     }
                 });
             }

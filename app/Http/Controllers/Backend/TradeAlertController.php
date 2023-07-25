@@ -10,6 +10,7 @@ use App\Mail\TradeCreationAlertMail;
 use App\Models\Trade;
 use App\Models\TradeDetail;
 use App\Models\User;
+use App\Service\SmsService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Mail\Mailer;
@@ -43,7 +44,6 @@ class TradeAlertController extends Controller
      */
     public function create()
     {
-       
         return view('admin.trade_alert.create');
     }
 
@@ -99,13 +99,13 @@ class TradeAlertController extends Controller
             $tradeObj->save();
             DB::commit();
 
-            //Bulk trade creation email to activated users 
+            //Bulk trade creation email to activated users's email
             $activeSubscribers = $this->getActiveSubscriptionUsers();
 
             $trade_mail_title = ucfirst($trade_direction).' '.$trade_symbol.' '.ucfirst($trade_option);
-            $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('yMYd').' '
+            $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('dMY').' '
                 .$strike_price.' '.ucfirst($trade_option).' @ $'.$entry_price.' or better';
-
+            $url = route('front.trade-detail', ['id'=>$tradeObj->id]);
             $data = [
                 'title' => $trade_mail_title,
                 'body' => [
@@ -115,16 +115,28 @@ class TradeAlertController extends Controller
                     'stop_price' => $stop_price,
                     'target_price' => $target_price,
                     'comments' => $trade_description,
-                    'visit' => route('front.trade-detail', ['id'=>$tradeObj->id])                
+                    'visit' =>  $url              
                 ]
             ];
     
             foreach($activeSubscribers as $subscriber){            
                 Mail::to($subscriber->email)->queue(new TradeCreationAlertMail($data));
             }
-    
+            
+            //Bulk trade creation notification to activated users' phone
+            $msg = $body_title.' '.$url;
+            foreach($activeSubscribers as $subscriber)
+            {            
+                 //if user subscribed for the mobile notification and verified the phone number
+                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
+                {
+                    $sms_service = new SmsService();
+                    $sms_service->sendSMS($msg, $subscriber->mobile_number);
+                }
+            }
 
             return back()->with('flash_success', 'Trade was created successfully!')->withInput();
+
         }catch(Exception $ex){
             DB::rollBack();
             return back()->withErrors($ex->getMessage());
@@ -211,9 +223,10 @@ class TradeAlertController extends Controller
              $activeSubscribers = $this->getActiveSubscriptionUsers();
 
              $trade_mail_title = $addTradeDirection.' (Add) '.$addTradeSymbol.' '.ucfirst($addTradeOption);
-             $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('yMYd').' '
-                 .$addTradeStrikePrice.' '.ucfirst($addTradeOption).' @ $'.$addBuyPrice.' or better';
- 
+             $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('dMY').' '
+                 .$addTradeStrikePrice.' '.ucfirst($addTradeOption).' @ $'.$addBuyPrice.' or better'; 
+             $url = route('front.trade-detail', ['id'=>$tradeObj->id]);
+
              $data = [
                  'title' => $trade_mail_title,
                  'body' => [
@@ -223,13 +236,28 @@ class TradeAlertController extends Controller
                      'stop_price' => $addStopPrice,
                      'target_price' => $addTargetPrice,
                      'comments' => $addComments,
-                     'visit' => route('front.trade-detail', ['id'=>$tradeObj->id])
+                     'visit' => $url
                  ]
              ];
      
              foreach($activeSubscribers as $subscriber){            
                  Mail::to($subscriber->email)->queue(new TradeAddAlertMail($data));
              }
+
+            //Bulk trade creation notification to activated users' phone
+            $mobileNotificationTitle = strtoupper($addTradeDirection).' '.'(Add) '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('dMY').' '
+            .$addTradeStrikePrice.' '.ucfirst($addTradeOption).' @ $'.$addBuyPrice.' or better'; 
+            $msg = $mobileNotificationTitle.' '.$url;
+
+            foreach($activeSubscribers as $subscriber)
+            {            
+                 //if user subscribed for the mobile notification and verified the phone number
+                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
+                {
+                    $sms_service = new SmsService();
+                    $sms_service->sendSMS($msg, $subscriber->mobile_number);
+                }
+            }
 
             return back()->with('flash_success', 'Trade was added successfully!')->withInput();
         }catch(Exception $ex){
@@ -243,13 +271,14 @@ class TradeAlertController extends Controller
     {
         $closeFormID = $request->closeFormID;
         $closeExitDate = $request->closeExitDate;
-        $closeExitPrice = $request->closeExitPrice;
-        $closeTradeEntryPrice = $request->closeTradeEntryPrice;
+        $closeExitPrice = (float)$request->closeExitPrice;
+        $closeTradeEntryPrice = (float)str_replace(['$', '(', ')'], '', $request->closeTradeEntryPrice);
         $closedComments = $request->closedComments;
         $closeTradeSymbol = $request->closeTradeSymbol;
-        $closeTradeOption = $request->closeTradeOption;
-        $closeTradeStrikePrice = $request->closeTradeStrikePrice;
         $closeTradeDirection = $request->closeTradeDirection;
+        $closeTradePositionSize = $request->closeTradePositionSize;
+        $closeTradeStrikePrice = $request->closeTradeStrikePrice;
+        $closeTradeOption = $request->closeTradeOption;
        
         DB::beginTransaction();
         try{
@@ -269,29 +298,57 @@ class TradeAlertController extends Controller
             DB::commit();
 
              //Bulk Trade add email to activated users 
-             $activeSubscribers = $this->getActiveSubscriptionUsers();
+             $activeSubscribers = $this->getActiveSubscriptionUsers();    
 
-             if($closeTradeDirection == 'buy') $closeTradeDirection = 'Sell';
-             else $closeTradeDirection = 'Buy';
+             //converted Closed trade Direction from frontend 
+             if($closeTradeDirection == 'buy')  
+             {
+                 //original: Sell Trade  [average sell price – buy price]/average sell price]*100.
+                $profits = ($closeTradeEntryPrice - $closeExitPrice) / $closeTradeEntryPrice * 100;  //closeTradeEntryPrice: it's average price.  
+             }
+             else   // original: Buy Trade
+             {
+                //Profit % for a buy trade = [[close price- average purchase price]/average purchase price]*100.
+                $profits = ($closeExitPrice - $closeTradeEntryPrice) / $closeTradeEntryPrice * 100;  
+             }
 
-             $trade_mail_title = $closeTradeDirection.' (Close) '.$closeTradeSymbol.' '.ucfirst($closeTradeOption);
-             $body_title = strtoupper($closeTradeDirection).' '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('yMYd').' '
-                 .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better';
- 
+             $trade_mail_title = 'Close '.$closeTradeSymbol;
+             $body_title = strtoupper($closeTradeDirection).' '.$closeTradeSymbol;  
+             $url = route('front.trade-detail', ['id'=>$tradeObj->id]);
+
              $data = [
                  'title' => $trade_mail_title,
                  'body' => [
                      'title' => $body_title,
                      'trade_exit_date' => Carbon::parse($closeExitDate)->format('d/m/Y'),
+                     'position_size' => $closeTradePositionSize,
                      'exit_price' => $closeExitPrice,
-                     'comments' => $closedComments,
-                     'visit' => route('front.trade-detail', ['id'=>$tradeObj->id])
+                     'profits' => round($profits, 1),
+                     'trade_direction' => $closeTradeDirection,
+                     'comments' => $closedComments,                     
+                     'visit' => $url
                  ]
              ];
      
              foreach($activeSubscribers as $subscriber){            
                  Mail::to($subscriber->email)->queue(new TradeCloseAlertMail($data));
              }
+
+            //Bulk trade creation notification to activated users' phone
+            $mobileNotificationTitle = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('dMY').' '
+            .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
+
+            $msg = $mobileNotificationTitle.' '.$url;
+
+            foreach($activeSubscribers as $subscriber)
+            {            
+                 //if user subscribed for the mobile notification and verified the phone number
+                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
+                {
+                    $sms_service = new SmsService();
+                    $sms_service->sendSMS($msg, $subscriber->mobile_number);
+                }
+            }
 
             return back()->with('flash_success', 'Trade was closed successfully!')->withInput();
         }catch(Exception $ex){

@@ -73,7 +73,7 @@ class PaymentController extends Controller
                     'first_name' => $firstName, 
                     'last_name' => $lastName,
                     'email' => $email,
-                    'mobile_number' => $mobileNumber,
+                    'mobile_number' => trim($mobileNumber),
                     'password' => bcrypt($password),
                     'name' => $username               
                 ]);
