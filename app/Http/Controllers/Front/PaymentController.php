@@ -126,7 +126,7 @@ class PaymentController extends Controller
                 $data = [
                     'first_name' => $firstName,
                     'last_name' => $lastName,
-                    'user_name' => 'JDae'
+                    'user_name' => $username
                 ];
                 Mail::to($email)->queue(new Welcome($data));
 

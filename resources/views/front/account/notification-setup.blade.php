@@ -77,10 +77,10 @@
 
 @section('page-script')
     <script src="{{ asset('app-assets/vendors/js/extensions/toastr.min.js') }}"></script>
-    <script src="{{ asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('app-assets/vendors/js/forms/cleave/cleave.min.js') }}"></script>
     <script src="{{ asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js') }}"></script>
     <script src="{{ asset('app-assets/vendors/js/extensions/sweetalert2.all.min.js') }}"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
     <script>
         var SMSForm = $('#SMSForm');
         var isValid = true;
@@ -100,6 +100,8 @@
             var countdownInterval;
             var mobileVerifiedStatus = $("#mobileVerifiedStatus").val();
             var mobileNotificationSetting = $("#mobileNotificationSetting").val();
+            console.log(mobileVerifiedStatus);
+            console.log(mobileNotificationSetting);
 
             SMSForm.submit(function(e) {               
                 e.preventDefault(); // Prevent the form from submitting normally
@@ -179,10 +181,13 @@
                                 btn_subscribe.prop('disabled', false);
                             }
                         });
-                    }else{
+                    }
+                    else
+                    {
+                        console.log(0);
                         $.ajax({
-                            url: $(this).attr('action'),
-                            type: $(this).attr('method'),
+                            url: "{{route('front.account.send-verification-code')}}",
+                            type: 'POST',
                             data: data,
                             success: function(response) 
                             {   

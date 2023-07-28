@@ -93,6 +93,8 @@ class AccountController extends Controller
         }
 
         $mobileNotificationSetting = auth()->user()->mobile_notification_setting;
+        if ($mobileNotificationSetting == null)
+            $mobileNotificationSetting = 0;
 
         return view('front.account.notification-setup', 
         compact(
