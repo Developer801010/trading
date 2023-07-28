@@ -15,12 +15,12 @@
             <div class="">
                 <h1 class="table-title">Open Options Trades</h1>
                 <form action="{{ route('front.open-options-trades') }}" method="GET">
-                    <div class="mb-3 row">
+                    <div class="mb-3 row search-row-position">
                         <label class="col-md-1 col-form-label" style="padding-top:10px;"><b>Search</b></label>
-                        <div class="col-sm-4">
-                            <input type="text" name="search" class="form-control col-md-8" value="{{ request()->get('search') }}" placeholder="Please insert symbol"  />            
+                        <div class="col-sm-3">
+                            <input type="text" name="search" class="form-control col-md-8" value="{{ request()->get('search') }}"   />            
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-1">
                             <button type="submit" class="btn btn-primary">Search</button>
                         </div>
                     </div>
@@ -30,12 +30,11 @@
                         <tr>
                             <th></th>
                             <th>Symbol</th>
+                            <th>BUY/SELL</th>
                             <th>Long/Short</th>
                             <th>Entry Date</th>
-                            <th>BUY/SELL</th>
                             <th>Option</th>
                             <th>Entry Price</th>
-                            <th>Average Price</th>
                             <th>Stop Price</th>
                             <th>Target Price</th>
                         </tr>
@@ -51,6 +50,7 @@
                                 <td class="parent-trade text-primary" data-trade-id="{{ $trade->id }}">
                                     {{$trade->trade_symbol}}
                                 </td>
+                                <td>{{ucfirst($trade->trade_direction)}}</td>
                                 <td>
                                     @if($trade->trade_direction == 'buy') 
                                         Long
@@ -61,7 +61,6 @@
                                 <td>
                                     {{\Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y')}}
                                 </td>
-                                <td>{{ucfirst($trade->trade_direction)}}</td>
                                 <td>
                                     @if($trade->trade_option =='call')
                                         @php $trade_option = 'C'; @endphp
@@ -69,14 +68,13 @@
                                         @php $trade_option = 'P'; @endphp
                                     @endif
                                     {{ $trade->trade_symbol .' '. \Carbon\Carbon::parse($trade->entry_date)->format('ymd').' '.$trade_option.' '.$trade->strike_price }}
-                                </td>
-                                <td>${{$trade->entry_price}} ( {{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}% )</td>
+                                </td>                                
                                 <td class="average-price">
                                     <span class="price">${{$trade->entry_price}}</span>
-                                    <span class="size"></span>
+                                    <span class="size">( {{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}% )</span>
                                 </td>
                                 <td>{{$trade->stop_price}}</td>
-                                <td>{{$trade->target_price}}</td>
+                                <td>${{$trade->target_price}}</td>
                             </tr>
                             @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
                                 @php
@@ -85,27 +83,40 @@
                                     $totalPercentage = $trade->position_size / 100;  
                                     $averagePrice = 0;
                                  @endphp
-                                 @foreach($trade->tradeDetail as $childTrade)
-                                 @php
-                                     $totalPrice += $childTrade->entry_price * $childTrade->position_size /100;
-                                     $totalPercentage += $childTrade->position_size / 100;
-                                 @endphp
                                  <tr class="child-trade child-trade-{{ $trade->id }}">
-                                     <td></td>
-                                     <td></td>
-                                     <td></td>
-                                     <td>{{ \Carbon\Carbon::parse($childTrade->entry_date)->format('m/d/Y') }}</td>
-                                     <td></td>
-                                     <td></td>
-                                     <td>
-                                         <span>${{ $childTrade->entry_price }}</span>
-                                         <span>({{ rtrim(rtrim(number_format($childTrade->position_size, 1), '0'), '.') }}%)</span>
-                                     </td>
-                                     <td>${{ $childTrade->entry_price }}</td>
-                                     <td>{{$childTrade->stop_price}}</td>
-                                     <td>${{$childTrade->target_price}}</td>
-                                 </tr>
-                             @endforeach
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{ \Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y') }}</td>
+                                    <td></td>
+                                    <td>
+                                        <span>${{ $trade->entry_price }}</span>
+                                        <span>({{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%)</span>
+                                    </td>
+                                    <td>{{$trade->stop_price}}</td>
+                                    <td>${{$trade->target_price}}</td>
+                                </tr>
+                                 @foreach($trade->tradeDetail as $childTrade)
+                                    @php
+                                        $totalPrice += $childTrade->entry_price * $childTrade->position_size /100;
+                                        $totalPercentage += $childTrade->position_size / 100;
+                                    @endphp
+                                    <tr class="child-trade child-trade-{{ $trade->id }}">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>{{ \Carbon\Carbon::parse($childTrade->entry_date)->format('m/d/Y') }}</td>
+                                        <td></td>
+                                        <td>
+                                            <span>${{ $childTrade->entry_price }}</span>
+                                            <span>({{ rtrim(rtrim(number_format($childTrade->position_size, 1), '0'), '.') }}%)</span>
+                                        </td>
+                                        <td>{{$childTrade->stop_price}}</td>
+                                        <td>${{$childTrade->target_price}}</td>
+                                    </tr>
+                                @endforeach
                              @php
                                  $averagePrice = $totalPrice / $totalPercentage;
                              @endphp
