@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Mail\Welcome;
 use App\Models\Plan;
 use Exception;
 use Illuminate\Http\Request;
@@ -113,13 +114,14 @@ class FrontController extends Controller
 
     public function emailTest()
     {
-        $mailData = [
-            'title' => 'Mail from ItSolutionStuff.com',
-            'body' => 'This is for testing email using smtp.'
+        $data = [
+            'first_name' => 'first',
+            'last_name' => 'last',
+            'user_name' => 'username'
         ];
 
         try{
-            Mail::to('kristoffermorris80@gmail.com')->send(new WelcomeEmail($mailData));
+            Mail::to('kristoffermorris80@gmail.com')->send(new Welcome($data));
         }catch(Exception $ex){
             dd($ex->getMessage());
         }
