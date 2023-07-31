@@ -105,7 +105,11 @@ class TradeAlertController extends Controller
             $trade_mail_title = ucfirst($trade_direction).' '.$trade_symbol.' '.ucfirst($trade_option);
             $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('dMY').' '
                 .$strike_price.' '.ucfirst($trade_option).' @ $'.$entry_price.' or better';
-            $url = route('front.trade-detail', ['id'=>$tradeObj->id]);
+            $url = route('front.trade-detail', [
+                'id'=>$tradeObj->id,
+                't'=>'n'
+            ]);
+
             $data = [
                 'title' => $trade_mail_title,
                 'body' => [
@@ -225,7 +229,11 @@ class TradeAlertController extends Controller
              $trade_mail_title = $addTradeDirection.' (Add) '.$addTradeSymbol.' '.ucfirst($addTradeOption);
              $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('dMY').' '
                  .$addTradeStrikePrice.' '.ucfirst($addTradeOption).' @ $'.$addBuyPrice.' or better'; 
-             $url = route('front.trade-detail', ['id'=>$tradeObj->id]);
+            
+            $url = route('front.trade-detail', [
+                'id'=>$tradeObj->id,
+                't'=>'a'
+            ]);
 
              $data = [
                  'title' => $trade_mail_title,
@@ -314,7 +322,10 @@ class TradeAlertController extends Controller
 
              $trade_mail_title = 'Close '.$closeTradeSymbol;
              $body_title = strtoupper($closeTradeDirection).' '.$closeTradeSymbol;  
-             $url = route('front.trade-detail', ['id'=>$tradeObj->id]);
+             $url = route('front.trade-detail', [
+                'id'=>$tradeObj->id,
+                't'=>'c'
+            ]);
 
              $data = [
                  'title' => $trade_mail_title,

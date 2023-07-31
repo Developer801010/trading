@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\Trade;
+use App\Models\TradeDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -145,8 +146,19 @@ class PositionManagementController extends Controller
         return view('front.trades.closed-options-trades', compact('trades'));
     }
 
-    public function tradeDetail($id)
+    public function tradeDetail($id, $type)
     {
+        if($type == 'n') {
+            //trade creation alert
+            $trade = Trade::where('id', $id)->first();
+        }else if ($type == 'a'){
+            //trade add alert
+            $trade = TradeDetail::with('trade')->where('id', $id)->first();
+        }else if ($type == 'c'){
+            //trade close alert
+            $trade = Trade::with('tradeDetail')->where('id', $id)->first();
+        }
         
+        return view('front.trades.trade-detail', compact('trade', 'type'));
     }
 }
