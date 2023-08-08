@@ -98,7 +98,7 @@
                                 <p class="mb-1"><b>Average Entry Price: </b><span class="average_entry_price"></span></p>
                                 {{-- <p class="mb-1"><b>Entry Date: </b>{{\Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y')}}</p> --}}
                             @else
-                                <p class="mb-1"><b>Stop Price: </b>{{$trade->stop_price == 'No Stop' ? 'No Stop' : '$'.number_format($trade->stop_price, 0)}}</p>
+                                <p class="mb-1"><b>Stop Price: </b>{{$trade->stop_price }}</p>
                                 <p class="mb-1"><b>Target Price: </b> ${{number_format($trade->target_price, 0)}}</p>
                             @endif
                            
