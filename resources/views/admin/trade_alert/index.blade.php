@@ -39,7 +39,11 @@
                             @else
                                 @php $trade_option = 'P'; @endphp
                             @endif
-                            {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->entry_date)->format('ymd').''.$trade_option.''.number_format($parentTrade->strike_price, '0')}}
+                            @if($parentTrade->trade_type === 'stock')
+                                {{ $parentTrade->trade_symbol }}
+                            @else
+                                {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->entry_date)->format('ymd').''.$trade_option.''.number_format($parentTrade->strike_price, '0')}}
+                            @endif                            
                         </td>
                         <td style="width:10%">{{ $parentTrade->trade_type }}</td>
                         <td style="width: 15%">{{ \Carbon\Carbon::parse($parentTrade->entry_date)->format('m/d/Y') }}</td>
