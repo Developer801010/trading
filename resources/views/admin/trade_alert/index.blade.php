@@ -34,7 +34,12 @@
                             @endif
                         </td>
                         <td class="parent-trade text-primary" data-trade-id="{{ $parentTrade->id }}"  style="width: 20%">
-                            {{ $parentTrade->trade_symbol }}
+                            @if($parentTrade->trade_option =='call')
+                                @php $trade_option = 'C'; @endphp
+                            @else
+                                @php $trade_option = 'P'; @endphp
+                            @endif
+                            {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->entry_date)->format('ymd').''.$trade_option.''.number_format($parentTrade->strike_price, '0')}}
                         </td>
                         <td style="width:10%">{{ $parentTrade->trade_type }}</td>
                         <td style="width: 15%">{{ \Carbon\Carbon::parse($parentTrade->entry_date)->format('m/d/Y') }}</td>
@@ -66,7 +71,7 @@
                                 data-strikeprice = "{{$parentTrade->strike_price}}" 
                                 data-option="{{$parentTrade->trade_option}}" 
                                 data-entryprice="{{$parentTrade->entry_price}}" 
-                                data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('dMY')}}"
+                                data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('ymd')}}"
                                >
                               Add
                             </a>
@@ -301,12 +306,16 @@
             var direction = $(this).data('direction').toUpperCase();
             var symbol = $(this).data('symbol');
             var strikeprice = $(this).data('strikeprice');
+            
             var option = $(this).data('option');
+            if(option == 'call') option = 'c';
+            else if(option =='put') option ='p';
+
             var entryprice = $(this).closest('tr').find('.average-price').find('.price').text();
             if(entryprice == undefined)
                 entryprice = $(this).data('entryprice');
             var expirationdate = $(this).data('expirationdate');
-            var tradeTitle = direction+space+space+symbol+space+expirationdate+space+strikeprice+space+option+entryprice.replace(/[\$\(\)]/g, '');
+            var tradeTitle = direction+space+symbol+expirationdate+option+strikeprice;//entryprice.replace(/[\$\(\)]/g, '');
             // console.log(tradeTitle);
             
             $('#addTrade').modal('show');

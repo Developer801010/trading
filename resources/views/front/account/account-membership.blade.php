@@ -4,6 +4,7 @@
 @section('page-style')
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/toastr.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/forms/form-validation.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endsection
 
 
@@ -91,7 +92,8 @@
 @section('page-script')
     <script src="{{ asset('app-assets/vendors/js/extensions/toastr.min.js') }}"></script>
     <script src="{{ asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js') }}"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-       
+        $('.list-table').DataTable();
     </script>
 @endsection

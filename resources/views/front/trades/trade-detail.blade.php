@@ -19,7 +19,7 @@
                             <div class="row">
                                 <div class="col-12 col-md-8">
                                     <h5 class="card-title" style="font-weight: bold">
-                                        @if($type == 'a')
+                                        @if($type == 'a')   {{-- Add Trade --}}                                        
                                             {{ucfirst($trade->trade->trade_type)}} Alert - {{ucfirst($trade->trade->trade_direction)}} {{ $trade->trade->trade_symbol }} (Add)
                                         @else
                                             {{ucfirst($trade->trade_type)}} Alert - {{ucfirst($trade->trade_direction)}} 

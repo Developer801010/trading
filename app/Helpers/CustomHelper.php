@@ -46,3 +46,16 @@ function getSubscriptionType($interval, $interval_count)
 {
    
 }
+
+function getMiddleWord($string) {
+    $words = explode(' ', $string);
+    $wordCount = count($words);
+    
+    if($wordCount % 2 == 0) {
+        // If there's an even number of words, return the earlier of the two middle words.
+        // If you want the latter, change the index to $wordCount/2.
+        return $words[($wordCount/2)-1];
+    } else {
+        return $words[floor($wordCount/2)];
+    }
+}

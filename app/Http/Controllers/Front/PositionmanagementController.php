@@ -9,13 +9,17 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Cashier;
+use Laravel\Cashier\Subscription;
 
 class PositionManagementController extends Controller
 {
-    public function mainFeed()
+    public function mainFeed(Request $request)
     {
+        $search = $request->input('search');
+
         // Define the first query
         $trades = DB::table('trades as t')
+        ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
         ->select([
             't.id',
             't.trade_type',
@@ -23,26 +27,41 @@ class PositionManagementController extends Controller
             't.trade_direction',
             't.trade_option',
             't.strike_price',
-            't.entry_price',
+            DB::raw('CASE 
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN 
+                    ((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.entry_price
+                END AS entry_price'),
             't.stop_price',
             't.target_price',
+            DB::raw('CASE 
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN 
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.position_size
+                END AS position_size'),
             't.exit_price',
             't.exit_date',
-            't.position_size',
             't.trade_description',
             't.chart_image',
             't.close_comment',
             't.close_image',
             't.created_at',
             't.updated_at'
-        ]);
+        ])
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option', 
+       't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size', 
+        't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment', 
+        't.close_image', 't.created_at', 't.updated_at');
 
         // Define the second query and join with the trades table
         $tradeDetails = DB::table('trade_details as td')
         ->join('trades as t', 'td.trade_id', '=', 't.id')
         ->select([
             'td.id',
-            't.trade_type',            
+            't.trade_type',
             't.trade_symbol',
             'td.trade_direction',
             't.trade_option',
@@ -50,23 +69,28 @@ class PositionManagementController extends Controller
             'td.entry_price',
             'td.stop_price',
             'td.target_price',
-            't.exit_price',
-            't.exit_date',
             'td.position_size',
+            DB::raw('NULL AS exit_price'),
+            DB::raw('NULL AS exit_date'),
             'td.trade_description',
             'td.chart_image',
-             DB::raw("'' as close_comment"),
-             DB::raw("'' as close_image"),
+            DB::raw("'' AS close_comment"),
+            DB::raw("'' AS close_image"),
             'td.created_at',
             'td.updated_at'
-        ]);
+        ])
+        ->whereNull('t.exit_price')
+        ->whereNull('t.exit_date');
 
         $unionQuery = $trades->union($tradeDetails)->orderBy('updated_at', 'desc');
 
         // Combine both queries
         $results = $unionQuery->paginate(10);
 
-        return view('front.trades.main-feed', compact('results'));
+        //Get Account login info and Billing info
+        $billing_data = Subscription::where('user_id', auth()->user()->id)->first();
+
+        return view('front.trades.main-feed', compact('results', 'billing_data'));
     }
     
     public function openStockTrades(Request $request)
@@ -160,5 +184,12 @@ class PositionManagementController extends Controller
         }
         
         return view('front.trades.trade-detail', compact('trade', 'type'));
+    }
+
+    public function updateCloseEvent()
+    {
+        $obj = User::findorFail(auth()->user()->id);
+        $obj->close_feed = 1;
+        $obj->save();
     }
 }

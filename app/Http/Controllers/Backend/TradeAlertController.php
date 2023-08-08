@@ -107,7 +107,7 @@ class TradeAlertController extends Controller
                 .$strike_price.' '.ucfirst($trade_option).' @ $'.$entry_price.' or better';
             $url = route('front.trade-detail', [
                 'id'=>$tradeObj->id,
-                't'=>'n'
+                'type'=>'n'
             ]);
 
             $data = [
@@ -139,7 +139,7 @@ class TradeAlertController extends Controller
                 }
             }
 
-            return back()->with('flash_success', 'Trade was created successfully!')->withInput();
+            return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
 
         }catch(Exception $ex){
             DB::rollBack();
@@ -232,7 +232,7 @@ class TradeAlertController extends Controller
             
             $url = route('front.trade-detail', [
                 'id'=>$tradeObj->id,
-                't'=>'a'
+                'type'=>'a'
             ]);
 
              $data = [
@@ -324,7 +324,7 @@ class TradeAlertController extends Controller
              $body_title = strtoupper($closeTradeDirection).' '.$closeTradeSymbol;  
              $url = route('front.trade-detail', [
                 'id'=>$tradeObj->id,
-                't'=>'c'
+                'type'=>'c'
             ]);
 
              $data = [

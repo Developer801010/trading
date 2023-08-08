@@ -121,7 +121,7 @@ class FrontController extends Controller
         ];
 
         try{
-            Mail::to('kristoffermorris80@gmail.com')->send(new Welcome($data));
+            Mail::to('kristoffermorris80@gmail.com')->send(new Welcome($data));            
         }catch(Exception $ex){
             dd($ex->getMessage());
         }

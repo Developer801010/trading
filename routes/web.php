@@ -62,6 +62,7 @@ Route::group(['middleware' => ['auth'], ['prefix' => 'front']], function() {
     Route::get('/dashboard/open-options-trades', [PositionManagementController::class, 'openOptionsTrades'])->name('front.open-options-trades');
     Route::get('/dashboard/closed-options-trades', [PositionManagementController::class, 'closedOptionsTrades'])->name('front.closed-options-trades');
     Route::get('/dashboard/main-feed/{id}/{type}', [PositionManagementController::class, 'tradeDetail'])->name('front.trade-detail');
+    Route::get('/dashboard/update-close-event', [PositionManagementController::class, 'updateCloseEvent'])->name('front.update-close-event');
 
     Route::group(['middleware' => ['verified']], function() {  //'role:subscriber'
     });

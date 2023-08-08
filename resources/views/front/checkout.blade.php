@@ -257,9 +257,14 @@
                             @endcomponent
                         </div>
                     </div>
-                </div>
-                
+                </div>                
             </form>
+            <div id="overlay" style="display: none;"></div>
+
+            <div id="loadingSpinner" style="display: none;">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Please wait while we process your order...
+            </div>
         </section>
     </div>
        
@@ -563,6 +568,7 @@
         }
 
         cardButton.prop('disabled', true);
+        cardButton.html('Please wait while we process your order...').find('.spinner-border').show();
 
         if(paymentOption == 'stripe')
         {
@@ -611,8 +617,9 @@
 
             if(isValid){
                 FormHandler();                
+                $('#overlay, #loadingSpinner').show();
             }else{
-                cardButton.prop('disabled', false);
+                // $('#overlay, #loadingSpinner').hide();
             }
             
 
