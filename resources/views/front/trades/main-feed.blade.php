@@ -47,6 +47,7 @@
                     
                 </div>            
             @endif
+
             <form action="{{ route('front.main-feed') }}" method="GET" class="mainFeedSearch">
                 <div class="mb-3 mt-5 row" style="justify-content: flex-end">                    
                     <div class="col-sm-3">
@@ -66,18 +67,29 @@
                                     <div class="col-12 col-md-8">  
                                         {{-- A: Add trade, C: Close trade, N:New trade --}}
                                         <h5 class="card-title" style="font-weight: bold">                                            
-                                            {{ucfirst($trade->trade_type)}} Alert - {{ucfirst($trade->trade_direction)}} 
+                                            {{ucfirst($trade->trade_type)}} Alert - {{ucfirst($trade->trade_direction)}}
+
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 to Close
                                             @endif
-                                            {{$trade->trade_symbol}}{{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}}
+
+                                            {{$trade->trade_symbol}}
+
+                                            @if($trade->trade_type == 'option')
+                                               {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}}
+                                            @endif
+
                                             @if ($trade->trade_option == 'call')
                                                 C
                                             @elseif($trade->trade_option == 'put')
                                                 P
                                             @else
                                             
-                                            @endif{{rtrim(rtrim(number_format($trade->entry_price, 1), '0'), '.')}}
+                                            @endif
+                                            
+                                            @if($trade->trade_type == 'option')
+                                                {{rtrim(rtrim(number_format($trade->entry_price, 1), '0'), '.')}}
+                                            @endif
                                         </h5>
                                     </div>
                                     <div class="col-12 col-md-4">
@@ -85,7 +97,12 @@
                                     </div>
                                 </div>                          
                             <p class="mb-1">
-                                {{ucfirst($trade->trade_direction)}} {{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('M d, Y')}} ${{number_format($trade->entry_price, 0)}} {{$trade->trade_option}}.
+                                @if($trade->trade_type == 'option')
+                                    {{ucfirst($trade->trade_direction)}} {{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('M d, Y')}} ${{number_format($trade->entry_price, 0)}} {{$trade->trade_option}}.
+                                @else
+                                    {{ucfirst($trade->trade_direction)}} {{$trade->trade_symbol}}
+                                @endif
+                                
                             </p>
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                 <p class="mb-1"><b>Exit Price: </b>${{number_format($trade->exit_price, 0)}}</p>  
@@ -105,9 +122,9 @@
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)  
                                 <p class="mb-1"><b>Profits: </b>
                                     @if ($trade->trade_direction == 'buy')
-                                        {{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 0)  }}%
+                                        <span class="text-success">{{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 0)  }}%</span>
                                     @else
-                                        {{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 0) }}%
+                                        <span class="text-success">{{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 0) }}%</span>
                                     @endif
                                 </p>
                             @endif

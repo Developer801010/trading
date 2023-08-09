@@ -58,6 +58,7 @@
                         <td style="width: 20%">
                             <a href="#" class="btn btn-success btnClose"
                                 data-id="{{ $parentTrade->id }}" 
+                                data-type = "{{ $parentTrade->trade_type }}"
                                 data-direction="{{ $parentTrade->trade_direction }}"
                                 data-position = "{{ $parentTrade->position_size }}"
                                 data-symbol="{{$parentTrade->trade_symbol}}" 
@@ -246,6 +247,7 @@
                     <form id="closeTradeForm" method="post" action="{{route('admin.trade-close')}}" class="row gy-1 pt-75" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="closeFormID" id="closeFormID" value="" />
+                        <input type="hidden" name="closeTradeType" id="closeTradeType" value="" />
                         <input type="hidden" name="closeTradeSymbol" id="closeTradeSymbol" value="" />
                         <input type="hidden" name="closeTradeDirection" id="closeTradeDirection" value="" />
                         <input type="hidden" name="closeTradeStrikePrice" id="closeTradeStrikePrice" value="" />
@@ -335,6 +337,7 @@
             e.preventDefault();  
             var space = ' ';
             var id = $(this).data('id');
+            var type = $(this).data('type');
             var direction = $(this).data('direction');
              //if there is a total position size
             var position_size = $(this).closest('tr').find('.average-price').find('.size').text();
@@ -359,6 +362,7 @@
             $('#closeTrade').modal('show');
             $('.tradeCloseTitle').text(tradeTitle);
             $('#closeFormID').val(id);
+            $('#closeTradeType').val(type);
             $('#closeTradeSymbol').val(symbol);
             $('#closeTradeDirection').val(direction);
             $('#closeTradeEntryPrice').val(entryprice);  //average price

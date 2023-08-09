@@ -56,6 +56,11 @@ class PositionManagementController extends Controller
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment', 
         't.close_image', 't.created_at', 't.updated_at');
 
+        // Add search condition for trades
+        if (!empty($search)) {
+            $trades->where('t.trade_symbol', 'LIKE', '%' . $search . '%');
+        }
+
         // Define the second query and join with the trades table
         $tradeDetails = DB::table('trade_details as td')
         ->join('trades as t', 'td.trade_id', '=', 't.id')
@@ -81,6 +86,11 @@ class PositionManagementController extends Controller
         ])
         ->whereNull('t.exit_price')
         ->whereNull('t.exit_date');
+
+        // Add search condition for tradeDetails
+        if (!empty($search)) {
+            $tradeDetails->where('t.trade_symbol', 'LIKE', '%' . $search . '%');
+        }
 
         $unionQuery = $trades->union($tradeDetails)->orderBy('updated_at', 'desc');
 

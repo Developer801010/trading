@@ -103,8 +103,14 @@ class TradeAlertController extends Controller
             $activeSubscribers = $this->getActiveSubscriptionUsers();
 
             $trade_mail_title = ucfirst($trade_direction).' '.$trade_symbol.' '.ucfirst($trade_option);
-            $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('dMY').' '
+
+            if($trade_type == 'option'){
+                $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('dMY').' '
                 .$strike_price.' '.ucfirst($trade_option).' @ $'.$entry_price.' or better';
+            }else{
+                $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('dMY').' '
+                .$strike_price.' '.ucfirst($trade_option).' @ $'.$entry_price.' or better';
+            }
             $url = route('front.trade-detail', [
                 'id'=>$tradeObj->id,
                 'type'=>'n'
@@ -278,6 +284,7 @@ class TradeAlertController extends Controller
     public function tradeClose(Request $request) 
     {
         $closeFormID = $request->closeFormID;
+        $closeTradeType = $request->closeTradeType;
         $closeExitDate = $request->closeExitDate;
         $closeExitPrice = (float)$request->closeExitPrice;
         $closeTradeEntryPrice = (float)str_replace(['$', '(', ')'], '', $request->closeTradeEntryPrice);
@@ -321,7 +328,14 @@ class TradeAlertController extends Controller
              }
 
              $trade_mail_title = 'Close '.$closeTradeSymbol;
-             $body_title = strtoupper($closeTradeDirection).' '.$closeTradeSymbol;  
+
+             if($closeTradeType == 'option'){
+                $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('dMY').' '
+                .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
+            }else{
+                $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol; 
+            }
+
              $url = route('front.trade-detail', [
                 'id'=>$tradeObj->id,
                 'type'=>'c'
@@ -346,10 +360,7 @@ class TradeAlertController extends Controller
              }
 
             //Bulk trade creation notification to activated users' phone
-            $mobileNotificationTitle = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('dMY').' '
-            .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
-
-            $msg = $mobileNotificationTitle.' '.$url;
+            $msg = $body_title.' '.$url;
 
             foreach($activeSubscribers as $subscriber)
             {            
