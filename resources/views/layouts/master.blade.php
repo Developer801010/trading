@@ -103,7 +103,16 @@
 <!-- END: Page Vendor JS-->
 <script>
     var createRoleUrl = "{{ route('roles.create') }}";    
-    var createTradeUrl = "{{ route('trades.create') }}";    
+    var createTradeUrl = "{{ route('trades.create') }}";  
+    
+    $.ajaxSetup({
+        error: function (xhr) {
+            if (xhr.status === 419) { // Session timeout
+                location.href = '/login';
+            }
+        }
+    });
+
 </script>
 
 <script src="{{ asset('assets/js/scripts.js') }}"></script>

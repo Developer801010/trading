@@ -33,16 +33,11 @@
                                 <i class="expand-toggle fa-solid fa-chevron-right" style="cursor: pointer;"></i>
                             @endif
                         </td>
-                        <td class="parent-trade text-primary" data-trade-id="{{ $parentTrade->id }}"  style="width: 20%">
-                            @if($parentTrade->trade_option =='call')
-                                @php $trade_option = 'C'; @endphp
-                            @else
-                                @php $trade_option = 'P'; @endphp
-                            @endif
+                        <td class="parent-trade text-primary" data-trade-id="{{ $parentTrade->id }}"  style="width: 20%">                                                    
                             @if($parentTrade->trade_type === 'stock')
                                 {{ $parentTrade->trade_symbol }}
                             @else
-                                {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->entry_date)->format('ymd').''.$trade_option.''.number_format($parentTrade->strike_price, '0')}}
+                                {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->entry_date)->format('ymd').''.ucfirst(substr($parentTrade->trade_option, 0, 1)).''.number_format($parentTrade->strike_price, '0')}}
                             @endif                            
                         </td>
                         <td style="width:10%">{{ $parentTrade->trade_type }}</td>
@@ -65,11 +60,12 @@
                                 data-strikeprice = "{{$parentTrade->strike_price}}" 
                                 data-option="{{$parentTrade->trade_option}}" 
                                 data-entryprice="{{$parentTrade->entry_price}}" 
-                                data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('dMY')}}" >
+                                data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('ymd')}}" >
                                 Close
                             </a>
                             <a href="#" class="btn btn-success btnAdd"  
                                 data-id="{{ $parentTrade->id }}" 
+                                data-type = "{{ $parentTrade->trade_type }}" 
                                 data-direction="{{ $parentTrade->trade_direction }}"
                                 data-position = "{{ $parentTrade->position_size }}"
                                 data-symbol="{{$parentTrade->trade_symbol}}" 
@@ -172,8 +168,9 @@
                     
                     <form id="addTradeForm" method="post" action="{{route('admin.trade-add')}}" class="row gy-1 pt-75" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="addFormID" id="addFormID" value="" />
-                        <input type="hidden" name="addTradeSymbol" id="addTradeSymbol" value="" />
+                        <input type="hidden" name="addFormID" id="addFormID" value="" />          
+                        <input type="hidden" name="addTradeSymbol" id="addTradeSymbol" value="" />                        
+                        <input type="hidden" name="addTradeType" id="addTradeType" value="" />                        
                         <input type="hidden" name="addTradeOption" id="addTradeOption" value="" />
                         <input type="hidden" name="addTradeDirection" id="addTradeDirection" value="" />
                         <input type="hidden" name="addTradeStrikePrice" id="addTradeStrikePrice" value="" />
@@ -309,24 +306,27 @@
             e.preventDefault();
             var space = ' ';
             var id = $(this).data('id');
+            var trade_type = $(this).data('type'); 
             var direction = $(this).data('direction').toUpperCase();
             var symbol = $(this).data('symbol');
-            var strikeprice = $(this).data('strikeprice');
-            
-            var option = $(this).data('option');
-            if(option == 'call') option = 'c';
-            else if(option =='put') option ='p';
-
+            var strikeprice = $(this).data('strikeprice').replace(/\.00$/, '');            
+            var option = $(this).data('option').substring(0,1);
             var entryprice = $(this).closest('tr').find('.average-price').find('.price').text();
             if(entryprice == undefined)
                 entryprice = $(this).data('entryprice');
             var expirationdate = $(this).data('expirationdate');
-            var tradeTitle = direction+space+symbol+expirationdate+option+strikeprice;//entryprice.replace(/[\$\(\)]/g, '');
+
+            if(trade_type == 'option'){
+                var tradeTitle = direction+space+symbol+expirationdate+option+strikeprice.replace(/\.00$/, '');
+            }else{
+                var tradeTitle = direction+space+symbol;
+            }
             // console.log(tradeTitle);
             
             $('#addTrade').modal('show');
             $('.tradeAddTitle').text(tradeTitle);
             $('#addFormID').val(id);
+            $('#addTradeType').val(trade_type);
             $('#addTradeSymbol').val(symbol);
             $('#addTradeOption').val(option);
             $('#addTradeDirection').val(direction);
@@ -340,9 +340,10 @@
             var type = $(this).data('type');
             var direction = $(this).data('direction');
              //if there is a total position size
-            var position_size = $(this).closest('tr').find('.average-price').find('.size').text();
+            var position_size = $(this).closest('tr').find('.average-price').find('.size').text().replace(/[()%]/g, '');
             if(position_size == undefined)
-                position_size = parseFloat($(this).data('position'))+'%';
+                position_size = parseFloat($(this).data('position').replace(/[()%]/g, ''));
+            console.log(position_size);
 
             var entryprice = $(this).closest('tr').find('.average-price').find('.price').text();
             if(entryprice == undefined)
@@ -350,13 +351,18 @@
 
             var symbol = $(this).data('symbol');
             var strikeprice = $(this).data('strikeprice');
-            var option = $(this).data('option');
+            var option = $(this).data('option').substring(0,1);
           
             var expirationdate = $(this).data('expirationdate');
             if(direction =='sell') direction = 'Buy';
             else direction = 'Sell'
-            var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size.replace(/[\$\(\)]/g, '')+space+expirationdate+space+
-                strikeprice+space+option+entryprice.replace(/[\$\(\)]/g, '');
+
+            if(type == 'option'){
+                var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size.replace(/[\$\(\)]/g, '')+'%'+space+expirationdate+option+strikeprice;
+            }else{
+                var tradeTitle = direction.toUpperCase()+space+symbol;
+            }
+           
             // console.log(tradeTitle);
             
             $('#closeTrade').modal('show');

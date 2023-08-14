@@ -77,9 +77,11 @@
                 value="@if ($units == 'mo') {{$month_plan['paypal_plan']}} @elseif ($units == 'qu') {{$quarter_plan['paypal_plan']}}  @elseif($units == 'yr' ) {{$year_plan['paypal_plan']}} @endif" />
 
                 <input type="hidden" name="price" id="price" value="{{$price}}" />
-
                 <input type="hidden" name="period" id="period" value="{{$units}}" />
-                
+                {{-- For test --}}
+                {{-- <input type="hidden" name="paypal_plan_id" id="paypal_plan_id" value="P-5GX61793L103197094BLHFAA"> --}}
+                {{-- <input type="hidden" name="price" id="price" value="10" /> --}}
+
                 @include('layouts.error')
 
                 <div class="row">
@@ -567,9 +569,6 @@
             password_confirmation.removeClass('error');
         }
 
-        cardButton.prop('disabled', true);
-        cardButton.html('Please wait while we process your order...').find('.spinner-border').show();
-
         if(paymentOption == 'stripe')
         {
 
@@ -643,8 +642,9 @@
 
             if(isValid){
                 FormHandler();
+                $('#overlay, #loadingSpinner').show();
             }else{
-                cardButton.prop('disabled', false);
+                // cardButton.prop('disabled', false);
             }
         }
        

@@ -81,26 +81,65 @@ class PaypalAgreement extends Paypal
         return $agreement;
     }
 
+    public function getSubscriptionStatus($subscriptionID)
+    {
+        $agreement = Agreement::get($subscriptionID, $this->apiContext);  
+        $state = $agreement->getState();  
+
+        return $state;
+    }
+
+    /**
+     * Get Agreement 
+     */
+
+    public function getAgreementStatus($subscriptionID) 
+    {
+        return Agreement::get($subscriptionID, $this->apiContext);  
+    }
+
+    /**
+     * Pause Subscription 
+     */
     public function pauseSubscription($subscriptionID)
     {
         try {
             $agreementStateDescriptor = new AgreementStateDescriptor();
             $agreementStateDescriptor->setNote("Suspending the agreement");
     
-            $agreement = Agreement::get($subscriptionID, $this->apiContext);
+            $agreement = Agreement::get($subscriptionID, $this->apiContext);  
             $agreement->cancel($agreementStateDescriptor, $this->apiContext);
+            // $agreement->suspend($agreementStateDescriptor, $this->apiContext);
     
             // Retrieve the updated agreement state
             $updatedAgreement = Agreement::get($subscriptionID, $this->apiContext);
             $state = $updatedAgreement->getState();
 
-            dd($state);
             return $state;
 
         }catch(Exception $ex){
             echo "Error: " . $ex->getMessage();
         }
        
+    }
+
+    /**
+     * 
+     */
+    public function getSubscriptionHistory($subscriptionID)
+    {
+        try {
+            // Get agreement details using agreement ID
+            $params = array('start_date' => date('Y-m-d', strtotime('-15 years')), 'end_date' => date('Y-m-d', strtotime('+5 days')));
+            $invoices = Agreement::searchTransactions($subscriptionID, $params, $this->apiContext);
+
+            return $invoices;
+
+        } catch (Exception $ex) {
+            // Handle error (you might want to log this error or handle it in a more detailed manner)
+            echo "Error: " . $ex->getMessage();
+            return null;
+        }
     }
 
     protected function getPaypalDate() {

@@ -102,14 +102,15 @@ class TradeAlertController extends Controller
             //Bulk trade creation email to activated users's email
             $activeSubscribers = $this->getActiveSubscriptionUsers();
 
-            $trade_mail_title = ucfirst($trade_direction).' '.$trade_symbol.' '.ucfirst($trade_option);
+            
 
             if($trade_type == 'option'){
-                $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('dMY').' '
-                .$strike_price.' '.ucfirst($trade_option).' @ $'.$entry_price.' or better';
+                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'" '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+                $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('ymd').' '
+                .$strike_price.' '.ucfirst(substr($trade_option,0,1)).' @ $'.$strike_price.' or better';
             }else{
-                $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('dMY').' '
-                .$strike_price.' '.ucfirst($trade_option).' @ $'.$entry_price.' or better';
+                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'"';
+                $body_title = strtoupper($trade_direction).' '.$trade_symbol;
             }
             $url = route('front.trade-detail', [
                 'id'=>$tradeObj->id,
@@ -134,7 +135,7 @@ class TradeAlertController extends Controller
             }
             
             //Bulk trade creation notification to activated users' phone
-            $msg = $body_title.' '.$url;
+            $msg = $trade_mail_title.' '.$url;
             foreach($activeSubscribers as $subscriber)
             {            
                  //if user subscribed for the mobile notification and verified the phone number
@@ -190,6 +191,7 @@ class TradeAlertController extends Controller
     public function tradeAdd(Request $request) 
     {
         $addFormID = $request->addFormID;
+        $addTradeType = $request->addTradeType;
         $addTradeSymbol = $request->addTradeSymbol;
         $addTradeOption = $request->addTradeOption;
         $addTradeStrikePrice = $request->addTradeStrikePrice;
@@ -232,10 +234,16 @@ class TradeAlertController extends Controller
              //Bulk Trade add email to activated users 
              $activeSubscribers = $this->getActiveSubscriptionUsers();
 
-             $trade_mail_title = $addTradeDirection.' (Add) '.$addTradeSymbol.' '.ucfirst($addTradeOption);
-             $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('dMY').' '
-                 .$addTradeStrikePrice.' '.ucfirst($addTradeOption).' @ $'.$addBuyPrice.' or better'; 
-            
+            if($addTradeType == 'option'){
+                $trade_mail_title ='TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' "'.$addTradeSymbol.'" '.Carbon::parse($addEntryDate)->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
+                $body_title = strtoupper($addTradeDirection).' (Add) '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('ymd').' '
+                    .$addTradeStrikePrice.' '.ucfirst(substr($addTradeOption, 0, 1)).' @ $'.$addBuyPrice.' or better'; 
+            }else{
+                $trade_mail_title ='TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' "'.$addTradeSymbol.'" '. '(Add)';
+                $body_title = strtoupper($addTradeDirection).' (Add) '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('ymd').' '
+                    .$addTradeStrikePrice.' '.ucfirst(substr($addTradeOption, 0, 1)).' @ $'.$addBuyPrice.' or better'; 
+            }
+
             $url = route('front.trade-detail', [
                 'id'=>$tradeObj->id,
                 'type'=>'a'
@@ -259,9 +267,7 @@ class TradeAlertController extends Controller
              }
 
             //Bulk trade creation notification to activated users' phone
-            $mobileNotificationTitle = strtoupper($addTradeDirection).' '.'(Add) '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('dMY').' '
-            .$addTradeStrikePrice.' '.ucfirst($addTradeOption).' @ $'.$addBuyPrice.' or better'; 
-            $msg = $mobileNotificationTitle.' '.$url;
+            $msg = $trade_mail_title.' '.$url;
 
             foreach($activeSubscribers as $subscriber)
             {            
@@ -327,12 +333,15 @@ class TradeAlertController extends Controller
                 $profits = ($closeExitPrice - $closeTradeEntryPrice) / $closeTradeEntryPrice * 100;  
              }
 
-             $trade_mail_title = 'Close '.$closeTradeSymbol;
+             if($closeTradeDirection == 'buy')  $closeTradeDirection = 'cover';
 
-             if($closeTradeType == 'option'){
-                $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('dMY').' '
+             if($closeTradeType == 'option')
+             {  
+                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close "'.$closeTradeSymbol.'" ';
+                $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('ymd').' '
                 .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
             }else{
+                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close "'.$closeTradeSymbol.'" ';
                 $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol; 
             }
 
@@ -360,7 +369,7 @@ class TradeAlertController extends Controller
              }
 
             //Bulk trade creation notification to activated users' phone
-            $msg = $body_title.' '.$url;
+            $msg = $trade_mail_title.' '.$url;
 
             foreach($activeSubscribers as $subscriber)
             {            

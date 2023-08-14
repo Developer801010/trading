@@ -67,29 +67,33 @@
                                     <div class="col-12 col-md-8">  
                                         {{-- A: Add trade, C: Close trade, N:New trade --}}
                                         <h5 class="card-title" style="font-weight: bold">                                            
-                                            {{ucfirst($trade->trade_type)}} Alert - {{ucfirst($trade->trade_direction)}}
+                                            {{ucfirst($trade->trade_type)}} Alert - 
+
+                                            @if( $trade->exit_price == null && $trade->exit_date == null && $trade->child_direction == null )
+                                                New Trade
+                                            @endif
 
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
+                                                @if ($trade->original_trade_direction == 'buy')
+                                                    Cover 
+                                                @else
+                                                    {{ucfirst($trade->original_trade_direction)}}
+                                                @endif 
                                                 to Close
-                                            @endif
-
-                                            {{$trade->trade_symbol}}
-
-                                            @if($trade->trade_type == 'option')
-                                               {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}}
-                                            @endif
-
-                                            @if ($trade->trade_option == 'call')
-                                                C
-                                            @elseif($trade->trade_option == 'put')
-                                                P
                                             @else
-                                            
+                                                {{ucfirst($trade->original_trade_direction)}}                                  
                                             @endif
-                                            
+
                                             @if($trade->trade_type == 'option')
-                                                {{rtrim(rtrim(number_format($trade->entry_price, 1), '0'), '.')}}
+                                                "{{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}}"
+                                            @else
+                                                "{{$trade->trade_symbol}}"
                                             @endif
+
+                                            @if ($trade->child_direction !== null )
+                                                ({{$trade->child_direction}})
+                                            @endif
+                                            
                                         </h5>
                                     </div>
                                     <div class="col-12 col-md-4">
@@ -98,9 +102,9 @@
                                 </div>                          
                             <p class="mb-1">
                                 @if($trade->trade_type == 'option')
-                                    {{ucfirst($trade->trade_direction)}} {{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('M d, Y')}} ${{number_format($trade->entry_price, 0)}} {{$trade->trade_option}}.
+                                    {{ucfirst($trade->original_trade_direction)}} {{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('M d, Y')}} ${{number_format($trade->entry_price, 0)}} {{$trade->trade_option}}.
                                 @else
-                                    {{ucfirst($trade->trade_direction)}} {{$trade->trade_symbol}}
+                                    {{ucfirst($trade->original_trade_direction)}} {{$trade->trade_symbol}}
                                 @endif
                                 
                             </p>
@@ -121,7 +125,7 @@
                            
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)  
                                 <p class="mb-1"><b>Profits: </b>
-                                    @if ($trade->trade_direction == 'buy')
+                                    @if ($trade->original_trade_direction == 'buy')
                                         <span class="text-success">{{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 0)  }}%</span>
                                     @else
                                         <span class="text-success">{{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 0) }}%</span>

@@ -28,7 +28,7 @@ class TradeAddAlertMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'TradeInSync Trade Alert: '.$this->data['title'],
+            subject: $this->data['title'],
         );
     }
 

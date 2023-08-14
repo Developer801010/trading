@@ -150,7 +150,7 @@ class PaymentController extends Controller
     }
     
     public function pauseSubscription($id)
-    {
+    {   
         $agreement = new PaypalAgreement();
         $agreement->pauseSubscription($id);
 

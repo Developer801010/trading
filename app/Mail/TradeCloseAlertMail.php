@@ -29,7 +29,7 @@ class TradeCloseAlertMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Trade Close Alert Mail '.$this->data['title'],
+            subject: $this->data['title'],
         );
     }
 

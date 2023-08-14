@@ -26,15 +26,7 @@
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 to Close
                                             @endif
-                                                {{$trade->trade_symbol}}{{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}}
-
-                                            @if ($trade->trade_option == 'call')
-                                                C
-                                            @elseif($trade->trade_option == 'put')
-                                                P
-                                            @else
-                                            
-                                            @endif{{rtrim(rtrim(number_format($trade->entry_price, 1), '0'), '.')}}
+                                            {{$trade->trade_symbol}}{{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}}  {{ucfirst(substr($trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->entry_price, 1), '0'), '.')}}
                                         @endif
                                         
                                     </h5>

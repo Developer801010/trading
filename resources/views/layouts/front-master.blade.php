@@ -41,6 +41,14 @@
     @yield('page-script')
     <script>
        window.csrfToken = "{{ csrf_token() }}";
+
+       $.ajaxSetup({
+            error: function (xhr) {
+                if (xhr.status === 419) { // Session timeout
+                    location.href = '/login';
+                }
+            }
+        });
     </script>
 </body>
 <!-- END: Body-->

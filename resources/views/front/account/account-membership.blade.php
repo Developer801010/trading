@@ -2,8 +2,8 @@
 @section('title', 'Notification')
 
 @section('page-style')
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/toastr.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/forms/form-validation.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/sweetalert2.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/extensions/ext-component-sweet-alerts.css') }}">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endsection
 
@@ -23,32 +23,33 @@
                     <h2 class="heading pb-3 pt-3">Membership</h2>
                     
                     @include('layouts.error')
-                    @if ($subscriptions->data)
+                    @if($paymentType == 'paypal')
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label for="last_name" class="form-label">Member Since: </label> 
-                                {{ \Carbon\Carbon::parse($subscriptions->data[0]['created'])->format('F j, Y') }}
+                                {{-- {{ \Carbon\Carbon::parse($subscriptions->data[0]['created'])->format('F j, Y') }} --}}
                             </div>
                             <div class="col-md-12">
                                 <label for="last_name" class="form-label">Account will cancel on </label> 
-                                {{ \Carbon\Carbon::parse($subscriptions->data[0]['current_period_end'])->format('F j, Y') }}
+                                {{-- {{ \Carbon\Carbon::parse($subscriptions->data[0]['current_period_end'])->format('F j, Y') }} --}}
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label">Membership level: {{ $membership_level }}</label> 
                             </div>
                             <div class="col-md-12">
-                                <form method="post" action={{route('front.cancel-card-subscription')}} class="mt-3">
+                                <form method="post" id="cancelForm" action={{route('front.pause-agreement-paypal', ['id' => $subscription_id])}} class="mt-3">
                                     <input type="hidden" name="membership_level" value="{{ $membership_level }}" />
                                     @csrf
-                                    @if (auth()->user()->subscription($membership_level)->onGracePeriod())
-                                        <button type="submit" disabled class="btn btn-danger">Membership Cancelation Requested</button>
+                                    @if ($subscriptionStatus == 'Active')
+                                        <button type="submit" class="btn btn-danger cancelButton">Membership Cancelation</button>                                        
                                     @else
-                                        <button type="submit" class="btn btn-danger">Membership Cancelation</button>
+                                        <button disabled class="btn btn-danger">Membership Cancelation Requested</button>
                                     @endif                                    
                                 </form>                                
                             </div>
-                        </div>    
+                        </div>                
 
+                        <h3>Invoice History</h3>
                         <div class="table-responsive">
                             <table class="list-table table">
                                 <thead class="table-light">
@@ -62,25 +63,81 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($invoices->data as $invoice)
+                                    @foreach ($invoices->agreement_transaction_list as $invoice)
                                         <tr>
-                                            <td>{{ $invoice->id }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($invoice->period_start)->format('F j, Y') }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($invoice->period_end)->format('F j, Y') }}</td>
-                                            <td>{{ getSubscriptionTitle($invoice->subscription) }}</td>
+                                            <td>{{ $invoice->transaction_id }}</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>{{ $membership_level }}</td>
                                             <td>
-                                                ${{ $invoice->total/100 }}
+                                                ${{  json_decode($invoice->amount)->value }}
                                             </td>
                                             <td>{{$invoice->status}}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>    
-
+                        </div> 
                     @else
-                        <p>There isn't activated subscription</p>
-                    @endif
+                        @if ($subscriptions->data)
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="last_name" class="form-label">Member Since: </label> 
+                                    {{ \Carbon\Carbon::parse($subscriptions->data[0]['created'])->format('F j, Y') }}
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="last_name" class="form-label">Account will cancel on </label> 
+                                    {{ \Carbon\Carbon::parse($subscriptions->data[0]['current_period_end'])->format('F j, Y') }}
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Membership level: {{ $membership_level }}</label> 
+                                </div>
+                                <div class="col-md-12">
+                                    <form method="post" id="cancelForm" action={{route('front.cancel-card-subscription')}} class="mt-3">
+                                        <input type="hidden" name="membership_level" value="{{ $membership_level }}" />
+                                        @csrf
+                                        @if (auth()->user()->subscription($membership_level)->onGracePeriod())
+                                            <button type="submit" disabled class="btn btn-danger">Membership Cancelation Requested</button>
+                                        @else
+                                            <button type="submit" class="btn btn-danger">Membership Cancelation</button>
+                                        @endif                                    
+                                    </form>    
+                                </div>
+                            </div>                                 
+                        @else
+                            <p>There isn't activated subscription</p>
+                        @endif
+
+                        <h3>Invoice History</h3>
+                            <div class="table-responsive">
+                                <table class="list-table table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Order#</th=>                        
+                                            <th>Billing Start</th>
+                                            <th>Billing End</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($invoices->data as $key => $invoice)
+                                            <tr>
+                                                <td>{{ $invoice->id }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($invoice->period_start)->format('F j, Y') }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($invoice->period_end)->format('F j, Y') }}</td>
+                                                <td>{{ getSubscriptionTitle($invoice->subscription) }}</td>
+                                                <td>
+                                                    ${{ $invoice->total/100 }}
+                                                </td>
+                                                <td>{{$invoice->status}}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>   
+                    @endif                    
                 </div>
             </div>
            
@@ -90,10 +147,35 @@
 
 
 @section('page-script')
-    <script src="{{ asset('app-assets/vendors/js/extensions/toastr.min.js') }}"></script>
-    <script src="{{ asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('app-assets/vendors/js/extensions/sweetalert2.all.min.js') }}"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-        $('.list-table').DataTable();
+        $('.list-table').DataTable({
+            "order": false
+        });
+
+        var cancelButton = $('.cancelButton');
+
+        if (cancelButton.length) {
+            cancelButton.on('click', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                        title: 'Cancel your plan?',
+                        text: "Your plan will be canceled. but is still available until end of your biling period on August 13, 2023.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Cancel Plan',
+                        customClass: {
+                        confirmButton: 'btn btn-primary',
+                        cancelButton: 'btn btn-outline-danger ms-1'
+                    },
+                    buttonsStyling: false
+                }).then(function (result) {
+                    if (result.value) {
+                        $('#cancelForm').submit();
+                    }
+                });
+            });
+        }
     </script>
 @endsection

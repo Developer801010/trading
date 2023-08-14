@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\StripeSubscriptionCancelEmail;
 use App\Models\Plan;
 use App\Models\User;
+use App\Paypal\PaypalAgreement;
 use App\Service\SmsService;
 use Carbon\Carbon;
 use Exception;
@@ -180,33 +181,63 @@ class AccountController extends Controller
 
      public function membership()
      {
-        // Retrieve the user's Stripe customer ID
-        $customerId = auth()->user()->stripe_id;
-        Stripe::setApiKey(config('services.stripe.secret_key'));
-       
-        try{
-            // Retrieve the subscription history for the customer from Stripe
-            $subscriptions = StripeSubscription::all([
-                'customer' => $customerId,
-            ]);    
+        //get Payment type 
+        $paymentType = auth()->user()->pm_type;  
 
-            $invoices = Invoice::all([
-                'customer' => $customerId,
-                'limit' => 100, // Maximum allowed by Stripe
-            ]);    
+        if($paymentType == 'paypal'){
+
+            $agreement = new PaypalAgreement();
+            $subscription_id = Subscription::where('user_id', auth()->user()->id)->value('stripe_id');  
+            $invoices = $agreement->getSubscriptionHistory($subscription_id);  //dd($invoices);
+            $subscriptionStatus = $agreement->getSubscriptionStatus($subscription_id);
+            $subscriptionAgreement = $agreement->getAgreementStatus($subscription_id);  dd($subscriptionAgreement);
             
-            $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name');
+            $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name'); //dd($membership_level);
 
             return view('front.account.account-membership', 
             compact(
+                    'paymentType',
+                    'membership_level',
                     'invoices',
-                    'subscriptions',
-                    'membership_level'
+                    'subscription_id',
+                    'subscriptionStatus'
                 )
             ); 
-        }catch(Exception $ex){
-            return redirect()->route('front.account-membership')->withErrors($ex->getMessage());
+        }else{
+             // Retrieve the user's Stripe customer ID
+            $customerId = auth()->user()->stripe_id;  
+            Stripe::setApiKey(config('services.stripe.secret_key'));
+        
+            try{
+                // Retrieve the subscription history for the customer from Stripe
+                if ($customerId !== null){
+                    $subscriptions = StripeSubscription::all([
+                        'customer' => $customerId,
+                    ]);    //dd($subscriptions);
+
+                    $invoices = Invoice::all([
+                        'customer' => $customerId,
+                        'limit' => 100, // Maximum allowed by Stripe
+                    ]);     //dd($invoices);
+
+                    $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name');
+                    // dd(auth()->user()->subscription($membership_level)->onGracePeriod());
+                    return view('front.account.account-membership', 
+                    compact(
+                            'paymentType',
+                            'invoices',
+                            'subscriptions',
+                            'membership_level'
+                        )
+                    ); 
+                }
+            }catch(Exception $ex){
+                return redirect()->route('front.account-membership')->withErrors($ex->getMessage());
+            }
         }
+       
+
+           
      }
 
      public function paymentMethodManagement()

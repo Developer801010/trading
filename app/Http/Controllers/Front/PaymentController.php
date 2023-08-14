@@ -243,7 +243,7 @@ class PaymentController extends Controller
                 
                 DB::commit();
 
-                Auth::attempt(['email' => session('email'), 'password' => bcrypt(session('password'))]);
+                Auth::attempt(['email' => session('email'), 'password' => session('password')]);
 
                 //Welcome Email
                 $data = [
