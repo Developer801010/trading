@@ -22,11 +22,11 @@
                                         @if($type == 'a')   {{-- Add Trade --}}                                        
                                             {{ucfirst($trade->trade->trade_type)}} Alert - {{ucfirst($trade->trade->trade_direction)}} {{ $trade->trade->trade_symbol }} (Add)
                                         @else
-                                            {{ucfirst($trade->trade_type)}} Alert - {{ucfirst($trade->trade_direction)}} 
+                                            {{ucfirst($trade->trade_type)}} Alert - {{ucfirst($trade->trade_direction == 'buy' ? 'cover' : 'sell')}} 
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 to Close
                                             @endif
-                                            {{$trade->trade_symbol}}{{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}}  {{ucfirst(substr($trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->entry_price, 1), '0'), '.')}}
+                                            {{$trade->trade_symbol}}{{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}}  {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->entry_price, 1), '0'), '.')}}
                                         @endif
                                         
                                     </h5>
