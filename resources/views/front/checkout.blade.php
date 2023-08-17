@@ -78,9 +78,6 @@
 
                 <input type="hidden" name="price" id="price" value="{{$price}}" />
                 <input type="hidden" name="period" id="period" value="{{$units}}" />
-                {{-- For test --}}
-                {{-- <input type="hidden" name="paypal_plan_id" id="paypal_plan_id" value="P-5GX61793L103197094BLHFAA"> --}}
-                {{-- <input type="hidden" name="price" id="price" value="10" /> --}}
 
                 @include('layouts.error')
 

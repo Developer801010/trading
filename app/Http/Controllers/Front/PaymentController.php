@@ -172,9 +172,10 @@ class PaymentController extends Controller
     public function cancelSubscription(Request $request)
     {
         $membership_level = $request->membership_level;
-        $user = auth()->user();
+        $cancelAt = $request->cancelAt;
+        $user = auth()->user();  
         $subscription = $user->subscription($membership_level);   
-        
+
         if($subscription){
             try{
                 $subscription->cancel();
@@ -183,9 +184,10 @@ class PaymentController extends Controller
                 $data = [
                     'first_name' => auth()->user()->first_name,
                     'last_name' => auth()->user()->last_name,
+                    'cancel_at' => $cancelAt,
                 ];
-
-                Mail::to(auth()->user->email)->queue(new StripeSubscriptionCancelEmail($data));
+        
+                Mail::to(auth()->user()->email)->queue(new StripeSubscriptionCancelEmail($data));
 
                 return redirect()->back()->with('flash_success', 'Subscription cancelation requested successfully.');
             }catch(Exception $ex){

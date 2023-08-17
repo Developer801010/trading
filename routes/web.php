@@ -56,12 +56,12 @@ Route::group(['middleware' => ['auth', 'check.session.expired'], ['prefix' => 'f
     Route::post('pause-agreement/{id}', [PaymentController::class, 'pauseSubscription'])->name('front.pause-agreement-paypal');
     Route::post('cancel-subscription', [PaymentController::class, 'cancelSubscription'])->name('front.cancel-card-subscription');
 
-    Route::get('/dashboard/main-feed', [PositionManagementController::class, 'mainFeed'])->name('front.main-feed');
-    Route::get('/dashboard/open-stock-trades', [PositionManagementController::class, 'openStockTrades'])->name('front.open-stock-trades');
-    Route::get('/dashboard/closed-stock-trades', [PositionManagementController::class, 'closedStockTrades'])->name('front.closed-stock-trades');
-    Route::get('/dashboard/open-options-trades', [PositionManagementController::class, 'openOptionsTrades'])->name('front.open-options-trades');
-    Route::get('/dashboard/closed-options-trades', [PositionManagementController::class, 'closedOptionsTrades'])->name('front.closed-options-trades');
-    Route::get('/dashboard/main-feed/{id}/{type}', [PositionManagementController::class, 'tradeDetail'])->name('front.trade-detail');
+    Route::get('/dashboard/main-feed', [PositionManagementController::class, 'mainFeed'])->name('front.main-feed')->middleware('check.subscription.expired');
+    Route::get('/dashboard/open-stock-trades', [PositionManagementController::class, 'openStockTrades'])->name('front.open-stock-trades')->middleware('check.subscription.expired');
+    Route::get('/dashboard/closed-stock-trades', [PositionManagementController::class, 'closedStockTrades'])->name('front.closed-stock-trades')->middleware('check.subscription.expired');
+    Route::get('/dashboard/open-options-trades', [PositionManagementController::class, 'openOptionsTrades'])->name('front.open-options-trades')->middleware('check.subscription.expired');
+    Route::get('/dashboard/closed-options-trades', [PositionManagementController::class, 'closedOptionsTrades'])->name('front.closed-options-trades')->middleware('check.subscription.expired');
+    Route::get('/dashboard/main-feed/{id}/{type}', [PositionManagementController::class, 'tradeDetail'])->name('front.trade-detail')->middleware('check.subscription.expired');
     Route::get('/dashboard/update-close-event', [PositionManagementController::class, 'updateCloseEvent'])->name('front.update-close-event');
 
     Route::group(['middleware' => ['verified']], function() {  //'role:subscriber'

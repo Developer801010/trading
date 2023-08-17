@@ -2,7 +2,11 @@
 @section('title', 'Closed Options Trades')
 
 @section('page-style')
-
+<style>
+    .pagination .page-item{
+        padding: 0;
+    }
+</style>
 @endsection
 
 

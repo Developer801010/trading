@@ -2,6 +2,11 @@
 @section('title', 'Closed Stock Trades')
 
 @section('page-style')
+<style>
+    .pagination .page-item{
+        padding: 0;
+    }
+</style>
 @endsection
 
 

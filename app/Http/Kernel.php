@@ -67,6 +67,6 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
         'check.session.expired' => \App\Http\Middleware\CheckSessionExpired::class,
-
+        'check.subscription.expired' => \App\Http\Middleware\CheckSubscriptionCancellation::class,
     ];   
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendTwilioSMS;
 use App\Mail\TradeAddAlertMail;
 use App\Mail\TradeCloseAlertMail;
 use App\Mail\TradeCreationAlertMail;
@@ -14,8 +15,10 @@ use App\Service\SmsService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Cashier\Subscription;
 
 class TradeAlertController extends Controller
 {
@@ -102,14 +105,13 @@ class TradeAlertController extends Controller
             //Bulk trade creation email to activated users's email
             $activeSubscribers = $this->getActiveSubscriptionUsers();
 
-            
-
             if($trade_type == 'option'){
-                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'" '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
-                $body_title = strtoupper($trade_direction).' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('ymd').' '
-                .$strike_price.' '.ucfirst(substr($trade_option,0,1)).' @ $'.$strike_price.' or better';
+                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+                $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'" '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+                $body_title = strtoupper($trade_direction).' '.$trade_symbol.Carbon::parse($entry_date)->format('ymd').$strike_price.ucfirst(substr($trade_option,0,1)).'@$'.$strike_price.' or better';
             }else{
-                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'"';
+                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.$trade_symbol.'';
+                $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'"';
                 $body_title = strtoupper($trade_direction).' '.$trade_symbol;
             }
             $url = route('front.trade-detail', [
@@ -121,7 +123,8 @@ class TradeAlertController extends Controller
                 'title' => $trade_mail_title,
                 'body' => [
                     'title' => $body_title,
-                    'trade_entry_date' => Carbon::parse($entry_date)->format('d/m/Y'),
+                    'trade_entry_date' => Carbon::parse($entry_date)->format('m/d/Y'),
+                    'trade_entry_price' => $entry_price,
                     'position_size' => $position_size,
                     'stop_price' => $stop_price,
                     'target_price' => $target_price,
@@ -135,14 +138,13 @@ class TradeAlertController extends Controller
             }
             
             //Bulk trade creation notification to activated users' phone
-            $msg = $trade_mail_title.' '.$url;
+            $msg = $sms_msg.' '.$url;
             foreach($activeSubscribers as $subscriber)
             {            
                  //if user subscribed for the mobile notification and verified the phone number
                 if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
                 {
-                    $sms_service = new SmsService();
-                    $sms_service->sendSMS($msg, $subscriber->mobile_number);
+                    SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
                 }
             }
 
@@ -235,13 +237,13 @@ class TradeAlertController extends Controller
              $activeSubscribers = $this->getActiveSubscriptionUsers();
 
             if($addTradeType == 'option'){
-                $trade_mail_title ='TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' "'.$addTradeSymbol.'" '.Carbon::parse($addEntryDate)->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
-                $body_title = strtoupper($addTradeDirection).' (Add) '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('ymd').' '
-                    .$addTradeStrikePrice.' '.ucfirst(substr($addTradeOption, 0, 1)).' @ $'.$addBuyPrice.' or better'; 
+                $trade_mail_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
+                $sms_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' "'.$addTradeSymbol.'" '.Carbon::parse($addEntryDate)->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
+                $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol.' (Add) @ $ '.$addBuyPrice.' or better'; 
             }else{
-                $trade_mail_title ='TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' "'.$addTradeSymbol.'" '. '(Add)';
-                $body_title = strtoupper($addTradeDirection).' (Add) '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('ymd').' '
-                    .$addTradeStrikePrice.' '.ucfirst(substr($addTradeOption, 0, 1)).' @ $'.$addBuyPrice.' or better'; 
+                $trade_mail_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' '.$addTradeSymbol.' '. '(Add)';
+                $sms_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' "'.$addTradeSymbol.'" '. '(Add)';
+                $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol. ' (Add) @ $'.$addBuyPrice.' or better'; 
             }
 
             $url = route('front.trade-detail', [
@@ -253,7 +255,8 @@ class TradeAlertController extends Controller
                  'title' => $trade_mail_title,
                  'body' => [
                      'title' => $body_title,
-                     'trade_entry_date' => Carbon::parse($addEntryDate)->format('d/m/Y'),
+                     'trade_entry_date' => Carbon::parse($addEntryDate)->format('m/d/Y'),
+                     'trade_entry_price' => $addBuyPrice,
                      'position_size' => $addPositionSize,
                      'stop_price' => $addStopPrice,
                      'target_price' => $addTargetPrice,
@@ -267,15 +270,14 @@ class TradeAlertController extends Controller
              }
 
             //Bulk trade creation notification to activated users' phone
-            $msg = $trade_mail_title.' '.$url;
+            $msg = $sms_title.' '.$url;
 
             foreach($activeSubscribers as $subscriber)
             {            
                  //if user subscribed for the mobile notification and verified the phone number
                 if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
                 {
-                    $sms_service = new SmsService();
-                    $sms_service->sendSMS($msg, $subscriber->mobile_number);
+                    SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
                 }
             }
 
@@ -337,11 +339,13 @@ class TradeAlertController extends Controller
 
              if($closeTradeType == 'option')
              {  
-                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close "'.$closeTradeSymbol.'" ';
+                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
+                $sms_title = 'TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close "'.$closeTradeSymbol.'" ';
                 $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('ymd').' '
                 .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
             }else{
-                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close "'.$closeTradeSymbol.'" ';
+                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
+                $sms_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close "'.$closeTradeSymbol.'" ';
                 $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol; 
             }
 
@@ -354,7 +358,7 @@ class TradeAlertController extends Controller
                  'title' => $trade_mail_title,
                  'body' => [
                      'title' => $body_title,
-                     'trade_exit_date' => Carbon::parse($closeExitDate)->format('d/m/Y'),
+                     'trade_exit_date' => Carbon::parse($closeExitDate)->format('m/d/Y'),
                      'position_size' => $closeTradePositionSize,
                      'exit_price' => $closeExitPrice,
                      'profits' => round($profits, 1),
@@ -369,15 +373,14 @@ class TradeAlertController extends Controller
              }
 
             //Bulk trade creation notification to activated users' phone
-            $msg = $trade_mail_title.' '.$url;
+            $msg = $sms_title.' '.$url;
 
             foreach($activeSubscribers as $subscriber)
             {            
                  //if user subscribed for the mobile notification and verified the phone number
                 if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
                 {
-                    $sms_service = new SmsService();
-                    $sms_service->sendSMS($msg, $subscriber->mobile_number);
+                    SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
                 }
             }
 
@@ -390,8 +393,10 @@ class TradeAlertController extends Controller
 
     private function getActiveSubscriptionUsers()
     {
+        
         $activeSubscribers = User::whereHas('subscriptions', function ($query) {
-            $query->where('stripe_status', 'active');
+            $query->where('ends_at', '>', now())
+                    ->orWhereNull('ends_at'); 
         })->get();
         
         return $activeSubscribers;

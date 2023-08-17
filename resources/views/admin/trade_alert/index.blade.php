@@ -290,6 +290,7 @@
     </div>
     <!--/ Edit Trade Modal -->
 </div>
+
 @endsection
 
 @section('page-script')

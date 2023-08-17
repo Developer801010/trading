@@ -181,8 +181,9 @@ class AccountController extends Controller
 
      public function membership()
      {
+        
         //get Payment type 
-        $paymentType = auth()->user()->pm_type;  
+        $paymentType = auth()->user()->pm_type;   
 
         if($paymentType == 'paypal'){
 
@@ -221,7 +222,11 @@ class AccountController extends Controller
                     ]);     //dd($invoices);
 
                     $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name');
-                    // dd(auth()->user()->subscription($membership_level)->onGracePeriod());
+                    // dd(auth()->user()->subscription($membership_level)->onGracePeriod());  //cancel_at + false: Grace period false. cancelat + true: still active
+                    // if (auth()->user()->subscription($membership_level)->onGracePeriod()) {
+                    //     dd(1);
+                    // }
+                    // dd($invoices->data);
                     return view('front.account.account-membership', 
                     compact(
                             'paymentType',

@@ -95,11 +95,13 @@
                                 <div class="col-md-12">
                                     <form method="post" id="cancelForm" action={{route('front.cancel-card-subscription')}} class="mt-3">
                                         <input type="hidden" name="membership_level" value="{{ $membership_level }}" />
+                                        <input type="hidden" name="cancelAt" 
+                                        value="{{\Carbon\Carbon::parse($subscriptions->data[0]['current_period_end'])->format('F j, Y') }}" />
                                         @csrf
                                         @if (auth()->user()->subscription($membership_level)->onGracePeriod())
                                             <button type="submit" disabled class="btn btn-danger">Membership Cancelation Requested</button>
                                         @else
-                                            <button type="submit" class="btn btn-danger">Membership Cancelation</button>
+                                            <button type="submit" class="btn btn-danger cancelButton">Membership Cancelation</button>
                                         @endif                                    
                                     </form>    
                                 </div>
@@ -125,13 +127,19 @@
                                         @foreach ($invoices->data as $key => $invoice)
                                             <tr>
                                                 <td>{{ $invoice->id }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($invoice->period_start)->format('F j, Y') }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($invoice->period_end)->format('F j, Y') }}</td>
+                                                <td>
+                                                    {{ \Carbon\Carbon::parse(json_decode($invoice->lines['data'][0]['period']['start']))->format('F j, Y') }}
+                                                </td>
+                                                <td>{{ \Carbon\Carbon::parse(json_decode($invoice->lines['data'][0]['period']['end']))->format('F j, Y') }}</td>
+                                                {{-- <td>{{ \Carbon\Carbon::parse($invoice->period_start)->format('F j, Y') }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($invoice->period_end)->format('F j, Y') }}</td> --}}
                                                 <td>{{ getSubscriptionTitle($invoice->subscription) }}</td>
                                                 <td>
                                                     ${{ $invoice->total/100 }}
                                                 </td>
-                                                <td>{{$invoice->status}}</td>
+                                                <td class="text-success">
+                                                    {{$invoice->status}}
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -153,15 +161,29 @@
         $('.list-table').DataTable({
             "order": false
         });
+        
+        //get cancel_at date 
+
+        <?php if($paymentType == 'paypal'): ?>
+
+        <?php else: ?>
+            <?php if($subscriptions->data): ?>
+                var cancelAt = "<?php echo \Carbon\Carbon::parse($subscriptions->data[0]['current_period_end'])->format('F j, Y'); ?>";
+            <?php endif; ?>       
+        <?php endif; ?>
+        
+
 
         var cancelButton = $('.cancelButton');
 
         if (cancelButton.length) {
+            var message = "Your plan will be canceled, but it will still be available until the end of your billing period on " + cancelAt + ".  If you change your mind, you can renew your subscription.";
+
             cancelButton.on('click', function (e) {
                 e.preventDefault();
                 Swal.fire({
                         title: 'Cancel your plan?',
-                        text: "Your plan will be canceled. but is still available until end of your biling period on August 13, 2023.",
+                        text: message,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Cancel Plan',

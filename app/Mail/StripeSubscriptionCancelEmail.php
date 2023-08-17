@@ -27,7 +27,7 @@ class StripeSubscriptionCancelEmail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Stripe Subscription Cancel Email',
+            subject: 'Subscription Cancellation Email',
         );
     }
 
@@ -37,7 +37,7 @@ class StripeSubscriptionCancelEmail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.stripe-cancel-request',
+            markdown: 'emails.subscription-cancel-request',
             with: [
                 $this->data
             ]

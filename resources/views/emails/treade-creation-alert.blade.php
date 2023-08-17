@@ -2,11 +2,12 @@
 
 <b>{{$data['body']['title']}}</b><br>
 <b>Trade Entry Date: </b>{{$data['body']['trade_entry_date']}}<br>
+<b>Trade Entry Price: </b>${{$data['body']['trade_entry_price']}}<br>
 <b>Position Size: </b>{{$data['body']['position_size']}}%<br>
-@if ($data['body']['stop_price'] != 'No Stop')
-<b>Stop Price: </b>${{ $data['body']['stop_price'] }}<br>
-@else
+@if (strpos($data['body']['stop_price'], 'No Stop') !== false)
 <b>Stop Price: </b>{{ $data['body']['stop_price'] }}<br>
+@else
+<b>Stop Price: </b>${{ $data['body']['stop_price'] }}<br>
 @endif
 <b>Target Price: </b>${{$data['body']['target_price']}}<br>
 <b>Comments: </b>{{$data['body']['comments']}}<br>
