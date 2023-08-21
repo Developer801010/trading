@@ -67,7 +67,33 @@ class TradeAlertController extends Controller
         $entry_date = $request->entry_date;
         $position_size = $request->position_size;
         $trade_description = $request->trade_description;
+
+        //duplication issue
+        //for stock.  by the trade symbol
+        if($trade_type == 'stock'){
+            $tradeCount = Trade::where([
+                'trade_type' => 'stock',
+                'trade_symbol' => $trade_symbol
+            ])->count();
+
+            $msg = 'Symbol already exists';
+        }else{
+            //for option by the whole content 
+            $tradeCount = Trade::where([
+                'trade_type' => 'option',
+                'trade_symbol' => $trade_symbol,
+                'expiration_date' => $expiration_date,
+                'trade_option' => $trade_option,
+                'strike_price' => $strike_price
+            ])->count();
+
+            $msg = 'Contract already exists';
+       
+        }
         
+        if($tradeCount > 0)
+            return back()->withErrors($msg)->withInput();
+
         DB::beginTransaction();
         try{
 
@@ -152,7 +178,7 @@ class TradeAlertController extends Controller
 
         }catch(Exception $ex){
             DB::rollBack();
-            return back()->withErrors($ex->getMessage());
+            return back()->withErrors($ex->getMessage())->withInput();
         }
 
 

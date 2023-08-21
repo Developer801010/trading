@@ -75,9 +75,9 @@
 
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 @if ($trade->original_trade_direction == 'buy')
-                                                    Sell 
+                                                    Sell
                                                 @else
-                                                    Buy
+                                                    Cover 
                                                 @endif 
                                                 to Close
                                             @else

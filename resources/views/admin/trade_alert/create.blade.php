@@ -214,9 +214,17 @@
     });
 
     $(document).ready(function () {
-        var trade_type = $('input[name="trade_type"]').val();
-        console.log(trade_type);
 
+        var tradeType = @json(old('trade_type'));
+        console.log(tradeType);
+        if(tradeType == 'option'){
+            option_column.removeClass('d-none');
+        }else if (tradeType == 'stock'){
+            option_column.addClass('d-none');
+        }
+        // var tradeType = $('input[name="trade_type"]').val();
+        
+        
         tradeForm.validate({
             rules: {
                 'trade_symbol': {
@@ -236,68 +244,72 @@
                 },
             }
         });
+
+        $('input[name="trade_type"]').change(function() {
+
+            
+            // Get the value of the selected radio button
+            var selectedValue = $(this).val(); 
+            
+            // Perform actions based on the selected value
+            if (selectedValue === "stock") 
+            {
+                option_column.addClass('d-none');
+
+                tradeForm.validate({
+                    rules: {
+                        'trade_symbol': {
+                            required: true
+                        },
+                        'entry_price': {
+                            required: true
+                        },
+                        'stop_price': {
+                            required: true
+                        },
+                        'target_price': {
+                            required: true
+                        },
+                        'entry_date': {
+                            required: true
+                        },
+                    }
+                });
+            } 
+            else if (selectedValue === "option") 
+            {
+                option_column.removeClass('d-none');
+            
+                tradeForm.validate({
+                    rules: {
+                        'trade_symbol': {
+                            required: true
+                        },
+                        'expiration_date': {
+                            required: true
+                        },
+                        'strike_price': {
+                            required: true
+                        },
+                        'entry_price': {
+                            required: true
+                        },
+                        'stop_price': {
+                            required: true
+                        },
+                        'target_price': {
+                            required: true
+                        },
+                        'entry_date': {
+                            required: true
+                        },
+                    }
+                });
+            }      
+        });
     });
 
-    $('input[name="trade_type"]').change(function() {
-        // Get the value of the selected radio button
-        var selectedValue = $(this).val(); 
-        
-        // Perform actions based on the selected value
-        if (selectedValue === "stock") 
-        {
-            option_column.addClass('d-none');
-
-            tradeForm.validate({
-                rules: {
-                    'trade_symbol': {
-                        required: true
-                    },
-                    'entry_price': {
-                        required: true
-                    },
-                    'stop_price': {
-                        required: true
-                    },
-                    'target_price': {
-                        required: true
-                    },
-                    'entry_date': {
-                        required: true
-                    },
-                }
-            });
-        } 
-        else if (selectedValue === "option") 
-        {
-            option_column.removeClass('d-none');
-          
-            tradeForm.validate({
-                rules: {
-                    'trade_symbol': {
-                        required: true
-                    },
-                    'expiration_date': {
-                        required: true
-                    },
-                    'strike_price': {
-                        required: true
-                    },
-                    'entry_price': {
-                        required: true
-                    },
-                    'stop_price': {
-                        required: true
-                    },
-                    'target_price': {
-                        required: true
-                    },
-                    'entry_date': {
-                        required: true
-                    },
-                }
-            });
-        }      
-    });
+    
 
     picker = $('.picker');
     picker.flatpickr({

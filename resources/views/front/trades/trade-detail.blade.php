@@ -22,7 +22,7 @@
                                         @if($type == 'a')   {{-- Add Trade --}}                                        
                                             {{ucfirst($trade->trade->trade_type)}} Alert - {{ucfirst($trade->trade->trade_direction)}} {{ $trade->trade->trade_symbol }} (Add)
                                         @else
-                                            {{ucfirst($trade->trade_type)}} Alert - {{ucfirst($trade->trade_direction == 'buy' ? 'cover' : 'sell')}} 
+                                            {{ucfirst($trade->trade_type)}} Alert - {{ucfirst($trade->trade_direction == 'buy' ? 'Sell' : 'Cover')}} 
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 to Close
                                             @endif
