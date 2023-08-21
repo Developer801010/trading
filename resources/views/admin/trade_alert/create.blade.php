@@ -88,7 +88,7 @@
 
                                     <div class="col-md-3 col-12  option_column d-none">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Expiration Date (DD/MM/YYYY)</label>
+                                            <label class="form-label" for="itemname">Expiration Date (YYYY-MM-DD)</label>
                                             <input type="text" class="form-control picker" name="expiration_date" id="expiration_date" value="{{old('expiration_date')}}" />
                                         </div>
                                     </div>

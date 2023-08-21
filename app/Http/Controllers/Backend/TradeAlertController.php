@@ -90,7 +90,7 @@ class TradeAlertController extends Controller
             $msg = 'Contract already exists';
        
         }
-        
+        dd($tradeCount);
         if($tradeCount > 0)
             return back()->withErrors($msg)->withInput();
 
