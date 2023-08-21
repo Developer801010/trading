@@ -116,8 +116,9 @@
                             <p class="mb-1"><b>Position Size: </b>{{rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.')}}% of Portfolio</p> 
                             
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                <p class="mb-1"><b>Average Entry Price: </b><span class="average_entry_price"></span></p>
-                                {{-- <p class="mb-1"><b>Entry Date: </b>{{\Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y')}}</p> --}}
+                                <p class="mb-1"><b>Average Entry Price: </b>
+                                    <span class="average_entry_price">${{number_format($trade->entry_price, 0)}}</span>
+                                </p>                                
                             @else
                                 <p class="mb-1"><b>Stop Price: </b>{{$trade->stop_price == 'No Stop' ? 'No Stop' : '$'.number_format((float)$trade->stop_price, 0)}}</p>
                                 <p class="mb-1"><b>Target Price: </b> ${{number_format($trade->target_price, 0)}}</p>
@@ -132,7 +133,7 @@
                                     @endif
                                 </p>
                             @endif
-                            <p class="mb-1">
+                            <p class="mb-1"><b>Comments: </b>
                                 @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                     {{$trade->close_comment}}
                                 @else
