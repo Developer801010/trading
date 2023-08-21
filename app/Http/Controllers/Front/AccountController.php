@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendTwilioSMS;
 use App\Mail\StripeSubscriptionCancelEmail;
 use App\Models\Plan;
 use App\Models\User;
@@ -123,7 +124,6 @@ class AccountController extends Controller
                     return response()->json(['error' => 'Phone number is already used!'], 400);
                 }
                 
-                $sms_service = new SmsService();
                 $verificationCode = $this->generateVerificationCode();
                  // Store the verification code and its expiration time in the session
                 Session::put('verification_code', $verificationCode);
@@ -131,7 +131,8 @@ class AccountController extends Controller
                 Session::put('mobile_number', $recipients);
 
                 $msg = 'Your verification code is: ' . $verificationCode;
-                return $sms_service->sendSMS($msg, '+1'.$recipients);
+                SendTwilioSMS::dispatch('+1'.$recipients, $msg);
+
             }else{
                 //if mobile is alredy verified, it unsubscribes 
                 $obj = User::findorFail(auth()->user()->id);
@@ -189,9 +190,11 @@ class AccountController extends Controller
 
             $agreement = new PaypalAgreement();
             $subscription_id = Subscription::where('user_id', auth()->user()->id)->value('stripe_id');  
+            // $subscription_id = '';
             $invoices = $agreement->getSubscriptionHistory($subscription_id);  //dd($invoices);
             $subscriptionStatus = $agreement->getSubscriptionStatus($subscription_id);
-            $subscriptionAgreement = $agreement->getAgreementStatus($subscription_id);  dd($subscriptionAgreement);
+            $agreementDetails  = $agreement->getAgreementDetails($subscription_id);  
+            //dd($agreementDetails);
             
             $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name'); //dd($membership_level);
 
@@ -201,7 +204,8 @@ class AccountController extends Controller
                     'membership_level',
                     'invoices',
                     'subscription_id',
-                    'subscriptionStatus'
+                    'subscriptionStatus',
+                    'agreementDetails'
                 )
             ); 
         }else{

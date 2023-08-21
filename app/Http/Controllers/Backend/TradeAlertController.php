@@ -108,7 +108,7 @@ class TradeAlertController extends Controller
             if($trade_type == 'option'){
                 $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
                 $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'" '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
-                $body_title = strtoupper($trade_direction).' '.$trade_symbol.Carbon::parse($entry_date)->format('ymd').$strike_price.ucfirst(substr($trade_option,0,1)).'@$'.$strike_price.' or better';
+                $body_title = strtoupper($trade_direction).' '.$trade_symbol.Carbon::parse($entry_date)->format('ymd').$strike_price.ucfirst(substr($trade_option,0,1)).'@$'.$entry_price.' or better';
             }else{
                 $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.$trade_symbol.'';
                 $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'"';

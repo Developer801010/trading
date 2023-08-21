@@ -6,6 +6,7 @@ use DateInterval;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Session;
+use Laravel\Cashier\Subscription;
 use PayPal\Api\Agreement;
 use PayPal\Api\AgreementStateDescriptor;
 use PayPal\Api\Payer;
@@ -93,7 +94,7 @@ class PaypalAgreement extends Paypal
      * Get Agreement 
      */
 
-    public function getAgreementStatus($subscriptionID) 
+    public function getAgreementDetails($subscriptionID) 
     {
         return Agreement::get($subscriptionID, $this->apiContext);  
     }
@@ -108,14 +109,14 @@ class PaypalAgreement extends Paypal
             $agreementStateDescriptor->setNote("Suspending the agreement");
     
             $agreement = Agreement::get($subscriptionID, $this->apiContext);  
-            $agreement->cancel($agreementStateDescriptor, $this->apiContext);
-            // $agreement->suspend($agreementStateDescriptor, $this->apiContext);
-    
-            // Retrieve the updated agreement state
-            $updatedAgreement = Agreement::get($subscriptionID, $this->apiContext);
-            $state = $updatedAgreement->getState();
-
-            return $state;
+            $nextBillingDate = date('Y-m-d H:i:s', strtotime($agreement->getAgreementDetails()->next_billing_date));
+            // $agreement->cancel($agreementStateDescriptor, $this->apiContext);
+            $agreement->suspend($agreementStateDescriptor, $this->apiContext);
+            //update end date
+            Subscription::where('stripe_id', $subscriptionID)->update([
+                'ends_at' => $nextBillingDate
+            ]);
+            
 
         }catch(Exception $ex){
             echo "Error: " . $ex->getMessage();
@@ -130,8 +131,9 @@ class PaypalAgreement extends Paypal
     {
         try {
             // Get agreement details using agreement ID
-            $params = array('start_date' => date('Y-m-d', strtotime('-15 years')), 'end_date' => date('Y-m-d', strtotime('+5 days')));
-            $invoices = Agreement::searchTransactions($subscriptionID, $params, $this->apiContext);
+            $params = array('start_date' => date('Y-m-d', strtotime('-15 years')), 'end_date' => date('Y-m-d'));
+
+            $invoices = Agreement::searchTransactions($subscriptionID, $params, $this->apiContext); 
 
             return $invoices;
 

@@ -34,20 +34,15 @@ class SendTwilioSMS implements ShouldQueue
     {
 
         // Perform rate limiting to send 1 SMS per second        
-        RateLimiter::perSecond(3)->throttle('send-sms')->then(function () {
-            $twilio = new Client(config('services.twilio.account_id'), config('services.twilio.auth_token'));
+        $twilio = new Client(config('services.twilio.account_id'), config('services.twilio.auth_token'));
 
-            $twilio->messages->create(
-                $this->to,
-                [
-                    'from' => config('services.twilio.phone_number'),
-                    'body' => $this->message,
-                ]
-            );
-        }, function(){
-            // Delay and retry if rate limit is exceeded
-            return $this->release(3);
-        });
+        $twilio->messages->create(
+            $this->to,
+            [
+                'from' => config('services.twilio.phone_number'),
+                'body' => $this->message,
+            ]
+        );
         
     }
 }

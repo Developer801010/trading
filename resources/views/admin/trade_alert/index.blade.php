@@ -20,6 +20,7 @@
                     <th></th>
                     <th>Trade</th>
                     <th>Trade Type</th>
+                    <th>Direction</th>
                     <th>Trade Date</th>
                     <th>Average Price</th>
                     <th>Actions</th>
@@ -33,16 +34,23 @@
                                 <i class="expand-toggle fa-solid fa-chevron-right" style="cursor: pointer;"></i>
                             @endif
                         </td>
-                        <td class="parent-trade text-primary" data-trade-id="{{ $parentTrade->id }}"  style="width: 20%">                                                    
+                        <td class="parent-trade text-primary" data-trade-id="{{ $parentTrade->id }}"  style="width: 15%">                                                    
                             @if($parentTrade->trade_type === 'stock')
                                 {{ $parentTrade->trade_symbol }}
                             @else
                                 {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->entry_date)->format('ymd').''.ucfirst(substr($parentTrade->trade_option, 0, 1)).''.number_format($parentTrade->strike_price, '0')}}
                             @endif                            
-                        </td>
+                        </td>                       
                         <td style="width:10%">{{ $parentTrade->trade_type }}</td>
+                        <td style="width: 15%">
+                            @if($parentTrade->trade_direction == 'buy' )     
+                                Long
+                            @else
+                                Short
+                            @endif
+                        </td>
                         <td style="width: 15%">{{ \Carbon\Carbon::parse($parentTrade->entry_date)->format('m/d/Y') }}</td>
-                        <td style="width: 30%" class="average-price">
+                        <td style="width: 20%" class="average-price">
                             @if($parentTrade->trade_direction == 'sell')
                                 <span class="price">(${{ $parentTrade->entry_price }})</span>
                             @else
@@ -89,6 +97,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
+                            <td></td>
                             <td>{{ \Carbon\Carbon::parse($parentTrade->entry_date)->format('m/d/Y') }}</td>
                             <td>
                                 <span>${{ $parentTrade->entry_price }}</span>
@@ -102,6 +111,7 @@
                                 $totalPercentage += $childTrade->position_size / 100;
                             @endphp
                             <tr class="child-trade child-trade-{{ $parentTrade->id }}" style="display: none;">
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>

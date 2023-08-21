@@ -75,9 +75,9 @@
 
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 @if ($trade->original_trade_direction == 'buy')
-                                                    Cover 
+                                                    Sell 
                                                 @else
-                                                    {{ucfirst($trade->original_trade_direction)}}
+                                                    Buy
                                                 @endif 
                                                 to Close
                                             @else
@@ -85,9 +85,9 @@
                                             @endif
 
                                             @if($trade->trade_type == 'option')
-                                                "{{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}}"
+                                                {{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}}
                                             @else
-                                                "{{$trade->trade_symbol}}"
+                                                {{$trade->trade_symbol}}
                                             @endif
 
                                             @if ($trade->child_direction !== null )

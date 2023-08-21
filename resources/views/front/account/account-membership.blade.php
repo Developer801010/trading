@@ -27,14 +27,14 @@
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label for="last_name" class="form-label">Member Since: </label> 
-                                {{-- {{ \Carbon\Carbon::parse($subscriptions->data[0]['created'])->format('F j, Y') }} --}}
+                                {{ \Carbon\Carbon::parse($agreementDetails->getStartDate())->format('F j, Y') }}
                             </div>
                             <div class="col-md-12">
-                                <label for="last_name" class="form-label">Account will cancel on </label> 
-                                {{-- {{ \Carbon\Carbon::parse($subscriptions->data[0]['current_period_end'])->format('F j, Y') }} --}}
+                                <label for="last_name" class="form-label">Account will cancel on </label>                                 
+                                {{ \Carbon\Carbon::parse($agreementDetails->getAgreementDetails()->next_billing_date)->format('F j, Y') }}
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label">Membership level: {{ $membership_level }}</label> 
+                                <label class="form-label">Membership level: {{ $agreementDetails->description }}</label> 
                             </div>
                             <div class="col-md-12">
                                 <form method="post" id="cancelForm" action={{route('front.pause-agreement-paypal', ['id' => $subscription_id])}} class="mt-3">
@@ -55,7 +55,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Order#</th=>                        
-                                        <th>Billing Start</th>
+                                        {{-- <th>Billing Start</th> --}}
                                         <th>Billing End</th>
                                         <th>Description</th>
                                         <th>Amount</th>
@@ -63,16 +63,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+
                                     @foreach ($invoices->agreement_transaction_list as $invoice)
                                         <tr>
                                             <td>{{ $invoice->transaction_id }}</td>
-                                            <td></td>
-                                            <td></td>
+                                            {{-- <td></td> --}}
+                                            <td> {{ \Carbon\Carbon::parse($invoice->time_stamp)->format('F j, Y') }}</td>
                                             <td>{{ $membership_level }}</td>
                                             <td>
                                                 ${{  json_decode($invoice->amount)->value }}
                                             </td>
-                                            <td>{{$invoice->status}}</td>
+                                            <td class="text-success">{{$invoice->status}}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -164,8 +165,8 @@
         
         //get cancel_at date 
 
-        <?php if($paymentType == 'paypal'): ?>
-
+        <?php if($paymentType == 'paypal'): ?>            
+            var cancelAt = "<?php echo \Carbon\Carbon::parse($agreementDetails->getAgreementDetails()->next_billing_date)->format('F j, Y'); ?>";
         <?php else: ?>
             <?php if($subscriptions->data): ?>
                 var cancelAt = "<?php echo \Carbon\Carbon::parse($subscriptions->data[0]['current_period_end'])->format('F j, Y'); ?>";

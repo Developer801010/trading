@@ -221,7 +221,7 @@ class PaymentController extends Controller
                     'email' => session('email'),
                     'mobile_number' => session('mobile_number'),
                     'password' => bcrypt(session('password')),
-                    'name' => session('user_name')               
+                    'name' => session('user_name')     
                 ]);
                 
                 //save PayPal subscription data into the database 
@@ -237,6 +237,7 @@ class PaymentController extends Controller
                 //user table update with PayPal status
                 $user = User::find($user->id);
                 $user->pm_type = 'paypal';
+                $user->stripe_id = $subscriptionId;
                 $user->save();
                 
                 // Add a subscribe role. 
