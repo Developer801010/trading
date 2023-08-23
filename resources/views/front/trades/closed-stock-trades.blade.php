@@ -46,7 +46,7 @@
                         @foreach ($trades as $trade)
                         <tr class="expanded">
                             <td class="parent-trade text-primary" data-trade-id="{{ $trade->id }}">
-                                {{$trade->trade_symbol}}
+                                {{strtoupper($trade->trade_symbol)}}
                             </td>
                             <td>
                                 @if($trade->trade_direction == 'buy') 

@@ -132,13 +132,13 @@ class TradeAlertController extends Controller
             $activeSubscribers = $this->getActiveSubscriptionUsers();
 
             if($trade_type == 'option'){
-                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.$trade_symbol.' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
-                $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'" '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
-                $body_title = strtoupper($trade_direction).' '.$trade_symbol.Carbon::parse($entry_date)->format('ymd').$strike_price.ucfirst(substr($trade_option,0,1)).'@$'.$entry_price.' or better';
+                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert';
+                $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+                $body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('M d, Y').' $'.number_format($strike_price, 0).' '.ucfirst($trade_option).'@$'.$entry_price.' or better';
             }else{
-                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.$trade_symbol.'';
-                $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' "'.$trade_symbol.'"';
-                $body_title = strtoupper($trade_direction).' '.$trade_symbol;
+                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert';
+                $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol);
+                $body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol);
             }
             $url = route('front.trade-detail', [
                 'id'=>$tradeObj->id,
@@ -263,13 +263,13 @@ class TradeAlertController extends Controller
              $activeSubscribers = $this->getActiveSubscriptionUsers();
 
             if($addTradeType == 'option'){
-                $trade_mail_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' '.$addTradeSymbol.' '.Carbon::parse($addEntryDate)->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
-                $sms_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' "'.$addTradeSymbol.'" '.Carbon::parse($addEntryDate)->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
-                $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol.' (Add) @ $ '.$addBuyPrice.' or better'; 
+                $trade_mail_title = 'TradeInSync '.$addTradeType.' Alert';
+                $sms_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addEntryDate)->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
+                $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol).' (Add) @ $ '.$addBuyPrice.' or better'; 
             }else{
-                $trade_mail_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' '.$addTradeSymbol.' '. '(Add)';
-                $sms_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' "'.$addTradeSymbol.'" '. '(Add)';
-                $body_title = strtoupper($addTradeDirection).' '.$addTradeSymbol. ' (Add) @ $'.$addBuyPrice.' or better'; 
+                $trade_mail_title = 'TradeInSync '.$addTradeType.' Alert';
+                $sms_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '. '(Add)';
+                $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol). ' (Add) @ $'.$addBuyPrice.' or better'; 
             }
 
             $url = route('front.trade-detail', [
@@ -353,26 +353,33 @@ class TradeAlertController extends Controller
              if($closeTradeDirection == 'buy')  
              {
                  //original: Sell Trade  [average sell price – buy price]/average sell price]*100.
-                $profits = ($closeTradeEntryPrice - $closeExitPrice) / $closeTradeEntryPrice * 100;  //closeTradeEntryPrice: it's average price.  
+                 if ($closeTradeEntryPrice != 0) 
+                    $profits = ($closeTradeEntryPrice - $closeExitPrice) / $closeTradeEntryPrice * 100;  //closeTradeEntryPrice: it's average price.  
+                 else
+                    $profits = 0;
+                 
              }
              else   // original: Buy Trade
              {
                 //Profit % for a buy trade = [[close price- average purchase price]/average purchase price]*100.
-                $profits = ($closeExitPrice - $closeTradeEntryPrice) / $closeTradeEntryPrice * 100;  
+                if ($closeTradeEntryPrice != 0) 
+                    $profits = ($closeExitPrice - $closeTradeEntryPrice) / $closeTradeEntryPrice * 100;  
+                else
+                    $profits = 0;
              }
 
              if($closeTradeDirection == 'buy')  $closeTradeDirection = 'cover';
 
              if($closeTradeType == 'option')
              {  
-                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
-                $sms_title = 'TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close "'.$closeTradeSymbol.'" ';
-                $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol.' '.Carbon::parse($closeExitDate)->format('ymd').' '
+                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert';
+                $sms_title = 'TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
+                $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeExitDate)->format('M d, Y').' $'
                 .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
             }else{
-                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
-                $sms_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close "'.$closeTradeSymbol.'" ';
-                $body_title = strtoupper($closeTradeDirection).' '.'(Close) '.$closeTradeSymbol; 
+                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert';
+                $sms_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' ';
+                $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol); 
             }
 
              $url = route('front.trade-detail', [

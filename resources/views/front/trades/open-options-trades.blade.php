@@ -52,7 +52,7 @@
                                     @endif
                                 </td>
                                 <td class="parent-trade text-primary" data-trade-id="{{ $trade->id }}">
-                                    {{$trade->trade_symbol}}
+                                    {{strtoupper($trade->trade_symbol)}}
                                 </td>
                                 <td>{{ucfirst($trade->trade_direction)}}</td>
                                 <td>

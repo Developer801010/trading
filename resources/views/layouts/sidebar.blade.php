@@ -85,6 +85,17 @@
                         </li>
                     </ul>
                 </li>
+
+                <li class="navigation-header">
+                    <span>Articles</span>
+                </li>
+
+                <li class="nav-item @if(request()->is('articles*')) active @endif">
+                    <a class="d-flex align-items-center" href="{{ route('articles.index') }}">
+                        <i data-feather="gift"></i>
+                        <span class="menu-title text-truncate">Articles</span>
+                    </a>
+                </li>
             @endrole
 
             @role(['user'])

@@ -103,21 +103,21 @@
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
                                             <label class="form-label" for="itemname">Entry Price($)</label>
-                                            <input type="text" class="form-control numeral-mask" name="entry_price" id="entry_price" value="{{old('entry_price', '0')}}" />
+                                            <input type="text" class="form-control numeral-mask" name="entry_price" id="entry_price" value="{{old('entry_price')}}" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
                                             <label class="form-label" for="itemname">Stop Price($)</label>
-                                            <input type="text" class="form-control" name="stop_price" id="stop_price" value="{{old('stop_price', 'No Stop') }}"  />
+                                            <input type="text" class="form-control" name="stop_price" id="stop_price" value="{{old('stop_price') }}"  />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
                                             <label class="form-label" for="itemname">Target Price($)</label>
-                                            <input type="text" class="form-control numeral-mask" name="target_price" id="target_price" value="{{old('target_price', '0')}}"  />
+                                            <input type="text" class="form-control numeral-mask" name="target_price" id="target_price" value="{{old('target_price')}}"  />
                                         </div>
                                     </div>
 

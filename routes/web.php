@@ -9,6 +9,7 @@ use App\Http\Controllers\Backend\HomeController;
 use App\Http\Controllers\Backend\TradeAlertController;
 use App\Http\Controllers\Backend\PaymentManagementController;
 use App\Http\Controllers\Backend\PlanManagementController;
+use App\Http\Controllers\Backend\PostController;
 use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\RoleController;
 use App\Http\Controllers\Backend\UserController;
@@ -83,6 +84,8 @@ Route::group(['middleware' => ['auth', 'role:admin', 'check.session.expired'], [
     Route::resource('users', UserController::class);
 
     Route::resource('profiles', ProfileController::class);
+
+    Route::resource('articles', PostController::class);
 
     Route::resource('trades', TradeAlertController::class);
     Route::post('trades/close', [TradeAlertController::class, 'tradeClose'])->name('admin.trade-close');

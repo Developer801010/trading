@@ -85,9 +85,9 @@
                                             @endif
 
                                             @if($trade->trade_type == 'option')
-                                                {{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}}
+                                                {{strtoupper($trade->trade_symbol)}} {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}}
                                             @else
-                                                {{$trade->trade_symbol}}
+                                                {{strtoupper($trade->trade_symbol)}}
                                             @endif
 
                                             @if ($trade->child_direction !== null )
@@ -98,6 +98,15 @@
                                     </div>
                                     <div class="col-12 col-md-4">
                                         <p class="main-feed-published-time">{{\Carbon\Carbon::parse($trade->updated_at)->format('F d, Y h:i A')}}</p>
+                                        {{-- <p class="main-feed-published-time">
+                                            @php
+                                                $utcDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $trade->updated_at, 'UTC');
+                                                // Convert to Eastern Standard Time (EST) time zone
+                                                $estDateTime = $utcDateTime->setTimezone('America/New_York');
+
+                                                echo $estDateTime->format('F d, Y h:i A');
+                                            @endphp                                                 
+                                        </p> --}}
                                     </div>
                                 </div>                          
                             <p class="mb-1">
@@ -127,9 +136,22 @@
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)  
                                 <p class="mb-1"><b>Profits: </b>
                                     @if ($trade->original_trade_direction == 'buy')
-                                        <span class="text-success">{{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 0)  }}%</span>
+                                        <span class="text-success">
+                                            @if ($trade->entry_price != 0 )
+                                                {{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 0)  }}%
+                                            @else
+                                                0%
+                                            @endif                                            
+                                        </span>
                                     @else
-                                        <span class="text-success">{{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 0) }}%</span>
+                                        <span class="text-success">
+                                            @if ($trade->entry_price != 0 )
+                                                {{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 0) }}%
+                                            @else
+                                                0%
+                                            @endif
+                                            
+                                        </span>
                                     @endif
                                 </p>
                             @endif
@@ -146,7 +168,8 @@
                                 
                             @else
                                 @if($trade->chart_image && file_exists(public_path($trade->chart_image)))
-                                    <img src="{{ asset($trade->chart_image) }}" class="mb-1" />
+                                    <img src="{{ asset($trade->chart_image) }}" class="mb-1 comment_img"
+                                    data-image="{{ asset($trade->chart_image) }}"  />
                                 @endif
                             @endif
                             </div>
@@ -157,10 +180,24 @@
             {{ $results->appends(request()->query())->links() }}
         </section>
     </div>    
+
+    <div class="modal fade" id="commentImage" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-add-trade">
+            <div class="modal-content">
+                <div class="modal-header bg-transparent">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pb-5 px-sm-5 pt-50">
+                    <img class="modalImg" src="" />
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
 @section('page-script')    
+
     <script>
         $('.btn-close').click(function (e) { 
             e.preventDefault();
@@ -174,6 +211,14 @@
                     console.log('Error occurred: ' + error);
                 }
             })
+        });
+
+        $('body').on('click', '.comment_img', function(e) {
+            e.preventDefault();
+
+            var comment_img = $(this).data('image');
+            $('#commentImage').modal('show');
+            $('.modalImg').attr('src', comment_img);
         });
     </script>
 @endsection

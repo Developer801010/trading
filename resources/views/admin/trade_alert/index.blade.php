@@ -206,7 +206,7 @@
 
                         <div class="col-12 col-md-4">
                             <label class="form-label" for="addStopPrice">Stop Price</label>
-                            <input type="text" id="addStopPrice" name="addStopPrice" class="form-control" value="No Stop" value="{{old('addStopPrice')}}"  />
+                            <input type="text" id="addStopPrice" name="addStopPrice" class="form-control"  value="{{old('addStopPrice')}}"  />
                         </div>
 
                         <div class="col-12 col-md-4">
@@ -308,6 +308,7 @@
 <script src="{{asset('app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/cleave.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>    
     $(document).ready(function () {
         var addTradeForm = $('#addTradeForm');
@@ -343,6 +344,8 @@
             $('#addTradeDirection').val(direction);
             $('#addTradeStrikePrice').val(strikeprice);
         });
+
+        $('#addTrade').draggable();
 
         $('body').on('click', '.btnClose', function(e) {
             e.preventDefault();  
@@ -387,6 +390,8 @@
             $('#closeTradeStrikePrice').val(strikeprice);
             $('#closeTradeOption').val(option);
         });
+
+        $('#closeTrade').draggable();
 
         $.validator.addMethod('filesize', function(value, element, param) {
             // param = size (in bytes) 

@@ -15,6 +15,19 @@ class HomeController extends Controller
 
     public function index()
     {
-        return view('admin.home');
+        //total registered users
+        $totalUsers = 0;
+        //curretnly subscribed users
+        $subscribedUsers = 0;
+        //unsubscribed users
+        $unsubscribedUsers = 0;
+
+
+
+        return view('admin.home', compact(
+            'totalUsers',
+            'subscribedUsers',
+            'unsubscribedUsers',
+        ));
     }
 }

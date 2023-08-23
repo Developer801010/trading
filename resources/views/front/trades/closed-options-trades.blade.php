@@ -47,15 +47,10 @@
                         @foreach ($trades as $trade)
                         <tr class="expanded">
                             <td class="parent-trade text-primary" data-trade-id="{{ $trade->id }}">
-                                {{$trade->trade_symbol}}
+                                {{strtoupper($trade->trade_symbol)}}
                             </td>
                             <td>
-                                @if($trade->trade_option =='call')
-                                        @php $trade_option = 'C'; @endphp
-                                    @else
-                                        @php $trade_option = 'P'; @endphp
-                                    @endif
-                                    {{ $trade->trade_symbol .' '. \Carbon\Carbon::parse($trade->entry_date)->format('ymd').' '.$trade_option.' '.$trade->strike_price }}
+                                {{ strtoupper($trade->trade_symbol) .' '. \Carbon\Carbon::parse($trade->entry_date)->format('ymd').' '.ucfirst(substr($trade->trade_option, 0, 1)).' '.$trade->strike_price }}
                             </td>
                             <td>
                                 @if($trade->trade_direction == 'buy') 
@@ -78,13 +73,31 @@
                                     <span class="size"></span>
                                 @else
                                     @if ($trade->trade_direction == 'buy')
-                                        <span class="size">                                        
-                                            {{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2) }}%
+                                        @if ($trade->entry_price != 0)
+                                            @php
+                                                $profits =  number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
+                                            @endphp                                            
+                                        @else
+                                            @php
+                                                $profits = 0;
+                                            @endphp
+                                        @endif 
+                                        <span class="size @if($profits >=0) {{ 'text-success' }} @else {{'text-danger'}} @endif">               
+                                            {{$profits}}%
                                         </span>    
                                     @else
-                                        <span class="size">
-                                            {{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2) }}%
-                                        </span>
+                                        @if ($trade->entry_price != 0)
+                                            @php
+                                                $profits =   number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
+                                            @endphp                                            
+                                        @else
+                                            @php
+                                                $profits = 0;
+                                            @endphp
+                                        @endif 
+                                        <span class="size @if($profits >=0) {{ 'text-success' }} @else {{'text-danger'}} @endif">               
+                                            {{$profits}}%
+                                        </span>    
                                     @endif
                                 @endif                                
                             </td>                          
@@ -126,9 +139,16 @@
 
                                 // $('.parent-trade[data-trade-id="{{ $trade->id }}"]').closest('tr').find('.average-price')
                                 // .find('.size').text(' ('+totalPercentage * 100+'%)');
+                                var $profitElement = $('.parent-trade[data-trade-id="{{ $trade->id }}"]').closest('tr').find('.profit .size');
+                                $profitElement.text(parseFloat(profitPercentage).toFixed(2) + '%');
 
-                                $('.parent-trade[data-trade-id="{{ $trade->id }}"]').closest('tr').find('.profit').
-                                find('.size').text(parseFloat(profitPercentage).toFixed(2)+'%');
+                                if (profitPercentage >= 0) {
+                                    $profitElement.addClass('text-success');
+                                    $profitElement.removeClass('text-danger');
+                                } else {
+                                    $profitElement.addClass('text-danger');
+                                    $profitElement.removeClass('text-success');
+                                }
 
                                 // Show/hide child rows on expand icon click
                                 $(".expand-toggle").off('click').on('click', function() {

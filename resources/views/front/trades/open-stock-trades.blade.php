@@ -51,7 +51,7 @@
                                     @endif
                                 </td>
                                 <td class="parent-trade text-primary" data-trade-id="{{ $trade->id }}">
-                                    {{$trade->trade_symbol}}
+                                    {{strtoupper($trade->trade_symbol)}}
                                 </td>    
                                 <td>
                                     @if($trade->trade_direction == 'buy') 
@@ -67,7 +67,7 @@
                                     <span class="size">({{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%)</span>
                                 </td>
                                 <td>{{$trade->stop_price}}</td>
-                                <td>{{$trade->target_price}}</td>
+                                <td>${{$trade->target_price}}</td>
                             </tr>
                             @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
                                 @php
@@ -107,7 +107,7 @@
                                             <span>({{ rtrim(rtrim(number_format($childTrade->position_size, 1), '0'), '.') }}%)</span>
                                         </td>
                                         <td>{{$childTrade->stop_price}}</td>
-                                        <td>{{$childTrade->target_price}}</td>
+                                        <td>${{$childTrade->target_price}}</td>
                                     </tr>
                                 @endforeach
                                 @php
