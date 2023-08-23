@@ -85,7 +85,7 @@ Route::group(['middleware' => ['auth', 'role:admin', 'check.session.expired'], [
 
     Route::resource('profiles', ProfileController::class);
 
-    Route::resource('articles', PostController::class);
+    Route::resource('news', PostController::class);
 
     Route::resource('trades', TradeAlertController::class);
     Route::post('trades/close', [TradeAlertController::class, 'tradeClose'])->name('admin.trade-close');
