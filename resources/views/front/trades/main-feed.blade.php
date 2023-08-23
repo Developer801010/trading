@@ -111,9 +111,9 @@
                                 </div>                          
                             <p class="mb-1">
                                 @if($trade->trade_type == 'option')
-                                    {{ucfirst($trade->original_trade_direction)}} {{$trade->trade_symbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('M d, Y')}} ${{number_format($trade->entry_price, 0)}} {{$trade->trade_option}}.
+                                    {{ucfirst($trade->original_trade_direction)}} {{strtoupper($trade->trade_symbol)}} {{\Carbon\Carbon::parse($trade->updated_at)->format('M d, Y')}} ${{number_format($trade->entry_price, 0)}} {{$trade->trade_option}}.
                                 @else
-                                    {{ucfirst($trade->original_trade_direction)}} {{$trade->trade_symbol}}
+                                    {{ucfirst($trade->original_trade_direction)}} {{strtoupper($trade->trade_symbol)}}
                                 @endif
                                 
                             </p>
