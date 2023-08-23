@@ -16,11 +16,21 @@ class CheckSessionExpired
      */
     public function handle(Request $request, Closure $next): Response
     {
+       
         if (!Auth::check() && $request->session()->has('last_active')) {
-            $request->session()->flash('message', 'Session expired. Please login again.');            
-            return redirect('login');
+            $lastActive = $request->session()->get('last_active');
+            $currentTime = time();
+            // dd($currentTime - $lastActive);
+             // Check if 1 hour (3600 seconds) has passed since last activity
+            if ($currentTime - $lastActive > 60) {
+                // Perform logout and redirect
+                Auth::logout();
+                $request->session()->flash('message', 'Session expired due to inactivity. Please login again.');
+                return redirect('login');
+            }
         }
-
+        
+         // Update last active timestamp
         $request->session()->put('last_active', time());
         return $next($request);
     }
