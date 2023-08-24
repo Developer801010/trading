@@ -36,5 +36,7 @@ class ResetPasswordController extends Controller
             return '/dashboard/main-feed';
         }
     }
+
+    
     
 }

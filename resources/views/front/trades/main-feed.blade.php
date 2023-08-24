@@ -50,8 +50,9 @@
 
             <form action="{{ route('front.main-feed') }}" method="GET" class="mainFeedSearch">
                 <div class="mb-3 mt-5 row" style="justify-content: flex-end">                    
-                    <div class="col-sm-3">
-                        <input type="text" name="search" class="form-control col-md-8" value="{{ request()->get('search') }}" />            
+                    <div class="col-sm-3 input-container">
+                        <input type="text" name="search" class="form-control col-md-8" value="{{ request()->get('search') }}" />      
+                        <i class="fas fa-times-circle close-icon"></i>      
                     </div>
                     <div class="col-sm-1">
                         <button type="submit" class="btn btn-primary">Search</button>
@@ -135,7 +136,9 @@
                                     <span class="average_entry_price">${{$formattedExitPrice}}</span>
                                 </p>                                
                             @else
-                                <p class="mb-1"><b>Stop Price: </b>{{$trade->stop_price == 'No Stop' ? 'No Stop' : '$'.number_format((float)$trade->stop_price, 0)}}</p>
+                                <p class="mb-1"><b>Stop Price: </b>
+                                    {{ strpos($trade->stop_price, 'No Stop') !== false ? 'No Stop' : '$' . number_format((float) $trade->stop_price, 0) }}
+                                </p>
                                 <p class="mb-1"><b>Target Price: </b> ${{number_format($trade->target_price, 0)}}</p>
                             @endif
                            
@@ -225,6 +228,24 @@
             var comment_img = $(this).data('image');
             $('#commentImage').modal('show');
             $('.modalImg').attr('src', comment_img);
+        });
+
+       // JavaScript to handle the close icon click event
+       $('.close-icon').click(function() {
+            const input = $(this).parent().find('input');
+            input.val('');
+            input.focus();
+            $(this).hide();
+            
+        });
+
+        $('input').on('input', function() {
+            const icon = $(this).parent().find('.close-icon');
+            if ($(this).val().length > 0) {
+                icon.show();
+            } else {
+                icon.hide();
+            }
         });
     </script>
 @endsection

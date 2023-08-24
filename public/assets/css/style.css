@@ -856,6 +856,25 @@ div.dataTables_wrapper div.dataTables_filter input{
   max-height: 100%;
 }
 
+.input-container {
+  position: relative;
+}
+
+.close-icon {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: none; /* Initially hide the icon */
+}
+
+/* Show the close icon when the input is focused or has an error class */
+.input-container input:focus + .close-icon,
+.input-container input.error + .close-icon {
+  display: block;
+}
+
 
   @media screen and (max-width: 1399px) {
     #navbarSupportedContent .nav-link, 
