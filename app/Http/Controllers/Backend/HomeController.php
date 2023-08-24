@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -16,7 +17,7 @@ class HomeController extends Controller
     public function index()
     {
         //total registered users
-        $totalUsers = 0;
+        $totalUsers = User::count(); 
         //curretnly subscribed users
         $subscribedUsers = 0;
         //unsubscribed users

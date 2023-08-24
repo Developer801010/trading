@@ -66,13 +66,23 @@
                                 <div class="row">
                                     <div class="col-12 col-md-8">  
                                         {{-- A: Add trade, C: Close trade, N:New trade --}}
+                                        @php
+                                            $tradeDirection = ucfirst($trade->original_trade_direction);
+                                            $tradeSymbol = strtoupper($trade->trade_symbol);
+                                            $formattedDate = \Carbon\Carbon::parse($trade->updated_at)->format('M d, Y');
+                                            $formattedStrikePrice = number_format($trade->strike_price, 0);
+                                            $formattedEntryPrice = number_format($trade->entry_price, 0);
+                                            $formattedExitPrice = number_format($trade->exit_price, 0);
+                                            $tradeOption = $trade->trade_option;
+
+                                        @endphp     
                                         <h5 class="card-title" style="font-weight: bold">                                            
                                             {{ucfirst($trade->trade_type)}} Alert - 
 
                                             @if( $trade->exit_price == null && $trade->exit_date == null && $trade->child_direction == null )
                                                 New Trade
                                             @endif
-
+                                             {{-- closed trade    --}}
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 @if ($trade->original_trade_direction == 'buy')
                                                     Sell
@@ -81,13 +91,13 @@
                                                 @endif 
                                                 to Close
                                             @else
-                                                {{ucfirst($trade->original_trade_direction)}}                                  
+                                                {{$tradeDirection}}                                  
                                             @endif
-
-                                            @if($trade->trade_type == 'option')
-                                                {{strtoupper($trade->trade_symbol)}} {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}}
+                                          
+                                            @if($trade->trade_type == 'option')                                                
+                                                {{$tradeSymbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}}
                                             @else
-                                                {{strtoupper($trade->trade_symbol)}}
+                                                {{$tradeSymbol}}
                                             @endif
 
                                             @if ($trade->child_direction !== null )
@@ -98,35 +108,31 @@
                                     </div>
                                     <div class="col-12 col-md-4">
                                         <p class="main-feed-published-time">{{\Carbon\Carbon::parse($trade->updated_at)->format('F d, Y h:i A')}}</p>
-                                        {{-- <p class="main-feed-published-time">
-                                            @php
-                                                $utcDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $trade->updated_at, 'UTC');
-                                                // Convert to Eastern Standard Time (EST) time zone
-                                                $estDateTime = $utcDateTime->setTimezone('America/New_York');
-
-                                                echo $estDateTime->format('F d, Y h:i A');
-                                            @endphp                                                 
-                                        </p> --}}
                                     </div>
                                 </div>                          
                             <p class="mb-1">
-                                @if($trade->trade_type == 'option')
-                                    {{ucfirst($trade->original_trade_direction)}} {{strtoupper($trade->trade_symbol)}} {{\Carbon\Carbon::parse($trade->updated_at)->format('M d, Y')}} ${{number_format($trade->entry_price, 0)}} {{$trade->trade_option}}.
+                                @if ($trade->exit_price !== null && $trade->exit_date !== null)
+                                    @if($trade->trade_type == 'option')
+                                        {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }} {{ $formattedDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}.
+                                    @else
+                                        {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }}.
+                                    @endif
                                 @else
-                                    {{ucfirst($trade->original_trade_direction)}} {{strtoupper($trade->trade_symbol)}}
+                                    {{ $tradeDirection }} {{ $tradeSymbol }} {{ $formattedDate }} ${{ $formattedEntryPrice }} {{ $tradeOption }}.
                                 @endif
+                               
                                 
                             </p>
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                <p class="mb-1"><b>Exit Price: </b>${{number_format($trade->exit_price, 0)}}</p>  
+                                <p class="mb-1"><b>Exit Price: </b>${{$formattedExitPrice}}</p>  
                             @else
-                                <p class="mb-1"><b>Entry Price: </b>${{number_format($trade->entry_price, 0)}}</p>    
+                                <p class="mb-1"><b>Entry Price: </b>${{$formattedEntryPrice}}</p>    
                             @endif
                             <p class="mb-1"><b>Position Size: </b>{{rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.')}}% of Portfolio</p> 
                             
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                 <p class="mb-1"><b>Average Entry Price: </b>
-                                    <span class="average_entry_price">${{number_format($trade->entry_price, 0)}}</span>
+                                    <span class="average_entry_price">${{$formattedExitPrice}}</span>
                                 </p>                                
                             @else
                                 <p class="mb-1"><b>Stop Price: </b>{{$trade->stop_price == 'No Stop' ? 'No Stop' : '$'.number_format((float)$trade->stop_price, 0)}}</p>
