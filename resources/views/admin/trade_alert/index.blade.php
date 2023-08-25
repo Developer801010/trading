@@ -221,6 +221,44 @@
 
                         <div class="col-12 col-md-12">
                             <label class="form-label" for="itemname">Comment on Trade</label>
+                            <div class="quill-add-toolbar">
+                                <span class="ql-formats">
+                                    <select class="ql-header">
+                                        <option value="1">Heading</option>
+                                        <option value="2">Subheading</option>
+                                        <option selected>Normal</option>
+                                    </select>
+                                    <select class="ql-font">
+                                        <option selected>Sailec Light</option>
+                                        <option value="sofia">Sofia Pro</option>
+                                        <option value="slabo">Slabo 27px</option>
+                                        <option value="roboto">Roboto Slab</option>
+                                        <option value="inconsolata">Inconsolata</option>
+                                        <option value="ubuntu">Ubuntu Mono</option>
+                                    </select>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-list" value="ordered"></button>
+                                    <button class="ql-list" value="bullet"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-link"></button>
+                                    <button class="ql-image"></button>
+                                    <button class="ql-video"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-formula"></button>
+                                    <button class="ql-code-block"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-clean"></button>
+                                </span>
+                            </div>
                             <div class="quill_add_editor">
                                                 
                             </div>        
@@ -287,6 +325,44 @@
 
                         <div class="col-12 col-md-12">
                             <label class="form-label" for="itemname">Comment on Trade</label>
+                            <div class="quill-close-toolbar">
+                                <span class="ql-formats">
+                                    <select class="ql-header">
+                                        <option value="1">Heading</option>
+                                        <option value="2">Subheading</option>
+                                        <option selected>Normal</option>
+                                    </select>
+                                    <select class="ql-font">
+                                        <option selected>Sailec Light</option>
+                                        <option value="sofia">Sofia Pro</option>
+                                        <option value="slabo">Slabo 27px</option>
+                                        <option value="roboto">Roboto Slab</option>
+                                        <option value="inconsolata">Inconsolata</option>
+                                        <option value="ubuntu">Ubuntu Mono</option>
+                                    </select>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-list" value="ordered"></button>
+                                    <button class="ql-list" value="bullet"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-link"></button>
+                                    <button class="ql-image"></button>
+                                    <button class="ql-video"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-formula"></button>
+                                    <button class="ql-code-block"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-clean"></button>
+                                </span>
+                            </div>
                             <div class="quill_close_editor">
                                                 
                             </div>        
@@ -360,6 +436,9 @@
         });
 
         var quill_add = new Quill('.quill_add_editor', {
+            modules: {
+                toolbar: '.quill-add-toolbar'
+            },
             theme: 'snow'
         });
 
@@ -415,6 +494,9 @@
             $('#closeTradeOption').val(option);
 
             var quill_close = new Quill('.quill_close_editor', {
+                modules: {
+                toolbar: '.quill-close-toolbar'
+            },
                 theme: 'snow'
             });
 

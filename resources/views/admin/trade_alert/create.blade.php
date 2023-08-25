@@ -4,11 +4,7 @@
 
 @section('page-style')
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/katex.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/monokai-sublime.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/quill.snow.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/quill.bubble.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/plugins/forms/form-quill-editor.css')}}">
 @endsection
 @section('content')
 <section>
@@ -149,6 +145,44 @@
                                 <div class="row">
                                     <div class="col-md-12 mb-1">
                                         <label class="form-label" for="itemname">Comment on Trade</label>
+                                        <div class="quill-toolbar">
+                                            <span class="ql-formats">
+                                                <select class="ql-header">
+                                                    <option value="1">Heading</option>
+                                                    <option value="2">Subheading</option>
+                                                    <option selected>Normal</option>
+                                                </select>
+                                                <select class="ql-font">
+                                                    <option selected>Sailec Light</option>
+                                                    <option value="sofia">Sofia Pro</option>
+                                                    <option value="slabo">Slabo 27px</option>
+                                                    <option value="roboto">Roboto Slab</option>
+                                                    <option value="inconsolata">Inconsolata</option>
+                                                    <option value="ubuntu">Ubuntu Mono</option>
+                                                </select>
+                                            </span>
+                                            <span class="ql-formats">
+                                                <button class="ql-bold"></button>
+                                                <button class="ql-italic"></button>
+                                                <button class="ql-underline"></button>
+                                            </span>
+                                            <span class="ql-formats">
+                                                <button class="ql-list" value="ordered"></button>
+                                                <button class="ql-list" value="bullet"></button>
+                                            </span>
+                                            <span class="ql-formats">
+                                                <button class="ql-link"></button>
+                                                <button class="ql-image"></button>
+                                                <button class="ql-video"></button>
+                                            </span>
+                                            <span class="ql-formats">
+                                                <button class="ql-formula"></button>
+                                                <button class="ql-code-block"></button>
+                                            </span>
+                                            <span class="ql-formats">
+                                                <button class="ql-clean"></button>
+                                            </span>
+                                        </div>
                                         <div class="quill_editor">
                                                 
                                         </div>                                       
@@ -190,8 +224,6 @@
 <script src="{{asset('app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/cleave.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
-<script src="{{asset('app-assets/vendors/js/editors/quill/katex.min.js')}}"></script>
-<script src="{{asset('app-assets/vendors/js/editors/quill/highlight.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/editors/quill/quill.min.js')}}"></script>
 {{-- <script src="{{asset('app-assets/js/scripts/forms/form-quill-editor.js')}}"></script> --}}
 <script>
@@ -322,9 +354,13 @@
 
 
         var quill = new Quill('.quill_editor', {
+            modules: {
+                toolbar: '.quill-toolbar'
+            },
             theme: 'snow'
         });
 
+      
         quill.on('text-change', function(delta, oldDelta, source) {
             document.getElementById("quill_html").value = quill.root.innerHTML; 
         });
