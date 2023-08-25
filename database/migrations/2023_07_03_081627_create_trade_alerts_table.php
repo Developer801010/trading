@@ -25,10 +25,10 @@ return new class extends Migration
             $table->date('entry_date');
             $table->date('exit_date')->nullable();
             $table->decimal('exit_price', 10, 2)->nullable();            
-            $table->text('close_comment')->nullable();      
+            $table->longText('close_comment')->nullable();      
             $table->string('close_image')->nullable();      
             $table->decimal('position_size', 10, 2);
-            $table->text('trade_description')->nullable();
+            $table->longText('trade_description')->nullable();
             $table->string('chart_image')->nullable()->comment('The path or URL to the uploaded chart image');
             $table->dateTime('scheduled_at')->nullable()->comment('The date and time for scheduled posting');
             $table->timestamps();

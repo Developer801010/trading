@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('target_price', 10, 2)->nullable()->comment('Only for open stock trades');            
             $table->date('entry_date');
             $table->decimal('position_size', 10, 2);
-            $table->text('trade_description')->nullable();
+            $table->longText('trade_description')->nullable();
             $table->string('chart_image')->nullable()->comment('The path or URL to the uploaded chart image');
             $table->dateTime('scheduled_at')->nullable()->comment('The date and time for scheduled posting');
             $table->timestamps();

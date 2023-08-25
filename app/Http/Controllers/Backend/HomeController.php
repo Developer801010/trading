@@ -20,9 +20,9 @@ class HomeController extends Controller
         //total registered users
         $totalUsers = User::count() - 1; 
         //curretnly subscribed users
-        $subscribedUsers = Subscription::whereNotNull('ends_at')->where('ends_at', '<', now())->get()->count();
+        $subscribedUsers = Subscription::whereNull('ends_at')->get()->count();
         //unsubscribed users
-        $unsubscribedUsers = Subscription::whereNull('ends_at')->get()->count();
+        $unsubscribedUsers = Subscription::whereNotNull('ends_at')->where('ends_at', '<', now())->get()->count();
         //unsubscription pending users
         $pendingUnsubscribedUsers = $totalUsers - $subscribedUsers - $unsubscribedUsers;
 
