@@ -94,11 +94,8 @@
                                                 {{$tradeDirection}}                                  
                                             @endif
                                           
-                                            @if($trade->trade_type == 'option')                                                
-                                                {{$tradeSymbol}} {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}}
-                                            @else
-                                                {{$tradeSymbol}}
-                                            @endif
+                                            
+                                            {{$tradeSymbol}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}} @endif
 
                                             @if ($trade->child_direction !== null )
                                                 ({{$trade->child_direction}})

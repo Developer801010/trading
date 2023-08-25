@@ -35,7 +35,7 @@ class Kernel extends HttpKernel
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,            
         ],
 
         'api' => [
@@ -66,7 +66,7 @@ class Kernel extends HttpKernel
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
-        'check.session.expired' => \App\Http\Middleware\CheckSessionExpired::class,
         'check.subscription.expired' => \App\Http\Middleware\CheckSubscriptionCancellation::class,
+        'auth.timeout' => \JulioMotol\AuthTimeout\Middlewares\CheckAuthTimeout::class,
     ];   
 }

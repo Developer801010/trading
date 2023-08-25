@@ -31,10 +31,10 @@
                 <div class="dashbaord-header card-header flex-column align-items-start pb-0">
                     <div class="avatar bg-light-warning p-50 m-0">
                         <div class="avatar-content">
-                            <i data-feather="package" class="font-medium-5"></i>
+                            <i data-feather='user-check'  class="font-medium-5"></i>
                         </div>
                     </div>
-                    <h2 class="fw-bolder mt-1">{{$subscribedUsers}}</h2>
+                    <h2 class="fw-bolder mt-1" >{{$subscribedUsers}}</h2>
                     <p class="card-text">Subscribed Users</p>
                 </div>
             </div>
@@ -46,11 +46,25 @@
                 <div class="dashbaord-header card-header flex-column align-items-start">
                     <div class="avatar bg-light-primary p-50 m-0">
                         <div class="avatar-content">
-                            <i data-feather="users" class="font-medium-5"></i>
+                            <i data-feather='user-x'  class="font-medium-5"></i>
                         </div>
                     </div>
                     <h2 class="fw-bolder mt-1">{{$unsubscribedUsers}}</h2>
                     <p class="card-text">Unsubscribed Users</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="card">
+                <div class="dashbaord-header card-header flex-column align-items-start">
+                    <div class="avatar bg-light-primary p-50 m-0">
+                        <div class="avatar-content">
+                            <i data-feather='user-plus'  class="font-medium-5"></i>
+                        </div>
+                    </div>
+                    <h2 class="fw-bolder mt-1">{{$pendingUnsubscribedUsers}}</h2>
+                    <p class="card-text">Pending Unsubscribed Requesters</p>
                 </div>
             </div>
         </div>

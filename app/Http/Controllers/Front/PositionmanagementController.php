@@ -100,7 +100,7 @@ class PositionManagementController extends Controller
         $results = $unionQuery->paginate(10);
 
         //Get Account login info and Billing info
-        $billing_data = Subscription::where('user_id', auth()->user()->id)->first();
+        $billing_data = Subscription::where('user_id', auth()->user()->id)->first();  //dd($billing_data);
 
         return view('front.trades.main-feed', compact('results', 'billing_data'));
     }
@@ -189,12 +189,12 @@ class PositionManagementController extends Controller
             $trade = Trade::where('id', $id)->first();
         }else if ($type == 'a'){
             //trade add alert
-            $trade = TradeDetail::with('trade')->where('id', $id)->first();  //dd($trade->trade);
+            $trade = TradeDetail::with('trade')->where('id', $id)->first(); 
         }else if ($type == 'c'){
             //trade close alert
             $trade = Trade::with('tradeDetail')->where('id', $id)->first();
         }
-        
+         //dd($trade);
         return view('front.trades.trade-detail', compact('trade', 'type'));
     }
 

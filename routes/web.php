@@ -41,7 +41,7 @@ Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgr
 Route::get('/thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
 
 
-Route::group(['middleware' => ['auth', 'check.session.expired'], ['prefix' => 'front']], function() {
+Route::group(['middleware' => ['auth', 'auth.timeout'], ['prefix' => 'front']], function() {
     Route::get('/account/profile', [AccountController::class, 'index'])->name('front.account-profile');
     Route::post('/account/store', [AccountController::class, 'store'])->name('front.account.store');
 
@@ -75,7 +75,7 @@ Route::get('/login', function () {
 
 Auth::routes(['verify' => true]);
 
-Route::group(['middleware' => ['auth', 'role:admin', 'check.session.expired'], ['prefix' => 'admin']], function() {
+Route::group(['middleware' => ['auth', 'role:admin', 'auth.timeout'], ['prefix' => 'admin']], function() {
 
     Route::get('/home', [HomeController::class, 'index'])->name('admin.home');
 
