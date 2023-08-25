@@ -4,6 +4,11 @@
 
 @section('page-style')
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/katex.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/monokai-sublime.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/quill.snow.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/quill.bubble.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/plugins/forms/form-quill-editor.css')}}">
 @endsection
 
 @section('content')
@@ -216,10 +221,13 @@
 
                         <div class="col-12 col-md-12">
                             <label class="form-label" for="itemname">Comment on Trade</label>
-                            <textarea class="form-control" name="addComments" id="addComments" rows="3">{{ old('addComments') }}</textarea>
+                            <div class="quill_add_editor">
+                                                
+                            </div>        
+                            <input type="hidden" id="quill_add_html" name="quill_add_html"></input>
                         </div>
 
-                        <div class="col-12 col-md-12">
+                        <div class="col-12 col-md-12 addImgRow">
                             <label for="customFile" class="form-label">Chart Image</label>
                             <input class="form-control" type="file" id="addImage" name="addImage" />
                         </div>
@@ -279,10 +287,13 @@
 
                         <div class="col-12 col-md-12">
                             <label class="form-label" for="itemname">Comment on Trade</label>
-                            <textarea class="form-control" name="closedComments" id="closedComments" rows="3">{{ old('closedComments') }}</textarea>
+                            <div class="quill_close_editor">
+                                                
+                            </div>        
+                            <input type="hidden" id="quill_close_html" name="quill_close_html"></input>
                         </div>
 
-                        <div class="col-12 col-md-12">
+                        <div class="col-12 col-md-12 closeImgRow">
                             <label for="customFile" class="form-label">Chart Image</label>
                             <input class="form-control" type="file" id="closeImage" name="closeImage" />
                         </div>
@@ -309,6 +320,9 @@
 <script src="{{asset('app-assets/vendors/js/forms/cleave/cleave.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{{asset('app-assets/vendors/js/editors/quill/katex.min.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/editors/quill/highlight.min.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/editors/quill/quill.min.js')}}"></script>
 <script>    
     $(document).ready(function () {
         var addTradeForm = $('#addTradeForm');
@@ -342,10 +356,20 @@
             $('#addTradeSymbol').val(symbol);
             $('#addTradeOption').val(option);
             $('#addTradeDirection').val(direction);
-            $('#addTradeStrikePrice').val(strikeprice);
+            $('#addTradeStrikePrice').val(strikeprice);           
         });
 
-        $('#addTrade').draggable();
+        var quill_add = new Quill('.quill_add_editor', {
+            theme: 'snow'
+        });
+
+        quill_add.on('text-change', function(delta, oldDelta, source) {
+            document.getElementById("quill_add_html").value = quill_add.root.innerHTML; 
+        });
+
+        $('#addTrade').draggable({
+            handle: ".modal-header" 
+        });
 
         $('body').on('click', '.btnClose', function(e) {
             e.preventDefault();  
@@ -389,9 +413,19 @@
             $('#closeTradePositionSize').val(position_size);
             $('#closeTradeStrikePrice').val(strikeprice);
             $('#closeTradeOption').val(option);
+
+            var quill_close = new Quill('.quill_close_editor', {
+                theme: 'snow'
+            });
+
+            quill_close.on('text-change', function(delta, oldDelta, source) {
+                document.getElementById("quill_close_html").value = quill_close.root.innerHTML; 
+            });
         });
 
-        $('#closeTrade').draggable();
+        $('#closeTrade').draggable({
+            handle: ".modal-header" 
+        });
 
         $.validator.addMethod('filesize', function(value, element, param) {
             // param = size (in bytes) 

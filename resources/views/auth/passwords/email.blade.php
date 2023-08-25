@@ -7,7 +7,8 @@
         @include('auth.logo')
 
         {{-- <h4 class="card-title mb-1">Forgot Password? 🔒</h4> --}}
-        <p class="card-text mb-2">Enter the email address associated with your account and we'll send you a password reset link</p>
+        <p class="card-text mb-2">Reset your password:<br>
+            Enter the email address associated with your account and we'll send you a password reset link</p>
 
         @if (session('status'))
             <div class="alert alert-success" role="alert">

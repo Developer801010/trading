@@ -4,6 +4,11 @@
 
 @section('page-style')
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/katex.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/monokai-sublime.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/quill.snow.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/quill.bubble.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/plugins/forms/form-quill-editor.css')}}">
 @endsection
 @section('content')
 <section>
@@ -140,24 +145,27 @@
                                     </div>
                                   
                                 </div>
+                              
                                 <div class="row">
                                     <div class="col-md-12 mb-1">
                                         <label class="form-label" for="itemname">Comment on Trade</label>
-                                        <textarea class="form-control" name="trade_description" id="trade_description" rows="3">{{ old('trade_description') }}</textarea>
+                                        <div class="quill_editor">
+                                                
+                                        </div>                                       
                                     </div>
-
-                                    <div class="col-12 mb-1">
-                                        <label for="customFile" class="form-label">Chart Image</label>
-                                        <input class="form-control" type="file" id="image" name="image" />
-                                    </div>
-
-                                    <div class="col-12 mb-1 d-none">
-                                        <label class="form-label" for="itemname">Trade Date (yyyy-mm-dd)</label>
-                                        <input type="text" class="form-control picker" name="trade_date" id="trade_date" />
-                                    </div>
+                                    <input type="hidden" id="quill_html" name="quill_html"></input>
                                 </div>
 
-                                <hr />
+                                <div class="col-12 mb-1 image_row">
+                                    <label for="customFile" class="form-label">Chart Image</label>
+                                    <input class="form-control" type="file" id="image" name="image" />
+                                </div>
+
+                                {{-- <div class="col-12 mb-1 d-none">
+                                    <label class="form-label" for="itemname">Trade Date (yyyy-mm-dd)</label>
+                                    <input type="text" class="form-control picker" name="trade_date" id="trade_date" />
+                                </div> --}}
+
                             </div>
                         </div>
                         <div class="row">
@@ -182,6 +190,10 @@
 <script src="{{asset('app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/cleave.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/editors/quill/katex.min.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/editors/quill/highlight.min.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/editors/quill/quill.min.js')}}"></script>
+{{-- <script src="{{asset('app-assets/js/scripts/forms/form-quill-editor.js')}}"></script> --}}
 <script>
 
 
@@ -223,8 +235,8 @@
             option_column.addClass('d-none');
         }
         // var tradeType = $('input[name="trade_type"]').val();
-        
-        
+
+      
         tradeForm.validate({
             rules: {
                 'trade_symbol': {
@@ -307,9 +319,17 @@
                 });
             }      
         });
-    });
 
-    
+
+        var quill = new Quill('.quill_editor', {
+            theme: 'snow'
+        });
+
+        quill.on('text-change', function(delta, oldDelta, source) {
+            document.getElementById("quill_html").value = quill.root.innerHTML; 
+        });
+        
+    });
 
     picker = $('.picker');
     picker.flatpickr({

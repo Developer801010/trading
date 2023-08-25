@@ -51,7 +51,7 @@
             <form action="{{ route('front.main-feed') }}" method="GET" class="mainFeedSearch">
                 <div class="mb-3 mt-5 row" style="justify-content: flex-end">                    
                     <div class="col-sm-3 input-container">
-                        <input type="text" name="search" class="form-control col-md-8" value="{{ request()->get('search') }}" />      
+                        <input type="text" name="search" class="form-control col-md-8 search_input" value="{{ request()->get('search') }}" />      
                         <i class="fas fa-times-circle close-icon"></i>      
                     </div>
                     <div class="col-sm-1">
@@ -71,9 +71,9 @@
                                             $tradeDirection = ucfirst($trade->original_trade_direction);
                                             $tradeSymbol = strtoupper($trade->trade_symbol);
                                             $formattedDate = \Carbon\Carbon::parse($trade->updated_at)->format('M d, Y');
-                                            $formattedStrikePrice = number_format($trade->strike_price, 0);
-                                            $formattedEntryPrice = number_format($trade->entry_price, 0);
-                                            $formattedExitPrice = number_format($trade->exit_price, 0);
+                                            $formattedStrikePrice = number_format($trade->strike_price, 2);
+                                            $formattedEntryPrice = number_format($trade->entry_price, 2);
+                                            $formattedExitPrice = number_format($trade->exit_price, 2);
                                             $tradeOption = $trade->trade_option;
 
                                         @endphp     
@@ -86,11 +86,10 @@
                                              {{-- closed trade    --}}
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 @if ($trade->original_trade_direction == 'buy')
-                                                    Sell
+                                                    Sell to Close
                                                 @else
-                                                    Cover 
-                                                @endif 
-                                                to Close
+                                                    Cover to Close
+                                                @endif
                                             @else
                                                 {{$tradeDirection}}                                  
                                             @endif
@@ -113,16 +112,10 @@
                                 </div>                          
                             <p class="mb-1">
                                 @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                    @if($trade->trade_type == 'option')
-                                        {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }} {{ $formattedDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}.
-                                    @else
-                                        {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }}.
-                                    @endif
+                                    {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}@endif
                                 @else
-                                    {{ $tradeDirection }} {{ $tradeSymbol }} {{ $formattedDate }} ${{ $formattedEntryPrice }} {{ $tradeOption }}.
+                                    {{ $tradeDirection }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedDate }} ${{ $formattedEntryPrice }} {{ $tradeOption }}@endif
                                 @endif
-                               
-                                
                             </p>
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                 <p class="mb-1"><b>Exit Price: </b>${{$formattedExitPrice}}</p>  
@@ -137,7 +130,7 @@
                                 </p>                                
                             @else
                                 <p class="mb-1"><b>Stop Price: </b>
-                                    {{ strpos($trade->stop_price, 'No Stop') !== false ? 'No Stop' : '$' . number_format((float) $trade->stop_price, 0) }}
+                                    {{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 0) : $trade->stop_price }}
                                 </p>
                                 <p class="mb-1"><b>Target Price: </b> ${{number_format($trade->target_price, 0)}}</p>
                             @endif
@@ -166,15 +159,18 @@
                             @endif
                             <p class="mb-1"><b>Comments: </b>
                                 @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                    {{$trade->close_comment}}
+                                    {!! $trade->close_comment !!}
                                 @else
-                                    {{$trade->trade_description}}
+                                    {!! $trade->trade_description !!}
                                 @endif
                                 
                             </p>
                             {{-- for Close trade --}}
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                
+                                @if($trade->close_image && file_exists(public_path($trade->close_image)))
+                                    <img src="{{ asset($trade->close_image) }}" class="mb-1 comment_img"
+                                    data-image="{{ asset($trade->close_image) }}"  />
+                                @endif
                             @else
                                 @if($trade->chart_image && file_exists(public_path($trade->chart_image)))
                                     <img src="{{ asset($trade->chart_image) }}" class="mb-1 comment_img"
@@ -230,6 +226,17 @@
             $('.modalImg').attr('src', comment_img);
         });
 
+        var search_input = $('.search_input');
+        $(document).ready(function () {
+           var search_input_length = search_input.val().length;
+           if(search_input_length > 0){
+                $('.close-icon').show();
+           } else {
+                $('.close-icon').hide();
+           }
+            
+        });
+
        // JavaScript to handle the close icon click event
        $('.close-icon').click(function() {
             const input = $(this).parent().find('input');
@@ -239,7 +246,7 @@
             
         });
 
-        $('input').on('input', function() {
+        search_input.on('input', function() {
             const icon = $(this).parent().find('.close-icon');
             if ($(this).val().length > 0) {
                 icon.show();

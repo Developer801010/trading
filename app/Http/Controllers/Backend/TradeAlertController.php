@@ -66,7 +66,7 @@ class TradeAlertController extends Controller
         $entry_price = $request->entry_price;
         $entry_date = $request->entry_date;
         $position_size = $request->position_size;
-        $trade_description = $request->trade_description;
+        $trade_description = $request->quill_html;
 
         //duplication issue
         //for stock.  by the trade symbol
@@ -229,7 +229,7 @@ class TradeAlertController extends Controller
         $addPositionSize = $request->addPositionSize;
         $addStopPrice = $request->addStopPrice;
         $addTargetPrice = $request->addTargetPrice;
-        $addComments = $request->addComments;
+        $addComments = $request->quill_add_html;
        
         DB::beginTransaction();
         try{
@@ -322,7 +322,7 @@ class TradeAlertController extends Controller
         $closeExitDate = $request->closeExitDate;
         $closeExitPrice = (float)$request->closeExitPrice;
         $closeTradeEntryPrice = (float)str_replace(['$', '(', ')'], '', $request->closeTradeEntryPrice);
-        $closedComments = $request->closedComments;
+        $closedComments = $request->quill_close_html;
         $closeTradeSymbol = $request->closeTradeSymbol;
         $closeTradeDirection = $request->closeTradeDirection;
         $closeTradePositionSize = $request->closeTradePositionSize;

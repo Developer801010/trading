@@ -189,7 +189,7 @@ class PositionManagementController extends Controller
             $trade = Trade::where('id', $id)->first();
         }else if ($type == 'a'){
             //trade add alert
-            $trade = TradeDetail::with('trade')->where('id', $id)->first();
+            $trade = TradeDetail::with('trade')->where('id', $id)->first();  //dd($trade->trade);
         }else if ($type == 'c'){
             //trade close alert
             $trade = Trade::with('tradeDetail')->where('id', $id)->first();

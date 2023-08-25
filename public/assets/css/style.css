@@ -798,6 +798,10 @@ div.dataTables_wrapper div.dataTables_filter input{
     margin: 8px;
   }
 
+  .mainFeedCard p{
+    margin-bottom: 0.25rem;
+  }
+
   .mainFeedSearch{
     margin-bottom: 40px;
   }
@@ -875,6 +879,13 @@ div.dataTables_wrapper div.dataTables_filter input{
   display: block;
 }
 
+.quill_editor{
+  min-height: 150px;
+}
+
+.image_row, .addImgRow, .closeImgRow{
+  margin-top: 80px;
+}
 
   @media screen and (max-width: 1399px) {
     #navbarSupportedContent .nav-link, 
