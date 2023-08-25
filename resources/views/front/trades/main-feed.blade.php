@@ -199,7 +199,7 @@
 
 
 @section('page-script')    
-
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         $('.btn-close').click(function (e) { 
             e.preventDefault();
@@ -221,6 +221,10 @@
             var comment_img = $(this).attr('src');
             $('#commentImage').modal('show');
             $('.modalImg').attr('src', comment_img);
+        });
+        
+        $('#commentImage').draggable({
+            handle: ".modal-header" 
         });
 
         var search_input = $('.search_input');
