@@ -169,10 +169,10 @@
 
 @section('page-script')    
     <script>
-        $('body').on('click', '.comment_img', function(e) {
+        $('body').on('click', 'img', function(e) {
             e.preventDefault();
 
-            var comment_img = $(this).data('image');  
+            var comment_img = $(this).attr('src');
             $('#commentImage').modal('show');
             $('.modalImg').attr('src', comment_img);
         });
