@@ -3,6 +3,17 @@
 @section('title', 'User Management')
 
 @section('page-style')
+<style>
+    .dataTables_length, 
+    .dataTables_info{
+        padding-left: 15px;
+    }
+
+    .dataTables_filter,
+    .dataTables_paginate {
+        padding-right: 15px;
+    }
+</style>
 @endsection
 
 

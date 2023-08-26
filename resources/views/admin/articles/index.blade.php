@@ -1,15 +1,26 @@
 @extends('layouts.master')
 
-@section('title', 'ARticle Management')
+@section('title', 'Article Management')
 
 @section('page-style')
+<style>
+    /* .dataTables_length, 
+    .dataTables_info{
+        padding-left: 15px;
+    }
+
+    .dataTables_filter,
+    .dataTables_paginate {
+        padding-right: 15px;
+    } */
+</style>
 @endsection
 
 
 @section('content')
 <div class="card">
     <div class="table-responsive">
-        <table class="user-list-table table">
+        <table class="articles-list-table table">
             <thead class="table-light">
                 <tr>
                     <th></th>                        
@@ -41,22 +52,10 @@
 @endsection
 
 @section('page-script')
-<script src="{{ asset('app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js') }}"></script>   
-<script src="{{ asset('app-assets/vendors/js/forms/cleave/cleave.min.js') }}"></script>    
-<script src="{{ asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js') }}"></script>  
 
 <script>
     $(document).ready(function(){
-        new Cleave($('.phone-number-mask'), {
-            phone: true,
-            phoneRegionCode: 'US'
-        });
-
-        new Cleave($('.date-mask'), {
-            date: true,
-            delimiter: '-',
-            datePattern: ['Y', 'm', 'd']
-        });
+       
     });
 
 </script>

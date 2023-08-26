@@ -66,7 +66,26 @@ class TradeAlertController extends Controller
         $entry_price = $request->entry_price;
         $entry_date = $request->entry_date;
         $position_size = $request->position_size;
-        $trade_description = $request->quill_html;
+        $trade_description = $request->quill_html; 
+
+        // Extract base64 encoded image data from Quill content
+        $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
+
+        $trade_description = preg_replace_callback($pattern, function ($match) {
+            $extension = $match[1]; // Get image extension
+            $base64Image = $match[2]; // Get base64 image data
+            $imageData = base64_decode($base64Image); // Decode base64 data
+
+            // Save the image to a directory
+            $imageName = 'image_' . time() . '.' . $extension;
+            $imagePath = public_path('uploads/trade/' . $imageName);
+            file_put_contents($imagePath, $imageData);
+
+            // Replace base64 encoded image with URL
+            $imageUrl = asset('uploads/trade/' . $imageName);
+
+            return $imageUrl;
+        }, $trade_description);
 
         //duplication issue
         //for stock.  by the trade symbol
@@ -230,6 +249,25 @@ class TradeAlertController extends Controller
         $addStopPrice = $request->addStopPrice;
         $addTargetPrice = $request->addTargetPrice;
         $addComments = $request->quill_add_html;
+
+        // Extract base64 encoded image data from Quill content
+        $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
+
+        $addComments = preg_replace_callback($pattern, function ($match) {
+            $extension = $match[1]; // Get image extension
+            $base64Image = $match[2]; // Get base64 image data
+            $imageData = base64_decode($base64Image); // Decode base64 data
+
+            // Save the image to a directory
+            $imageName = 'image_' . time() . '.' . $extension;
+            $imagePath = public_path('uploads/trade/' . $imageName);
+            file_put_contents($imagePath, $imageData);
+
+            // Replace base64 encoded image with URL
+            $imageUrl = asset('uploads/trade/' . $imageName);
+
+            return $imageUrl;
+        }, $addComments);
        
         DB::beginTransaction();
         try{
@@ -328,6 +366,25 @@ class TradeAlertController extends Controller
         $closeTradePositionSize = $request->closeTradePositionSize;
         $closeTradeStrikePrice = $request->closeTradeStrikePrice;
         $closeTradeOption = $request->closeTradeOption;
+
+         // Extract base64 encoded image data from Quill content
+         $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
+
+         $closedComments = preg_replace_callback($pattern, function ($match) {
+             $extension = $match[1]; // Get image extension
+             $base64Image = $match[2]; // Get base64 image data
+             $imageData = base64_decode($base64Image); // Decode base64 data
+ 
+             // Save the image to a directory
+             $imageName = 'image_' . time() . '.' . $extension;
+             $imagePath = public_path('uploads/trade/' . $imageName);
+             file_put_contents($imagePath, $imageData);
+ 
+             // Replace base64 encoded image with URL
+             $imageUrl = asset('uploads/trade/' . $imageName);
+ 
+             return $imageUrl;
+         }, $closedComments);
        
         DB::beginTransaction();
         try{

@@ -104,6 +104,7 @@
 <script>
     var createRoleUrl = "{{ route('roles.create') }}";    
     var createTradeUrl = "{{ route('trades.create') }}";  
+    var createArticleUrl = "{{ route('articles.create') }}";  
     
     $.ajaxSetup({
         error: function (xhr) {
