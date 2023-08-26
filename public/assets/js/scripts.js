@@ -266,11 +266,7 @@ if (newBillingPlanForm.length) {
 }
 
 
-//action to go to the create page when the button is clicked. 
-$('.create-new-role, .create-new-trade').click(function (e) {
-  var link = $(this).attr('href');
-  window.location.href = link;
-});
+
 
 //article management
 var dtArticleTable = $('.articles-list-table');  
@@ -300,3 +296,10 @@ var dt_article = dtArticleTable.DataTable({
   }
   ]
 });    
+
+
+//action to go to the create page when the button is clicked. 
+$('.create-new-role, .create-new-trade, .create-new-article').click(function (e) {
+  var link = $(this).attr('href');
+  window.location.href = link;
+});

@@ -76,8 +76,11 @@ class TradeAlertController extends Controller
             $base64Image = $match[2]; // Get base64 image data
             $imageData = base64_decode($base64Image); // Decode base64 data
 
-            // Save the image to a directory
-            $imageName = 'image_' . time() . '.' . $extension;
+             // Generate a unique identifier for the image name
+            $uniqueIdentifier = uniqid();
+
+            // Combine unique identifier and current timestamp for the image name
+            $imageName = 'image_' . $uniqueIdentifier.'_'. time() . '.' . $extension;
             $imagePath = public_path('uploads/trade/' . $imageName);
             file_put_contents($imagePath, $imageData);
 
@@ -258,8 +261,11 @@ class TradeAlertController extends Controller
             $base64Image = $match[2]; // Get base64 image data
             $imageData = base64_decode($base64Image); // Decode base64 data
 
-            // Save the image to a directory
-            $imageName = 'image_' . time() . '.' . $extension;
+            // Generate a unique identifier for the image name
+            $uniqueIdentifier = uniqid();
+
+            // Combine unique identifier and current timestamp for the image name
+            $imageName = 'image_' . $uniqueIdentifier.'_'. time() . '.' . $extension;
             $imagePath = public_path('uploads/trade/' . $imageName);
             file_put_contents($imagePath, $imageData);
 
@@ -375,8 +381,11 @@ class TradeAlertController extends Controller
              $base64Image = $match[2]; // Get base64 image data
              $imageData = base64_decode($base64Image); // Decode base64 data
  
-             // Save the image to a directory
-             $imageName = 'image_' . time() . '.' . $extension;
+             // Generate a unique identifier for the image name
+             $uniqueIdentifier = uniqid();
+
+             // Combine unique identifier and current timestamp for the image name
+             $imageName = 'image_' . $uniqueIdentifier.'_'. time() . '.' . $extension;
              $imagePath = public_path('uploads/trade/' . $imageName);
              file_put_contents($imagePath, $imageData);
  
