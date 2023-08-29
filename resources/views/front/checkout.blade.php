@@ -80,7 +80,7 @@
                 <input type="hidden" name="period" id="period" value="{{$units}}" />
 
                 @include('layouts.error')
-
+                
                 <div class="row">
                     <div class="col-md-8">
                         <div class="account-box white-box">

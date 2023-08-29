@@ -31,7 +31,7 @@
                                         @else
                                             {{ucfirst($trade->trade_type)}} Alert - 
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                                {{ucfirst($trade->trade_direction == 'Buy' ? 'Sell' : 'Buy')}} to Close
+                                                {{ucfirst($trade->trade_direction) == 'Buy' ? 'Sell' : 'Buy' }}  to Close
                                             @else
                                                 New Trade {{ucfirst($trade->trade_direction) }}
                                             @endif

@@ -32,6 +32,7 @@ class PaymentController extends Controller
         // User validation
         $messages = [
             'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
+            'email.unique' => 'This email address is in use. Maybe you already have an account? <a href="http://portal.tradeinsync.com/password/reset">Need password help?</a>',
         ];
 
         $validator = Validator::make($request->all(), [

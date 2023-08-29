@@ -1011,6 +1011,13 @@ div.dataTables_wrapper div.dataTables_filter input{
       text-align: center;
     }
 
+    .main-feed-section .input-container{
+      margin-bottom: 15px;
+    }
 
+    .mainFeedCard .main-feed-published-time {
+      text-align: left;
+      margin-bottom: 15px !important;
+  }
   }
   
