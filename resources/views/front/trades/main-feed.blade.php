@@ -123,13 +123,13 @@
                             
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                 <p class="mb-1"><b>Average Entry Price: </b>
-                                    <span class="average_entry_price">${{$formattedExitPrice}}</span>
+                                    <span class="average_entry_price">${{$formattedEntryPrice}}</span>
                                 </p>                                
                             @else
                                 <p class="mb-1"><b>Stop Price: </b>
-                                    {{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 0) : $trade->stop_price }}
+                                    {{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 2) : $trade->stop_price }}
                                 </p>
-                                <p class="mb-1"><b>Target Price: </b> ${{number_format($trade->target_price, 0)}}</p>
+                                <p class="mb-1"><b>Target Price: </b> ${{number_format($trade->target_price, 2)}}</p>
                             @endif
                            
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)  
@@ -137,7 +137,7 @@
                                     @if ($trade->original_trade_direction == 'buy')
                                         <span class="text-success">
                                             @if ($trade->entry_price != 0 )
-                                                {{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 0)  }}%
+                                                {{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2)  }}%
                                             @else
                                                 0%
                                             @endif                                            
@@ -145,7 +145,7 @@
                                     @else
                                         <span class="text-success">
                                             @if ($trade->entry_price != 0 )
-                                                {{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 0) }}%
+                                                {{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2) }}%
                                             @else
                                                 0%
                                             @endif

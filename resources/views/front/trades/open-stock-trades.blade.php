@@ -20,9 +20,10 @@
                 <h1 class="table-title">Open Stock Trades</h1>
                 <form action="{{ route('front.open-stock-trades') }}" method="GET">
                     <div class="mb-3 row search-row-position">
-                        <label class="col-md-1 col-form-label" style="padding-top:10px;"><b>Search</b></label>
-                        <div class="col-sm-3">
-                            <input type="text" name="search" class="form-control col-md-8" value="{{ request()->get('search') }}" />            
+                        <label class="col-md-1 col-form-label" style="padding-top:10px;"><b>Search</b></label>                    
+                        <div class="col-sm-3 input-container">
+                            <input type="text" name="search" class="form-control col-md-8 search_input" value="{{ request()->get('search') }}" />      
+                            <i class="fas fa-times-circle close-icon"></i>      
                         </div>
                         <div class="col-sm-1">
                             <button type="submit" class="btn btn-primary">Search</button>
@@ -155,5 +156,34 @@
 
 
 @section('page-script')    
-    
+<script>
+    var search_input = $('.search_input');
+       $(document).ready(function () {
+          var search_input_length = search_input.val().length;
+          if(search_input_length > 0){
+               $('.close-icon').show();
+          } else {
+               $('.close-icon').hide();
+          }
+           
+       });
+
+      // JavaScript to handle the close icon click event
+      $('.close-icon').click(function() {
+           const input = $(this).parent().find('input');
+           input.val('');
+           input.focus();
+           $(this).hide();
+           
+       });
+
+       search_input.on('input', function() {
+           const icon = $(this).parent().find('.close-icon');
+           if ($(this).val().length > 0) {
+               icon.show();
+           } else {
+               icon.hide();
+           }
+       });
+</script>
 @endsection
