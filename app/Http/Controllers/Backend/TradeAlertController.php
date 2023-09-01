@@ -92,7 +92,7 @@ class TradeAlertController extends Controller
         }, $trade_description);
 
         //duplication issue
-        //for stock.  by the trade symbol
+        //for stock's opened trades.  by the trade symbol  
         if($trade_type == 'stock'){
             $tradeCount = Trade::where([
                 'trade_type' => 'stock',
