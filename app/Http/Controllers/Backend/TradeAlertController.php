@@ -97,7 +97,10 @@ class TradeAlertController extends Controller
             $tradeCount = Trade::where([
                 'trade_type' => 'stock',
                 'trade_symbol' => $trade_symbol
-            ])->count();
+            ])
+            ->whereNull('exit_price')
+            ->whereNull('exit_date')
+            ->count();
 
             $msg = 'Symbol already exists';
         }else{
@@ -108,7 +111,10 @@ class TradeAlertController extends Controller
                 'expiration_date' => $expiration_date,
                 'trade_option' => $trade_option,
                 'strike_price' => $strike_price
-            ])->count();
+            ])
+            ->whereNull('exit_price')
+            ->whereNull('exit_date')
+            ->count();
 
             $msg = 'Contract already exists';
        
