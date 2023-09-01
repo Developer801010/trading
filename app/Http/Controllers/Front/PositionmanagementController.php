@@ -23,6 +23,7 @@ class PositionManagementController extends Controller
         ->select([
             't.id',
             't.trade_type',
+            't.entry_date',
             't.trade_symbol',
             't.trade_direction AS original_trade_direction',
             DB::raw('NULL as child_direction'),            
@@ -42,7 +43,7 @@ class PositionManagementController extends Controller
                     (t.position_size + COALESCE(SUM(td.position_size), 0))
                 ELSE
                     t.position_size
-                END AS position_size'),
+                END AS position_size'),            
             't.exit_price',
             't.exit_date',
             't.trade_description',
@@ -52,7 +53,7 @@ class PositionManagementController extends Controller
             't.created_at',
             't.updated_at'
         ])
-        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option', 
+        ->groupBy( 't.id', 't.trade_type', 't.entry_date', 't.trade_symbol', 't.trade_direction', 't.trade_option', 
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size', 
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment', 
         't.close_image', 't.created_at', 't.updated_at');
@@ -68,6 +69,7 @@ class PositionManagementController extends Controller
         ->select([
             'td.id',
             't.trade_type',
+            't.entry_date',
             't.trade_symbol',
             't.trade_direction as original_trade_direction',
             'td.trade_direction as child_direction',
@@ -100,7 +102,7 @@ class PositionManagementController extends Controller
         $results = $unionQuery->paginate(10);
 
         //Get Account login info and Billing info
-        $billing_data = Subscription::where('user_id', auth()->user()->id)->first();  //dd($billing_data);
+        $billing_data = Subscription::where('user_id', auth()->user()->id)->first();  //dd($results);
 
         return view('front.trades.main-feed', compact('results', 'billing_data'));
     }
@@ -125,9 +127,52 @@ class PositionManagementController extends Controller
 
     public function closedStockTrades(Request $request)
     {
-        $query = Trade::with('tradeDetail')    
+        // $query = Trade::with('tradeDetail')    
+        // ->where('trade_type', 'stock')
+        // ->whereNotNull('exit_price')->whereNotNull('exit_date');  //open trade
+
+        $query = DB::table('trades as t')
+        ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
+        ->select([
+            't.id',
+            't.trade_type',
+            't.trade_symbol',
+            't.trade_direction',
+            't.entry_date',
+            DB::raw('NULL as child_direction'),            
+            't.trade_option',
+            't.strike_price',
+            DB::raw('CASE 
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN 
+                    ((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.entry_price
+                END AS entry_price'),
+            't.stop_price',
+            't.target_price',
+            DB::raw('CASE 
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN 
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.position_size
+                END AS position_size'),
+            't.exit_price',
+            't.exit_date',
+            't.trade_description',
+            't.chart_image',
+            't.close_comment',
+            't.close_image',
+            't.created_at',
+            't.updated_at'
+        ])
         ->where('trade_type', 'stock')
-        ->whereNotNull('exit_price')->whereNotNull('exit_date');  //open trade
+        ->whereNotNull('exit_price')
+        ->whereNotNull('exit_date')
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date', 
+       't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size', 
+        't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment', 
+        't.close_image', 't.created_at', 't.updated_at');
 
          // Handle search query
         $search = $request->input('search');
@@ -136,7 +181,7 @@ class PositionManagementController extends Controller
         }
 
         // Fetch the paginated results
-        $trades = $query->orderBy('created_at', 'desc')->paginate(10);
+        $trades = $query->orderBy('created_at', 'desc')->paginate(10);  //dd($trades);
 
         return view('front.trades.closed-stock-trades', compact('trades'));
     }
@@ -161,23 +206,61 @@ class PositionManagementController extends Controller
 
     public function closedOptionsTrades(Request $request)
     {
-        $query = Trade::with('tradeDetail')    
+        // $query = Trade::with('tradeDetail')    
+        // ->where('trade_type', 'option')
+        // ->whereNotNull('exit_price')->whereNotNull('exit_date');  //open trade
+
+        $query = DB::table('trades as t')
+        ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
+        ->select([
+            't.id',
+            't.trade_type',
+            't.trade_symbol',
+            't.trade_direction',
+            't.entry_date',
+            DB::raw('NULL as child_direction'),            
+            't.trade_option',
+            't.strike_price',
+            DB::raw('CASE 
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN 
+                    ((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.entry_price
+                END AS entry_price'),
+            't.stop_price',
+            't.target_price',
+            DB::raw('CASE 
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN 
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.position_size
+                END AS position_size'),
+            't.exit_price',
+            't.exit_date',
+            't.trade_description',
+            't.chart_image',
+            't.close_comment',
+            't.close_image',
+            't.created_at',
+            't.updated_at'
+        ])
         ->where('trade_type', 'option')
-        ->whereNotNull('exit_price')->whereNotNull('exit_date');  //open trade
+        ->whereNotNull('exit_price')
+        ->whereNotNull('exit_date')
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date', 
+       't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size', 
+        't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment', 
+        't.close_image', 't.created_at', 't.updated_at');
 
          // Handle search query
-        $search = $request->input('search');
+        $search = $request->input('search'); 
         if (!empty($search)) {
             $query->where('trade_symbol', 'like', '%' . $search . '%');
         }
 
         // Fetch the paginated results
         $trades = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        $trades = Trade::with('tradeDetail')
-        ->where('trade_type', 'option')
-        ->whereNotNull('exit_price')->whereNotNull('exit_date')
-        ->orderBy('created_at','desc')->paginate(10);
 
         return view('front.trades.closed-options-trades', compact('trades'));
     }
@@ -194,7 +277,7 @@ class PositionManagementController extends Controller
             //trade close alert
             $trade = Trade::with('tradeDetail')->where('id', $id)->first();
         }
-         //dd($trade);
+        //dd($trade->trade->trade_type);
         return view('front.trades.trade-detail', compact('trade', 'type'));
     }
 

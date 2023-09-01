@@ -70,7 +70,7 @@
                                         @php
                                             $tradeDirection = ucfirst($trade->original_trade_direction);
                                             $tradeSymbol = strtoupper($trade->trade_symbol);
-                                            $formattedDate = \Carbon\Carbon::parse($trade->updated_at)->format('M d, Y');
+                                            $formattedDate = \Carbon\Carbon::parse($trade->entry_date)->format('M d, Y');
                                             $formattedStrikePrice = number_format($trade->strike_price, 2);
                                             $formattedEntryPrice = number_format($trade->entry_price, 2);
                                             $formattedExitPrice = number_format($trade->exit_price, 2);
@@ -95,7 +95,7 @@
                                             @endif
                                           
                                             
-                                            {{$tradeSymbol}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}} @endif
+                                            {{$tradeSymbol}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->entry_date)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}} @endif
 
                                             @if ($trade->child_direction !== null )
                                                 ({{$trade->child_direction}})
@@ -108,6 +108,7 @@
                                     </div>
                                 </div>                          
                             <p class="mb-1">
+                                {{-- close trade --}}
                                 @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                     {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}@endif
                                 @else
@@ -135,17 +136,23 @@
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)  
                                 <p class="mb-1"><b>Profits: </b>
                                     @if ($trade->original_trade_direction == 'buy')
-                                        <span class="text-success">
+                                        @php
+                                            $buyProfits = number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
+                                        @endphp
+                                        <span class="@if($buyProfits >= 0 )text-success @else text-danger @endif">
                                             @if ($trade->entry_price != 0 )
-                                                {{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2)  }}%
+                                                {{ $buyProfits }}%
                                             @else
                                                 0%
                                             @endif                                            
                                         </span>
                                     @else
-                                        <span class="text-success">
+                                        @php
+                                            $sellProfits = number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
+                                        @endphp
+                                        <span class="@if($sellProfits >= 0 )text-success @else text-danger @endif">
                                             @if ($trade->entry_price != 0 )
-                                                {{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2) }}%
+                                                {{ $sellProfits }}%
                                             @else
                                                 0%
                                             @endif

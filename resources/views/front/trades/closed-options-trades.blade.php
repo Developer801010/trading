@@ -62,48 +62,44 @@
                             </td>
                             <td>{{\Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y')}}</td>
                             <td class="average-price">
-                                <span class="price">${{ $trade->entry_price }}</span>                                
+                                <span class="price">${{ number_format($trade->entry_price, 2) }}</span>                                
                             </td>
                             <td>{{Carbon\Carbon::parse($trade->exit_date)->format('m/d/Y')}}</td>
-                            <td>${{$trade->exit_price}}</td>
+                            <td>${{ number_format($trade->exit_price, 2) }}</td>
                             <td>
                                 <span>{{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%</span>
                             </td>
                             <td class="profit">
-                                @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
-                                    <span class="size"></span>
+                                @if ($trade->trade_direction == 'buy')
+                                @if ($trade->entry_price != 0)
+                                    @php
+                                        $profits =  number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
+                                    @endphp                                            
                                 @else
-                                    @if ($trade->trade_direction == 'buy')
-                                        @if ($trade->entry_price != 0)
-                                            @php
-                                                $profits =  number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
-                                            @endphp                                            
-                                        @else
-                                            @php
-                                                $profits = 0;
-                                            @endphp
-                                        @endif 
-                                        <span class="size @if($profits >=0) {{ 'text-success' }} @else {{'text-danger'}} @endif">               
-                                            {{$profits}}%
-                                        </span>    
+                                    @php
+                                        $profits = 0;
+                                    @endphp
+                                @endif 
+                                <span class="size @if($profits >=0) {{ 'text-success' }} @else {{'text-danger'}} @endif">               
+                                    {{$profits}}%
+                                </span>    
+                                @else
+                                    @if ($trade->entry_price != 0)
+                                        @php
+                                            $profits =   number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
+                                        @endphp                                            
                                     @else
-                                        @if ($trade->entry_price != 0)
-                                            @php
-                                                $profits =   number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
-                                            @endphp                                            
-                                        @else
-                                            @php
-                                                $profits = 0;
-                                            @endphp
-                                        @endif 
-                                        <span class="size @if($profits >=0) {{ 'text-success' }} @else {{'text-danger'}} @endif">               
-                                            {{$profits}}%
-                                        </span>    
-                                    @endif
-                                @endif                                
+                                        @php
+                                            $profits = 0;
+                                        @endphp
+                                    @endif 
+                                    <span class="size @if($profits >=0) {{ 'text-success' }} @else {{'text-danger'}} @endif">               
+                                        {{$profits}}%
+                                    </span>    
+                                @endif                             
                             </td>                          
                         </tr>  
-                        @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
+                        {{-- @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
                             @php
                                 //parent row's data
                                 $totalPrice = $trade->entry_price * $trade->position_size / 100;
@@ -169,7 +165,7 @@
                                 });
                             });
                         </script>
-                         @endif
+                         @endif --}}
                         @endforeach
                        
                     </tbody>

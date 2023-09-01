@@ -4,6 +4,7 @@
             margin-bottom: 1px;
         }
     </style>
+<b>{{$data['body']['first_title']}}</b><br>
 <b>{{$data['body']['title']}}</b><br>
 <b>Trade Entry Date: </b>{{$data['body']['trade_exit_date']}}<br>
 <b>Position Size: </b>{{$data['body']['position_size']}}%<br>

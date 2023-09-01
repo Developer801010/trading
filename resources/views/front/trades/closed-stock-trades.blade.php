@@ -58,7 +58,7 @@
                             </td>
                             <td>{{\Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y')}}</td>
                             <td class="average-price">
-                                <span class="price">${{ $trade->entry_price }}</span>                                
+                                <span class="price">${{ number_format($trade->entry_price, 2) }}</span>                                
                             </td>
                             <td>{{Carbon\Carbon::parse($trade->exit_date)->format('m/d/Y')}}</td>
                             <td>${{$trade->exit_price}}</td>
@@ -66,22 +66,24 @@
                                 <span class="size">{{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%</span>
                             </td>
                             <td class="profit">
-                                @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
-                                    <span class="size"></span>
+                                @if ($trade->trade_direction == 'buy')
+                                    @php
+                                        $buyProfit =  number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
+                                    @endphp
+                                    <span class="size @if ($buyProfit > 0) text-success @else text-danger @endif">                                        
+                                        {{ $buyProfit  }}%
+                                    </span>    
                                 @else
-                                    @if ($trade->trade_direction == 'buy')
-                                        <span class="size">                                        
-                                            {{ number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2)  }}%
-                                        </span>    
-                                    @else
-                                        <span class="size">
-                                            {{ number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2) }}%
-                                        </span>
-                                    @endif
+                                    @php
+                                        $sellProfit =  number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
+                                    @endphp
+                                    <span class="size  @if ($sellProfit > 0) text-success @else text-danger @endif">
+                                        {{ $sellProfit }}%
+                                    </span>
                                 @endif
                             </td>                          
                         </tr>  
-                        @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
+                        {{--@if($trade->tradeDetail !== null && $trade->tradeDetail->count())
                             @php
                                 //parent row's data
                                 $totalPrice = $trade->entry_price * $trade->position_size / 100;
@@ -99,7 +101,7 @@
                         @php
                             $averagePrice = $totalPrice / $totalPercentage;
                         @endphp
-                        <script>
+                         <script>
                             $(document).ready(function() {
                                 var averagePrice = {{ $averagePrice }};
                                 var totalPercentage = {{$totalPercentage}}
@@ -139,7 +141,7 @@
                                 });
                             });
                         </script>
-                         @endif
+                         @endif --}}
                         @endforeach
                        
                     </tbody>

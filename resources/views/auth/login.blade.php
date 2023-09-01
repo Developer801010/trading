@@ -18,7 +18,7 @@
                                            value="{{ old('email') }}" required autofocus>
                     </div>
         
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <div class="d-flex justify-content-between">
                             <label class="form-label" for="login-password">Password</label>
                             <a href="{{ url('/password/reset') }}">
@@ -36,13 +36,13 @@
                         @include('layouts.error')
                     </div>
                     
-                    {{-- <div class="mb-1">
+                    <div class="mb-2">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" 
                             id="remember" name="remember" {{ old('remember') ? 'checked' : '' }} tabindex="3" />                    
                             <label class="form-check-label" for="remember">   {{ __('Remember Me') }} </label>
                         </div>
-                    </div> --}}
+                    </div>
                     <button class="btn btn-primary w-100" tabindex="4">Sign in</button>
                 </form>
             </div>

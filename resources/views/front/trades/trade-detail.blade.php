@@ -23,19 +23,22 @@
                                             $trade_add_symbol = strtoupper($trade->trade->trade_symbol); 
                                             $trade_add_direction = $trade->trade->trade_direction;
                                             $trade_add_type = $trade->trade->trade_type;
+                                            $trade_add_option = $trade->trade->trade_option;
                                         } 
                                     @endphp
                                     <h5 class="card-title" style="font-weight: bold">
                                         @if($type == 'a')   {{-- Add Trade --}}                                        
-                                            {{ucfirst($trade_add_type)}} Alert - {{ucfirst($trade_add_direction)}} {{ $trade_add_symbol }} (Add)
+                                            {{ucfirst($trade_add_type)}} Alert - {{ucfirst($trade_add_direction)}} {{ $trade_add_symbol }} {{\Carbon\Carbon::parse($trade->entry_date)->format('ymd')}} {{ucfirst(substr($trade_add_option,0,1))}}  {{rtrim(rtrim(number_format($trade->strike_price, 2), '0'), '.')}} (Add)
                                         @else
                                             {{ucfirst($trade->trade_type)}} Alert - 
+                                            {{-- close trade --}}
                                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
                                                 {{ucfirst($trade->trade_direction) == 'Buy' ? 'Sell' : 'Buy' }}  to Close
                                             @else
                                                 New Trade {{ucfirst($trade->trade_direction) }}
                                             @endif
-                                            {{strtoupper($trade->trade_symbol)}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->updated_at)->format('ymd')}}  {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->entry_price, 1), '0'), '.')}}  @endif
+                                            
+                                            {{strtoupper($trade->trade_symbol)}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->entry_date)->format('ymd')}}  {{ucfirst(substr($trade->trade_option,0,1))}}  {{rtrim(rtrim(number_format($trade->strike_price, 2), '0'), '.')}}  @endif
                                         @endif
                                         
                                     </h5>
@@ -90,7 +93,7 @@
                         @else
                             <p class="mb-1"><b>Position Size: </b>{{rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.')}}% of Portfolio</p> 
                             <p class="mb-1"><b>Stop Price: </b>
-                                {{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 0) : $trade->stop_price }}
+                                {{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 2) : $trade->stop_price }}
                             </p>
                             <p class="mb-1"><b>Target Price: </b> ${{$trade->target_price}}</p>
                         @endif

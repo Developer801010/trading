@@ -23,6 +23,7 @@ use Laravel\Cashier\Subscription;
 class TradeAlertController extends Controller
 {
 
+    public $tradeinSyncText = 'TradeInSync ';
     public function __construct() 
     {
         $this->middleware('permission:trade-list|trade-create|trade-edit|trade-delete', ['only' => ['index','store']]);
@@ -151,15 +152,23 @@ class TradeAlertController extends Controller
             DB::commit();
 
             //Bulk trade creation email to activated users's email
-            $activeSubscribers = $this->getActiveSubscriptionUsers();
+            $activeSubscribers = $this->getActiveSubscriptionUsers();            
 
             if($trade_type == 'option'){
-                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert';
-                $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+                $trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
+
+                $sms_msg = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+
+                $body_first_title = ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+
                 $body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('M d, Y').' $'.number_format($strike_price, 0).' '.ucfirst($trade_option).'@$'.$entry_price.' or better';
             }else{
-                $trade_mail_title = 'TradeInSync '.ucfirst($trade_type).' '.'Alert';
-                $sms_msg = 'TradeInSync '.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol);
+                $trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
+
+                $sms_msg = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol);
+
+                $body_first_title = ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol);
+
                 $body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol);
             }
             $url = route('front.trade-detail', [
@@ -170,6 +179,7 @@ class TradeAlertController extends Controller
             $data = [
                 'title' => $trade_mail_title,
                 'body' => [
+                    'first_title' => $body_first_title,
                     'title' => $body_title,
                     'trade_entry_date' => Carbon::parse($entry_date)->format('m/d/Y'),
                     'trade_entry_price' => $entry_price,
@@ -280,6 +290,7 @@ class TradeAlertController extends Controller
             $tradeObj = new TradeDetail();
             $tradeObj->trade_id = $addFormID;
             $tradeObj->trade_direction = 'Add';
+            $tradeObj->strike_price = $addTradeStrikePrice;
             $tradeObj->entry_date = $addEntryDate;
             $tradeObj->entry_price = $addBuyPrice;            
             $tradeObj->position_size = $addPositionSize;
@@ -304,15 +315,26 @@ class TradeAlertController extends Controller
             DB::commit();
 
              //Bulk Trade add email to activated users 
-             $activeSubscribers = $this->getActiveSubscriptionUsers();
-
+            $activeSubscribers = $this->getActiveSubscriptionUsers();
+            
             if($addTradeType == 'option'){
-                $trade_mail_title = 'TradeInSync '.$addTradeType.' Alert';
-                $sms_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addEntryDate)->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
+                $trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
+
+                $sms_title = $this->tradeinSyncText.$addTradeType.' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addEntryDate)
+                ->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
+
+                $body_first_title = ucfirst($addTradeType).' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addEntryDate)
+                ->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
+
                 $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol).' (Add) @ $ '.$addBuyPrice.' or better'; 
+
             }else{
-                $trade_mail_title = 'TradeInSync '.$addTradeType.' Alert';
-                $sms_title = 'TradeInSync '.$addTradeType.' Alert- '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '. '(Add)';
+                $trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
+
+                $sms_title = $this->tradeinSyncText.$addTradeType.' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '. '(Add)';
+
+                $body_first_title = ucfirst($addTradeType).' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '. '(Add)';
+
                 $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol). ' (Add) @ $'.$addBuyPrice.' or better'; 
             }
 
@@ -324,6 +346,7 @@ class TradeAlertController extends Controller
              $data = [
                  'title' => $trade_mail_title,
                  'body' => [
+                    'first_title' => $body_first_title,
                      'title' => $body_title,
                      'trade_entry_date' => Carbon::parse($addEntryDate)->format('m/d/Y'),
                      'trade_entry_price' => $addBuyPrice,
@@ -438,13 +461,21 @@ class TradeAlertController extends Controller
 
              if($closeTradeType == 'option')
              {  
-                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert';
-                $sms_title = 'TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
+                $trade_mail_title = $this->tradeinSyncText.$closeTradeType.' Alert';
+
+                $sms_title = $this->tradeinSyncText.$closeTradeType.' Alert - '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
+
+                $body_first_title = ucfirst($closeTradeType).' Alert - '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
+
                 $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeExitDate)->format('M d, Y').' $'
                 .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
             }else{
-                $trade_mail_title ='TradeInSync '.$closeTradeType.' Alert';
-                $sms_title ='TradeInSync '.$closeTradeType.' Alert- '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' ';
+                $trade_mail_title = $this->tradeinSyncText.$closeTradeType.' Alert';
+
+                $sms_title = $this->tradeinSyncText.$closeTradeType.' Alert - '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' ';
+
+                $body_first_title = ucfirst($closeTradeType).' Alert - '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' ';
+
                 $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol); 
             }
 
@@ -456,11 +487,12 @@ class TradeAlertController extends Controller
              $data = [
                  'title' => $trade_mail_title,
                  'body' => [
+                    'first_title' => $body_first_title,
                      'title' => $body_title,
                      'trade_exit_date' => Carbon::parse($closeExitDate)->format('m/d/Y'),
                      'position_size' => $closeTradePositionSize,
-                     'exit_price' => $closeExitPrice,
-                     'profits' => round($profits, 1),
+                     'exit_price' => number_format($closeExitPrice, 2),
+                     'profits' => number_format($profits, 2),
                      'trade_direction' => $closeTradeDirection,
                      'comments' => $closedComments,                     
                      'visit' => $url
