@@ -163,11 +163,11 @@ class TradeAlertController extends Controller
             if($trade_type == 'option'){
                 $trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
 
-                $sms_msg = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+                $sms_msg = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
 
-                $body_first_title = ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+                $body_first_title = ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
 
-                $body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol).' '.Carbon::parse($entry_date)->format('M d, Y').' $'.number_format($strike_price, 0).' '.ucfirst($trade_option).'@$'.$entry_price.' or better';
+                $body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('M d, Y').' $'.number_format($strike_price, 0).' '.ucfirst($trade_option).'@$'.$entry_price.' or better';
             }else{
                 $trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
 
@@ -256,18 +256,19 @@ class TradeAlertController extends Controller
 
     public function tradeAdd(Request $request) 
     {
-        $addFormID = $request->addFormID;
+        $addFormID = $request->addFormID;  
         $addTradeType = $request->addTradeType;
         $addTradeSymbol = $request->addTradeSymbol;
         $addTradeOption = $request->addTradeOption;
         $addTradeStrikePrice = $request->addTradeStrikePrice;
+        $addExpirationDate = $request->addExpirationDate;
         $addTradeDirection = $request->addTradeDirection;
         $addEntryDate = $request->addEntryDate;
         $addBuyPrice = $request->addBuyPrice;
         $addPositionSize = $request->addPositionSize;
         $addStopPrice = $request->addStopPrice;
         $addTargetPrice = $request->addTargetPrice;
-        $addComments = $request->quill_add_html;
+        $addComments = $request->quill_add_html;   
 
         // Extract base64 encoded image data from Quill content
         $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -296,7 +297,6 @@ class TradeAlertController extends Controller
             $tradeObj = new TradeDetail();
             $tradeObj->trade_id = $addFormID;
             $tradeObj->trade_direction = 'Add';
-            $tradeObj->strike_price = $addTradeStrikePrice;
             $tradeObj->entry_date = $addEntryDate;
             $tradeObj->entry_price = $addBuyPrice;            
             $tradeObj->position_size = $addPositionSize;
@@ -304,11 +304,10 @@ class TradeAlertController extends Controller
             $tradeObj->target_price = $addTargetPrice;
             $tradeObj->trade_description = $addComments;
        
-            // if($trade_type == 'option'){
-            //     $tradeObj->trade_option = $trade_option;    
-            //     $tradeObj->expiration_date = $expiration_date;
-            //     $tradeObj->strike_price = $strike_price;
-            // }
+            if($addTradeType == 'option'){                  
+                $tradeObj->expiration_date = \Carbon\Carbon::parse($addExpirationDate)->format('Y-m-d');
+                $tradeObj->strike_price = $addTradeStrikePrice;
+            }
 
             if($request->hasFile('addImage')){
                 $imageName = time().'.'.$request->addImage->extension();    
@@ -326,13 +325,13 @@ class TradeAlertController extends Controller
             if($addTradeType == 'option'){
                 $trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
 
-                $sms_title = $this->tradeinSyncText.$addTradeType.' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addEntryDate)
+                $sms_title = $this->tradeinSyncText.$addTradeType.' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addExpirationDate)
                 ->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
 
-                $body_first_title = ucfirst($addTradeType).' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addEntryDate)
+                $body_first_title = ucfirst($addTradeType).' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addExpirationDate)
                 ->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
 
-                $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol).' (Add) @ $ '.$addBuyPrice.' or better'; 
+                $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol).' (Add) @$'.$addBuyPrice.' or better'; 
 
             }else{
                 $trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
@@ -401,6 +400,7 @@ class TradeAlertController extends Controller
         $closeTradePositionSize = $request->closeTradePositionSize;
         $closeTradeStrikePrice = $request->closeTradeStrikePrice;
         $closeTradeOption = $request->closeTradeOption;
+        $closeOptionExpirationDate = $request->closeOptionExpirationDate;
 
          // Extract base64 encoded image data from Quill content
          $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -469,11 +469,13 @@ class TradeAlertController extends Controller
              {  
                 $trade_mail_title = $this->tradeinSyncText.$closeTradeType.' Alert';
 
-                $sms_title = $this->tradeinSyncText.$closeTradeType.' Alert - '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
+                $sms_title = $this->tradeinSyncText.$closeTradeType.' Alert - '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' '.Carbon::parse($closeOptionExpirationDate)
+                ->format('ymd').ucfirst(substr($closeTradeOption,0,1)).$closeTradeStrikePrice;
 
-                $body_first_title = ucfirst($closeTradeType).' Alert - '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' ';
+                $body_first_title = ucfirst($closeTradeType).' Alert - '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' '.Carbon::parse($closeOptionExpirationDate)
+                ->format('ymd').ucfirst(substr($closeTradeOption,0,1)).$closeTradeStrikePrice;
 
-                $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeExitDate)->format('M d, Y').' $'
+                $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeOptionExpirationDate)->format('M d, Y').' $'
                 .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
             }else{
                 $trade_mail_title = $this->tradeinSyncText.$closeTradeType.' Alert';

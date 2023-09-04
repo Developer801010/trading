@@ -50,13 +50,14 @@ class PositionManagementController extends Controller
             't.chart_image',
             't.close_comment',
             't.close_image',
+            't.expiration_date',
             't.created_at',
             't.updated_at'
         ])
         ->groupBy( 't.id', 't.trade_type', 't.entry_date', 't.trade_symbol', 't.trade_direction', 't.trade_option', 
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size', 
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment', 
-        't.close_image', 't.created_at', 't.updated_at');
+        't.close_image',  't.expiration_date', 't.created_at', 't.updated_at');
 
         // Add search condition for trades
         if (!empty($search)) {
@@ -85,6 +86,7 @@ class PositionManagementController extends Controller
             'td.chart_image',
             DB::raw("'' AS close_comment"),
             DB::raw("'' AS close_image"),
+            'td.expiration_date',
             'td.created_at',
             'td.updated_at'
         ])

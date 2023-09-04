@@ -28,7 +28,7 @@
                                     @endphp
                                     <h5 class="card-title" style="font-weight: bold">
                                         @if($type == 'a')   {{-- Add Trade --}}                                        
-                                            {{ucfirst($trade_add_type)}} Alert - {{ucfirst($trade_add_direction)}} {{ $trade_add_symbol }} {{\Carbon\Carbon::parse($trade->entry_date)->format('ymd')}} {{ucfirst(substr($trade_add_option,0,1))}}  {{rtrim(rtrim(number_format($trade->strike_price, 2), '0'), '.')}} (Add)
+                                            {{ucfirst($trade_add_type)}} Alert - {{ucfirst($trade_add_direction)}} {{ $trade_add_symbol }} @if($trade_add_type == 'option')  {{\Carbon\Carbon::parse($trade->expiration_date)->format('ymd')}} @else {{\Carbon\Carbon::parse($trade->entry_date)->format('ymd')}} @endif {{ucfirst(substr($trade_add_option,0,1))}}  {{rtrim(rtrim(number_format($trade->strike_price, 2), '0'), '.')}} (Add)
                                         @else
                                             {{ucfirst($trade->trade_type)}} Alert - 
                                             {{-- close trade --}}
@@ -38,7 +38,7 @@
                                                 New Trade {{ucfirst($trade->trade_direction) }}
                                             @endif
                                             
-                                            {{strtoupper($trade->trade_symbol)}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->entry_date)->format('ymd')}}  {{ucfirst(substr($trade->trade_option,0,1))}}  {{rtrim(rtrim(number_format($trade->strike_price, 2), '0'), '.')}}  @endif
+                                            {{strtoupper($trade->trade_symbol)}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->expiration_date)->format('ymd')}}  {{ucfirst(substr($trade->trade_option,0,1))}}  {{rtrim(rtrim(number_format($trade->strike_price, 2), '0'), '.')}}  @endif
                                         @endif
                                         
                                     </h5>
@@ -49,7 +49,7 @@
                             </div>      
                             @if($type == 'a')
                                 <p class="mb-1">                                
-                                    {{ucfirst($trade_add_direction)}} {{$trade_add_symbol }} @if($trade_add_type == 'option') {{\Carbon\Carbon::parse($trade->trade->updated_at)->format('M d, Y')}} ${{number_format($trade->trade->strike_price, 2)}} {{$trade->trade->trade_option}} @endif                              
+                                    {{ucfirst($trade_add_direction)}} {{$trade_add_symbol }} @if($trade_add_type == 'option') {{\Carbon\Carbon::parse($trade->trade->expiration_date)->format('M d, Y')}} ${{number_format($trade->trade->strike_price, 2)}} {{$trade->trade->trade_option}} @endif                              
                                 </p>
                             @else
                                 <p class="mb-1">
@@ -58,7 +58,7 @@
                                     @else
                                         {{ucfirst($trade->trade_direction)}} 
                                     @endif
-                                   {{strtoupper($trade->trade_symbol)}}  @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->updated_at)->format('M d, Y')}} ${{$trade->entry_price}} {{$trade->trade_option}} @endif
+                                   {{strtoupper($trade->trade_symbol)}}  @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->expiration_date)->format('M d, Y')}} ${{$trade->strike_price}} {{$trade->trade_option}} @endif
                                 </p>
                             @endif
                         @if ($trade->exit_price !== null && $trade->exit_date !== null)

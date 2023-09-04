@@ -43,7 +43,7 @@
                             @if($parentTrade->trade_type === 'stock')
                                 {{ $parentTrade->trade_symbol }}
                             @else
-                                {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->entry_date)->format('ymd').''.ucfirst(substr($parentTrade->trade_option, 0, 1)).''.number_format($parentTrade->strike_price, '0')}}
+                                {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->expiration_date)->format('ymd').''.ucfirst(substr($parentTrade->trade_option, 0, 1)).''.number_format($parentTrade->strike_price, '0')}}
                             @endif                            
                         </td>                       
                         <td style="width:10%">{{ $parentTrade->trade_type }}</td>
@@ -73,7 +73,7 @@
                                 data-strikeprice = "{{$parentTrade->strike_price}}" 
                                 data-option="{{$parentTrade->trade_option}}" 
                                 data-entryprice="{{$parentTrade->entry_price}}" 
-                                data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('ymd')}}" >
+                                data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('Ymd')}}" >
                                 Close
                             </a>
                             <a href="#" class="btn btn-success btnAdd"  
@@ -85,7 +85,7 @@
                                 data-strikeprice = "{{$parentTrade->strike_price}}" 
                                 data-option="{{$parentTrade->trade_option}}" 
                                 data-entryprice="{{$parentTrade->entry_price}}" 
-                                data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('ymd')}}"
+                                data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('Ymd')}}"
                                >
                               Add
                             </a>
@@ -189,6 +189,8 @@
                         <input type="hidden" name="addTradeOption" id="addTradeOption" value="" />
                         <input type="hidden" name="addTradeDirection" id="addTradeDirection" value="" />
                         <input type="hidden" name="addTradeStrikePrice" id="addTradeStrikePrice" value="" />
+                        <input type="hidden" name="addExpirationDate" id="addExpirationDate" value="" />
+                        
                         
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="AddEntryDate">Entry Date</label>
@@ -306,6 +308,7 @@
                         <input type="hidden" name="closeTradeStrikePrice" id="closeTradeStrikePrice" value="" />
                         <input type="hidden" name="closeTradeEntryPrice" id="closeTradeEntryPrice" value="" />
                         <input type="hidden" name="closeTradePositionSize" id="closeTradePositionSize" value="" />
+                        <input type="hidden" name="closeOptionExpirationDate" id="closeOptionExpirationDate" value="" />
 
                         <div class="col-12 col-md-4">
                             <label class="form-label" for="closeExitDate">Exit Date</label>
@@ -412,14 +415,14 @@
             var direction = $(this).data('direction').toUpperCase();
             var symbol = $(this).data('symbol');
             var strikeprice = $(this).data('strikeprice').replace(/\.00$/, '');            
-            var option = $(this).data('option').substring(0,1);
+            var option = $(this).data('option').substring(0,1).toUpperCase();
             var entryprice = $(this).closest('tr').find('.average-price').find('.price').text();
             if(entryprice == undefined)
                 entryprice = $(this).data('entryprice');
-            var expirationdate = $(this).data('expirationdate');
+            var expirationdate = $(this).data('expirationdate');  
 
             if(trade_type == 'option'){
-                var tradeTitle = direction+space+symbol+expirationdate+option+strikeprice.replace(/\.00$/, '');
+                var tradeTitle = direction+space+symbol+expirationdate.toString().substring(2,8)+option+strikeprice.replace(/\.00$/, '');
             }else{
                 var tradeTitle = direction+space+symbol;
             }
@@ -432,7 +435,8 @@
             $('#addTradeSymbol').val(symbol);
             $('#addTradeOption').val(option);
             $('#addTradeDirection').val(direction);
-            $('#addTradeStrikePrice').val(strikeprice);           
+            $('#addTradeStrikePrice').val(strikeprice);   
+            $('#addExpirationDate').val(expirationdate);                 
         });
 
         var quill_add = new Quill('.quill_add_editor', {
@@ -460,22 +464,21 @@
             var position_size = $(this).closest('tr').find('.average-price').find('.size').text().replace(/[()%]/g, '');
             if(position_size == undefined)
                 position_size = parseFloat($(this).data('position').replace(/[()%]/g, ''));
-            console.log(position_size);
-
+            
             var entryprice = $(this).closest('tr').find('.average-price').find('.price').text();
             if(entryprice == undefined)
                 entryprice = $(this).data('entryprice');
 
             var symbol = $(this).data('symbol');
             var strikeprice = $(this).data('strikeprice');
-            var option = $(this).data('option').substring(0,1);
+            var option = $(this).data('option').substring(0,1).toUpperCase();
           
             var expirationdate = $(this).data('expirationdate');
             if(direction =='sell') direction = 'Buy';
             else direction = 'Sell'
 
             if(type == 'option'){
-                var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size.replace(/[\$\(\)]/g, '')+'%'+space+expirationdate+option+strikeprice;
+                var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size.replace(/[\$\(\)]/g, '')+'%'+space+expirationdate.toString().substring(2,8)+option+strikeprice;
             }else{
                 var tradeTitle = direction.toUpperCase()+space+symbol;
             }
@@ -492,6 +495,7 @@
             $('#closeTradePositionSize').val(position_size);
             $('#closeTradeStrikePrice').val(strikeprice);
             $('#closeTradeOption').val(option);
+            $('#closeOptionExpirationDate').val(expirationdate);          
 
             var quill_close = new Quill('.quill_close_editor', {
                 modules: {

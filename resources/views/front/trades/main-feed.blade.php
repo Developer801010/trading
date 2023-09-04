@@ -70,7 +70,7 @@
                                         @php
                                             $tradeDirection = ucfirst($trade->original_trade_direction);
                                             $tradeSymbol = strtoupper($trade->trade_symbol);
-                                            $formattedDate = \Carbon\Carbon::parse($trade->entry_date)->format('M d, Y');
+                                            $formattedExpirationDate = \Carbon\Carbon::parse($trade->expiration_date)->format('M d, Y');
                                             $formattedStrikePrice = number_format($trade->strike_price, 2);
                                             $formattedEntryPrice = number_format($trade->entry_price, 2);
                                             $formattedExitPrice = number_format($trade->exit_price, 2);
@@ -95,7 +95,7 @@
                                             @endif
                                           
                                             
-                                            {{$tradeSymbol}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->entry_date)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}} @endif
+                                            {{$tradeSymbol}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->expiration_date)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}} @endif
 
                                             @if ($trade->child_direction !== null )
                                                 ({{$trade->child_direction}})
@@ -110,9 +110,9 @@
                             <p class="mb-1">
                                 {{-- close trade --}}
                                 @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                    {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}@endif
+                                    {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedExpirationDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}@endif
                                 @else
-                                    {{ $tradeDirection }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedDate }} ${{ $formattedEntryPrice }} {{ $tradeOption }}@endif
+                                    {{ $tradeDirection }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedExpirationDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}@endif
                                 @endif
                             </p>
                             @if ($trade->exit_price !== null && $trade->exit_date !== null)
