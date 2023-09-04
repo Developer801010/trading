@@ -470,10 +470,10 @@ class TradeAlertController extends Controller
              {  
                 $trade_mail_title = $this->tradeinSyncText.$closeTradeType.' Alert';
 
-                $sms_title = $this->tradeinSyncText.$closeTradeType.' Alert - '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' '.Carbon::parse($closeOptionExpirationDate)
+                $sms_title = $this->tradeinSyncText.$closeTradeType.' Alert - '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeOptionExpirationDate)
                 ->format('ymd').ucfirst(substr($closeTradeOption,0,1)).$closeTradeStrikePrice;
 
-                $body_first_title = ucfirst($closeTradeType).' Alert - '.strtoupper($closeTradeDirection). ' To Close '.$closeTradeSymbol.' '.Carbon::parse($closeOptionExpirationDate)
+                $body_first_title = ucfirst($closeTradeType).' Alert - '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeOptionExpirationDate)
                 ->format('ymd').ucfirst(substr($closeTradeOption,0,1)).$closeTradeStrikePrice;
 
                 $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeOptionExpirationDate)->format('M d, Y').' $'
