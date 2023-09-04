@@ -72,7 +72,7 @@
                                     @else
                                         @php $trade_option = 'P'; @endphp
                                     @endif
-                                    {{ $trade->trade_symbol .' '. \Carbon\Carbon::parse($trade->entry_date)->format('ymd').' '.$trade_option.' '.$trade->strike_price }}
+                                    {{ strtoupper($trade->trade_symbol) .' '. \Carbon\Carbon::parse($trade->entry_date)->format('ymd').' '.$trade_option.' '.$trade->strike_price }}
                                 </td>                                
                                 <td class="average-price">
                                     <span class="price">${{$trade->entry_price}}</span>
