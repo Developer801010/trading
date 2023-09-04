@@ -331,7 +331,8 @@ class TradeAlertController extends Controller
                 $body_first_title = ucfirst($addTradeType).' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addExpirationDate)
                 ->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
 
-                $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol).' (Add) @$'.$addBuyPrice.' or better'; 
+                $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addExpirationDate)
+                ->format('M d, Y').'$'.$addTradeStrikePrice.ucfirst($addTradeOption).' (Add) @$'.$addBuyPrice.' or better'; 
 
             }else{
                 $trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
