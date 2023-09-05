@@ -402,6 +402,7 @@ class TradeAlertController extends Controller
         $closeTradeStrikePrice = $request->closeTradeStrikePrice;
         $closeTradeOption = $request->closeTradeOption;
         $closeOptionExpirationDate = $request->closeOptionExpirationDate;
+        
 
          // Extract base64 encoded image data from Quill content
          $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';

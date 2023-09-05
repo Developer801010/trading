@@ -74,7 +74,7 @@
                                             $formattedStrikePrice = number_format($trade->strike_price, 2);
                                             $formattedEntryPrice = number_format($trade->entry_price, 2);
                                             $formattedExitPrice = number_format($trade->exit_price, 2);
-                                            $tradeOption = $trade->trade_option;
+                                            $tradeOption = ucfirst($trade->trade_option);
 
                                         @endphp     
                                         <h5 class="card-title" style="font-weight: bold">                                            

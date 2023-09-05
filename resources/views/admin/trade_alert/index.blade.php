@@ -308,6 +308,7 @@
                         <input type="hidden" name="closeTradeStrikePrice" id="closeTradeStrikePrice" value="" />
                         <input type="hidden" name="closeTradeEntryPrice" id="closeTradeEntryPrice" value="" />
                         <input type="hidden" name="closeTradePositionSize" id="closeTradePositionSize" value="" />
+                        <input type="hidden" name="closeTradeOption" id="closeTradeOption" value="" />
                         <input type="hidden" name="closeOptionExpirationDate" id="closeOptionExpirationDate" value="" />
 
                         <div class="col-12 col-md-4">
@@ -415,14 +416,14 @@
             var direction = $(this).data('direction').toUpperCase();
             var symbol = $(this).data('symbol');
             var strikeprice = $(this).data('strikeprice').replace(/\.00$/, '');            
-            var option = $(this).data('option').substring(0,1).toUpperCase();
+            var option = $(this).data('option');
             var entryprice = $(this).closest('tr').find('.average-price').find('.price').text();
             if(entryprice == undefined)
                 entryprice = $(this).data('entryprice');
             var expirationdate = $(this).data('expirationdate');  
 
             if(trade_type == 'option'){
-                var tradeTitle = direction+space+symbol+expirationdate.toString().substring(2,8)+option+strikeprice.replace(/\.00$/, '');
+                var tradeTitle = direction+space+symbol+expirationdate.toString().substring(2,8)+option.substring(0,1).toUpperCase()+strikeprice.replace(/\.00$/, '');
             }else{
                 var tradeTitle = direction+space+symbol;
             }
@@ -471,14 +472,14 @@
 
             var symbol = $(this).data('symbol');
             var strikeprice = $(this).data('strikeprice');
-            var option = $(this).data('option').substring(0,1).toUpperCase();
+            var option = $(this).data('option');
           
             var expirationdate = $(this).data('expirationdate');
             if(direction =='sell') direction = 'Buy';
             else direction = 'Sell'
 
             if(type == 'option'){
-                var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size.replace(/[\$\(\)]/g, '')+'%'+space+expirationdate.toString().substring(2,8)+option+strikeprice;
+                var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size.replace(/[\$\(\)]/g, '')+'%'+space+expirationdate.toString().substring(2,8)+option.substring(0,1).toUpperCase()+strikeprice;
             }else{
                 var tradeTitle = direction.toUpperCase()+space+symbol;
             }
