@@ -64,9 +64,9 @@
                                 </thead>
                                 <tbody>
 
-                                    @foreach ($invoices->agreement_transaction_list as $invoice)
+                                    @foreach ($invoices->agreement_transaction_list as $key=>$invoice)
                                         <tr>
-                                            <td>{{ $invoice->transaction_id }}</td>
+                                            <td>{{ $key+1000 }}</td>
                                             {{-- <td></td> --}}
                                             <td> {{ \Carbon\Carbon::parse($invoice->time_stamp)->format('F j, Y') }}</td>
                                             <td>{{ $membership_level }}</td>
@@ -127,7 +127,7 @@
                                     <tbody>
                                         @foreach ($invoices->data as $key => $invoice)
                                             <tr>
-                                                <td>{{ $invoice->id }}</td>
+                                                <td>{{ $key+1000 }}</td>
                                                 <td>
                                                     {{ \Carbon\Carbon::parse(json_decode($invoice->lines['data'][0]['period']['start']))->format('F j, Y') }}
                                                 </td>

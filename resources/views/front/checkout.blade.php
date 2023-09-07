@@ -147,7 +147,7 @@
                                 </div>
                             </div>
                             <div class="stripe_payment">
-                                <div class="row">
+                                {{-- <div class="row">
                                     <div class="col-12 col-md-6 mb-1">
                                         <label class="form-label" for="addCardNumber">Card Number</label>
                                         <div class="input-group input-group-merge">
@@ -171,12 +171,15 @@
                                         <input type="text" id="card-expire-date" name="card-expire-date" class="form-control expiry-date-mask"  value="{{old('card-expire-date')}}" placeholder="MM/YY" />
                                         <span class="error card-exp-error d-none">This field is required.</span>
                                     </div>
-                                </div>
-                                <div class="row">
+                                </div> --}}
+                                <div id="card-element"></div>
+
+                                <div id="card-errors" role="alert"></div>
+                                {{-- <div class="row">
                                     <div class="col-md-12">
                                         <span class="payment-errors" style="color: red;margin-top:10px;"></span>
                                     </div>
-                                </div>
+                                </div> --}}
 
                             </div>
                             
@@ -188,7 +191,7 @@
         
                             <div class="terms rule">
                                 <input type="checkbox" id="terms"  />
-                                <label for="terms">I understand that my personal data will be used to process this order, support my experience throughout this website, and for other purposes described in our <a href="#">privacy policy</a>.
+                                <label for="terms">I understand that my personal data will be used to process this order, support my experience throughout this website, and for other purposes described in our <a href="#">privacy policy</a>.
                                 </label>
                             </div>
 
@@ -273,6 +276,7 @@
 
 
 @section('page-script')
+<script src="https://js.stripe.com/v3/"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/cleave.min.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js')}}"></script>
@@ -450,6 +454,48 @@
     }
 
     var payment_method;
+    var stripe = Stripe('{{ config('services.stripe.publish_key') }}');
+
+    // Create an instance of Elements
+    var elements = stripe.elements();
+    const cardButton = document.getElementById('card-button');
+
+    var style = {
+        base: {
+            color: '#242424',
+            lineHeight: '24px',
+            fontFamily: '"Lato", sans-serif',
+            fontSmoothing: 'antialiased',
+            fontSize: '16px',
+            '::placeholder': {
+            color: '#D4D4D4'
+            }
+        },
+        invalid: {
+            color: '#FF0033',
+            iconColor: '#FF0033'
+        }
+    };
+
+    // Create an instance of the card Element
+    var card = elements.create('card', {
+        style: style,
+        hidePostalCode: true
+    });
+
+    // Add an instance of the card Element into the `card-element` <div>
+    card.mount('#card-element');
+
+    // Handle real-time validation errors from the card Element.
+    card.addEventListener('change', function(event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
+
 
     //Phone Number
     if (phoneMask.length) {
@@ -460,44 +506,44 @@
     }
 
     // Credit Card
-    if (creditCard.length) {
-            creditCard.each(function () {
-                new Cleave($(this), {
-                    creditCard: true,
-                    onCreditCardTypeChanged: function (type) {
-                    const elementNodeList = document.querySelectorAll('.card-type');
-                        if (type != '' && type != 'unknown') {
-                            //! we accept this approach for multiple credit card masking
-                            for (let i = 0; i < elementNodeList.length; i++) {
-                            elementNodeList[i].innerHTML =
-                                '<img src="' + assetsPath + '/image/icons/payments/' + type + '-cc.png" height="24"/>';
-                            }
-                        } else {
-                            for (let i = 0; i < elementNodeList.length; i++) {
-                            elementNodeList[i].innerHTML = '';
-                            }
-                        }
-                    }
-                });
-            });
-        }
+    // if (creditCard.length) {
+    //         creditCard.each(function () {
+    //             new Cleave($(this), {
+    //                 creditCard: true,
+    //                 onCreditCardTypeChanged: function (type) {
+    //                 const elementNodeList = document.querySelectorAll('.card-type');
+    //                     if (type != '' && type != 'unknown') {
+    //                         //! we accept this approach for multiple credit card masking
+    //                         for (let i = 0; i < elementNodeList.length; i++) {
+    //                         elementNodeList[i].innerHTML =
+    //                             '<img src="' + assetsPath + '/image/icons/payments/' + type + '-cc.png" height="24"/>';
+    //                         }
+    //                     } else {
+    //                         for (let i = 0; i < elementNodeList.length; i++) {
+    //                         elementNodeList[i].innerHTML = '';
+    //                         }
+    //                     }
+    //                 }
+    //             });
+    //         });
+    //     }
 
-    // Expiry Date Mask
-    if (expiryDateMask.length) {
-        new Cleave(expiryDateMask, {
-            date: true,
-            delimiter: '/',
-            datePattern: ['m', 'y']
-        });
-    }
+    // // Expiry Date Mask
+    // if (expiryDateMask.length) {
+    //     new Cleave(expiryDateMask, {
+    //         date: true,
+    //         delimiter: '/',
+    //         datePattern: ['m', 'y']
+    //     });
+    // }
 
-    // CVV
-    if (cvvMask.length) {
-        new Cleave(cvvMask, {
-            numeral: true,
-            numeralPositiveOnly: true
-        });
-    }
+    // // CVV
+    // if (cvvMask.length) {
+    //     new Cleave(cvvMask, {
+    //         numeral: true,
+    //         numeralPositiveOnly: true
+    //     });
+    // }
     
     // Handle form submission
     var payment_form = document.getElementById('payment-form');
@@ -569,33 +615,33 @@
         if(paymentOption == 'stripe')
         {
 
-            var card_number = $('#card-number');
-            var card_cvc = $('#card-cvc');
-            var card_date = $('#card-expire-date');
+            // var card_number = $('#card-number');
+            // var card_cvc = $('#card-cvc');
+            // var card_date = $('#card-expire-date');
           
-            if(card_number.val() == ''){
-                isValid = false;
-                card_number.addClass('error');
-                $('.card-error').removeClass('d-none');
-            }else{
-                card_number.removeClass('error');
-            }
+            // if(card_number.val() == ''){
+            //     isValid = false;
+            //     card_number.addClass('error');
+            //     $('.card-error').removeClass('d-none');
+            // }else{
+            //     card_number.removeClass('error');
+            // }
 
-            if(card_cvc.val() == ''){
-                isValid = false;
-                card_cvc.addClass('error');
-                $('.card-cvc-error').removeClass('d-none');
-            }else{
-                card_cvc.removeClass('error');
-            }
+            // if(card_cvc.val() == ''){
+            //     isValid = false;
+            //     card_cvc.addClass('error');
+            //     $('.card-cvc-error').removeClass('d-none');
+            // }else{
+            //     card_cvc.removeClass('error');
+            // }
 
-            if(card_date.val() == ''){
-                isValid = false;
-                card_date.addClass('error');
-                $('.card-exp-error').removeClass('d-none');
-            }else{
-                card_date.removeClass('error');
-            }
+            // if(card_date.val() == ''){
+            //     isValid = false;
+            //     card_date.addClass('error');
+            //     $('.card-exp-error').removeClass('d-none');
+            // }else{
+            //     card_date.removeClass('error');
+            // }
             
             if (!termsChecked) {
                 isValid = false;
@@ -612,8 +658,20 @@
             }
 
             if(isValid){
-                FormHandler();                
-                $('#overlay, #loadingSpinner').show();
+
+                stripe.createToken(card).then(function(result) {
+                    if (result.error) {
+                    // Display an error message to the user.
+                    var errorElement = document.getElementById('card-errors');
+                    errorElement.textContent = result.error.message;
+                    } else {
+                    // You can now use the Payment Method ID on your server to make a payment.
+                        // console.log(result.token.id);
+                        stripeTokenHandler(result.token.id);
+                        // Send the Payment Method ID to your server for further processing.
+                        $('#overlay, #loadingSpinner').show();
+                    }
+                });
             }else{
                 // $('#overlay, #loadingSpinner').hide();
             }
@@ -638,7 +696,7 @@
             }
 
             if(isValid){
-                FormHandler();
+                PayPalHandler();
                 $('#overlay, #loadingSpinner').show();
             }else{
                 // cardButton.prop('disabled', false);
@@ -647,8 +705,19 @@
        
     }); 
 
-   
-    function FormHandler(){
+    function stripeTokenHandler(token) {
+        // Insert the token ID into the form so it gets submitted to the server
+        var payment_form = document.getElementById('payment-form');
+        var hiddenInput = document.createElement('input');
+        hiddenInput.setAttribute('type', 'hidden');
+        hiddenInput.setAttribute('name', 'token');
+        hiddenInput.setAttribute('value', token);
+        payment_form.appendChild(hiddenInput);
+        // Submit the form
+        payment_form.submit();
+    }
+
+    function PayPalHandler(){
         var payment_form = document.getElementById('payment-form');
         payment_form.submit();
     }

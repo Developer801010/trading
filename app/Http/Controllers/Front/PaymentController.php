@@ -29,6 +29,7 @@ class PaymentController extends Controller
 {
     public function process(Request $request)
     {
+        
         // User validation
         $messages = [
             'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
@@ -82,18 +83,25 @@ class PaymentController extends Controller
                 Stripe::setApiKey(config('services.stripe.secret_key'));
 
                  //card validation and get the payment method
-                $cardNumber = $request->input('card-number');
-                $expDate = $request->input('card-expire-date');
-                list($expMonth, $expYear) = explode('/', $expDate);
-                $cvc = $request->input('card-cvc');
+                // $cardNumber = $request->input('card-number');
+                // $expDate = $request->input('card-expire-date');
+                // list($expMonth, $expYear) = explode('/', $expDate);
+                // $cvc = $request->input('card-cvc');
+
+                // $paymentMethod = PaymentMethod::create([
+                //     'type' => 'card',
+                //     'card' => [
+                //         'number' => $cardNumber,
+                //         'exp_month' => $expMonth,
+                //         'exp_year' => $expYear,
+                //         'cvc' => $cvc,
+                //     ],
+                // ]);  
 
                 $paymentMethod = PaymentMethod::create([
                     'type' => 'card',
                     'card' => [
-                        'number' => $cardNumber,
-                        'exp_month' => $expMonth,
-                        'exp_year' => $expYear,
-                        'cvc' => $cvc,
+                        'token' => $request->token,
                     ],
                 ]);  
 
