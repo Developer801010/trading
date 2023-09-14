@@ -213,7 +213,7 @@
                                     <label for="month">$147.00 Monthly Membership</label>
                                 </div>                           
                             </div>
-                            @component('components.tooltip')
+                            @component('components.tooltiptooltip')
                                 
                             @endcomponent
                         </div>

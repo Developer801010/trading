@@ -252,16 +252,19 @@ class AccountController extends Controller
      public function paymentMethodManagement()
      {
         $user = User::find(auth()->user()->id);
-        $paymentMethods = $user->paymentMethods();    
+        $paymentMethods = $user->paymentMethods();  
+        $paymentMethodCount =   count($paymentMethods);
+
         $defaultPaymentMethod = null;
         if ($user->hasPaymentMethod()) {
             $defaultPaymentMethod = $user->defaultPaymentMethod();  
         }     
-
+        
         return view('front.account.account-payment-method-management', 
             compact(               
                 'paymentMethods',
-                'defaultPaymentMethod'
+                'defaultPaymentMethod',
+                'paymentMethodCount'
             )
         );
      }
@@ -271,30 +274,21 @@ class AccountController extends Controller
 
         try{
             $user = User::find(auth()->user()->id);
+            $token =  $request->token;
 
             Stripe::setApiKey(config('services.stripe.secret_key'));
 
-            $cardName = $request->input('card-name');
-            $cardNumber = $request->input('card-number');
-            $cardCVC = $request->input('card-cvc');
-            $expDate = $request->input('card-expire-date');
-            list($expMonth, $expYear) = explode('/', $expDate);
-
+            // Create a PaymentMethod
             $paymentMethod = PaymentMethod::create([
                 'type' => 'card',
                 'card' => [
-                    'number' => $cardNumber, // Replace with the actual card number
-                    'exp_month' => $expMonth, // Replace with the actual expiration month
-                    'exp_year' => $expYear, // Replace with the actual expiration year
-                    'cvc' => $cardCVC
-                ],
-                'billing_details' => [
-                    'name' => $cardName
+                    'token' => $token
                 ]
-            ]); 
+            ]);  
 
-
+            // dd($paymentMethod);
             $user->addPaymentMethod($paymentMethod);
+
             $user->updateDefaultPaymentMethod($paymentMethod);
 
             $user->pm_type = $paymentMethod['card']['brand'];
@@ -308,31 +302,38 @@ class AccountController extends Controller
         }
        
      }
-
     
 
      public function deleteCard(Request $request, $id)
      {
         $user = USer::find(auth()->user()->id);
+        $paymentMethods = $user->paymentMethods();  
+        $paymentMethodCount =   count($paymentMethods);
+        
+        if($paymentMethodCount == 1){
+            //if there is only one payment method. 
+            return redirect()->back()->withInput()->withErrors('That payment method cannot be deleted because it is linked to an automatic subscription. Please add a payment method, before trying again.');
+            
+        }else{
+            try{
 
-        try{
-
-            // Check if the payment method to be deleted is the default payment method
-            $paymentMethod = $user->findPaymentMethod($id);
-            $isDefaultPaymentMethod = $user->defaultPaymentMethod()->id === $id;
-
-            // Delete the payment method
-            $user->deletePaymentMethod($id);
-
-            // Update default payment method if the deleted method was the default
-            if ($isDefaultPaymentMethod && $user->hasPaymentMethod()) {
-                $newDefaultPaymentMethod = $user->paymentMethods()->first();
-                $user->updateDefaultPaymentMethod($newDefaultPaymentMethod->id);
+                // Check if the payment method to be deleted is the default payment method
+                $paymentMethod = $user->findPaymentMethod($id);
+                $isDefaultPaymentMethod = $user->defaultPaymentMethod()->id === $id;
+    
+                // Delete the payment method
+                $user->deletePaymentMethod($id);
+    
+                // Update default payment method if the deleted method was the default
+                if ($isDefaultPaymentMethod && $user->hasPaymentMethod()) {
+                    $newDefaultPaymentMethod = $user->paymentMethods()->first();
+                    $user->updateDefaultPaymentMethod($newDefaultPaymentMethod->id);
+                }
+    
+                return redirect()->back()->with('flash_success', 'Payment method is deleted successfully');
+            }catch(Exception $ex){
+                return redirect()->back()->with('error', $ex->getMessage());
             }
-
-            return redirect()->back()->with('flash_success', 'Payment method is deleted successfully');
-        }catch(Exception $ex){
-            return redirect()->back()->with('error', $ex->getMessage());
         }
         
      }
