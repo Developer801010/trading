@@ -52,5 +52,5 @@ class User extends Authenticatable //implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new \App\Notifications\UserVerifyNotification(Auth::user()));  //pass the currently logged in user to the notification class
-    }
+    }  
 }

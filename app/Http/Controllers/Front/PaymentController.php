@@ -59,7 +59,13 @@ class PaymentController extends Controller
         $email = $request->email;
         $mobileNumber = $request->mobile_number;
         $password = $request->password;
-        $username = strtolower(substr($firstName, 0, 1) . $lastName);
+        $username = $firstName.$lastName;
+        $count = 1;
+        //check if the usernmae already exists: if it does, increment the count
+        while (User::where('name', $username)->exists()){
+            $username = $username.$count;
+            $count++;
+        }
 
          //Get the payment option
          $payment_option = $request->input('payment_option');
