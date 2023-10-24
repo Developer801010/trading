@@ -38,7 +38,7 @@ class TradeCreationAlertMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.treade-creation-alert',
+            markdown: 'emails.trade-creation-alert',
             with:[
                 $this->data
             ]

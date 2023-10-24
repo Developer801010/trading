@@ -61,7 +61,8 @@ class PaymentController extends Controller
         $password = $request->password;
         $username = $firstName.$lastName;
         $count = 1;
-        //check if the usernmae already exists: if it does, increment the count
+        
+        //check if the username already exists: if it does, increment the count
         while (User::where('name', $username)->exists()){
             $username = $username.$count;
             $count++;
