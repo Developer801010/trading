@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthenticateController;
+use App\Http\Controllers\Api\PositionmanagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -34,4 +35,15 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 
     //This route takes the new password and confirmation password, and resets the password.
     Route::post('/new-password', [AuthenticateController::class, 'setNewAccountPassword'])->name('new-account-password');
+
+    //This route takes main-feed data.
+    Route::get('/main-feed', [PositionManagementController::class, 'mainFeed'])->name('api.main-feed');
+    //This route takes open stock trades.
+    Route::get('/open-stock-trades', [PositionManagementController::class, 'openStockTrades'])->name('api.open-stock-trades');
+    //This route takes closed stock trades.
+    Route::get('/closed-stock-trades', [PositionManagementController::class, 'closedStockTrades'])->name('front.closed-stock-trades')->middleware('check.subscription.expired');
+    //This route takes open options trade.
+    Route::get('/open-options-trades', [PositionManagementController::class, 'openOptionsTrades'])->name('front.open-options-trades')->middleware('check.subscription.expired');
+    //This route takes closed options trades.
+    Route::get('/closed-options-trades', [PositionManagementController::class, 'closedOptionsTrades'])->name('front.closed-options-trades')->middleware('check.subscription.expired');
 });
