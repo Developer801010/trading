@@ -32,7 +32,7 @@ class AuthenticateController extends Controller
                 'password' => 'required',
                 'device_name' => 'required',
             ]);
-    
+
             if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
@@ -40,10 +40,10 @@ class AuthenticateController extends Controller
                     'errors' => $validator->errors(),
                 ], 422);
             }
-    
+
             //Check email
             $user = User::where('email',$request->email)->first();
-    
+
             //Check password
             if(!$user || !Hash::check($request->password, $user->password)){
                 return response()->json([
@@ -51,21 +51,21 @@ class AuthenticateController extends Controller
                     'message' => 'The provided credentials are incorrect.',
                 ], 401);
             }
-    
+
             $token = $user->createToken($request->device_name)->plainTextToken;
-    
+
             $response = [
                 'user' => $user,
                 'token' => $token
             ];
-            
+
             return response()->json([
                 'status' => true,
                 'message' => 'Login Successful',
                 'data' => $response,
             ], 200);
         }catch(Throwable $th){
-            return response()->json([   
+            return response()->json([
                 'status' => false,
                 'message' => $th->getMessage(),
             ], 500);
@@ -77,7 +77,7 @@ class AuthenticateController extends Controller
      * @param Request request
      * @return Response token and user information
      */
-    
+
     public function register(Request $request)
     {
         try{
@@ -86,7 +86,7 @@ class AuthenticateController extends Controller
                 'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
                 'email.unique' => 'This email address is in use. Maybe you already have an account? <a href="http://portal.tradeinsync.com/password/reset">Need password help?</a>',
             ];
-    
+
             $validator = Validator::make($request->all(), [
                 'first_name' => 'required',
                 'last_name' => 'required',
@@ -100,7 +100,7 @@ class AuthenticateController extends Controller
                     'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
                 ],
             ], $messages);
-    
+
             if ($validator->fails()) {
                 return response()->json([
                     'message' => 'Validation error',
@@ -205,8 +205,8 @@ class AuthenticateController extends Controller
             ], 422);
         }
 
-        $reset_token = $resetToken->getResetIdentifierCode();
-       
+        $reset_token = $resetToken->getResetIdentifierCode($resetToken->user_id);
+
         return response()->json([
             'status' => true,
             'token' => $reset_token
@@ -246,7 +246,7 @@ class AuthenticateController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-      
+
         do {
             $obj = new APIPasswordResetToken();
             $token = $obj->getResetCode();
@@ -259,7 +259,7 @@ class AuthenticateController extends Controller
 
         try {
             $user->notify(new ApiPasswordResetNotification($token));
-           
+
             $obj->user_id = $user->id;
             $obj->token_signature = $signature;
             $obj->expires_at = Carbon::now()->addMinutes(30);
@@ -284,7 +284,7 @@ class AuthenticateController extends Controller
         $messages = [
             'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
         ];
-        
+
         $validator = Validator::make($request->all(), [
             'password_token' => 'required|string',
             'password' =>  'required|string|min:8|max:45|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
@@ -305,29 +305,29 @@ class AuthenticateController extends Controller
         if($verifyToken == null || $verifyToken->count() <= 0 ){
             return response()->json([
                 'status' => false,
-                'message' => 'Invalid token for resetting password'                
+                'message' => 'Invalid token for resetting password'
             ], 422);
         }
 
         $user_id = $verifyToken[0]->user_id;
-        $userInfo = User::where('id', $user_id)->first();       
+        $userInfo = User::where('id', $user_id)->first();
 
         if($userInfo == null || $userInfo->count() <= 0){
             return response()->json([
                 'status' => false,
-                'message' => 'Token does not correspond to any existing user.'                
+                'message' => 'Token does not correspond to any existing user.'
             ], 422);
-        } else if (Carbon::now()->greaterThan($verifyToken[0]->expires_at)){    
+        } else if (Carbon::now()->greaterThan($verifyToken[0]->expires_at)){
             return response()->json([
                 'status' => false,
-                'message' => 'The reset password token has expired. Please try again.'                
+                'message' => 'The reset password token has expired. Please try again.'
             ], 422);
         }
 
         $userObj = User::findOrFail($user_id);
         $userObj->password = bcrypt($request->password);
         $userObj->update();
-        
+
         $verifyToken[0]->update([
             'expires_at' => Carbon::now()
         ]);
@@ -339,5 +339,4 @@ class AuthenticateController extends Controller
         ]);
     }
 
-  
 }

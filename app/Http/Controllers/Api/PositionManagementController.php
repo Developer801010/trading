@@ -101,7 +101,8 @@ class PositionManagementController extends Controller
         $unionQuery = $trades->union($tradeDetails)->orderBy('updated_at', 'desc');
 
         // Combine both queries
-        $results = $unionQuery->paginate(10);
+        // $results = $unionQuery->paginate(10);
+        $results = $unionQuery->get()->all();
 
         //Get Account login info and Billing info
         $billing_data = Subscription::where('user_id', auth()->user()->id)->first();  //dd($results);
@@ -131,7 +132,8 @@ class PositionManagementController extends Controller
             }
 
             // Fetch the paginated results
-            $trades = $query->orderBy('created_at', 'desc')->paginate(10);
+            // $trades = $query->orderBy('created_at', 'desc')->paginate(10);
+            $trades = $query->orderBy('created_at', 'desc')->get()->all();
 
             return response()->json([
                 'status' => true,
@@ -142,10 +144,6 @@ class PositionManagementController extends Controller
 
     public function closedStockTrades(Request $request)
     {
-        // $query = Trade::with('tradeDetail')
-        // ->where('trade_type', 'stock')
-        // ->whereNotNull('exit_price')->whereNotNull('exit_date');  //open trade
-
         $query = DB::table('trades as t')
         ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
         ->select([
@@ -196,7 +194,70 @@ class PositionManagementController extends Controller
         }
 
         // Fetch the paginated results
-        $trades = $query->orderBy('created_at', 'desc')->paginate(10);  //dd($trades);
+        // $trades = $query->orderBy('created_at', 'desc')->paginate(10);  //dd($trades);
+            $trades = $query->orderBy('created_at', 'desc')->get()->all();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'get closed stock trades Data Succeessfully',
+            'data' => $trades,
+        ], 200);
+    }
+
+    public function closedStockTradesNoLogged(Request $request)
+    {
+        $query = DB::table('trades as t')
+        ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
+        ->select([
+            't.id',
+            't.trade_type',
+            't.trade_symbol',
+            't.trade_direction',
+            't.entry_date',
+            DB::raw('NULL as child_direction'),
+            't.trade_option',
+            't.strike_price',
+            DB::raw('CASE
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
+                    ((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.entry_price
+                END AS entry_price'),
+            't.stop_price',
+            't.target_price',
+            DB::raw('CASE
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.position_size
+                END AS position_size'),
+            't.exit_price',
+            't.exit_date',
+            't.trade_description',
+            't.chart_image',
+            't.close_comment',
+            't.close_image',
+            't.created_at',
+            't.updated_at'
+        ])
+        ->where('trade_type', 'stock')
+        ->whereNotNull('exit_price')
+        ->whereNotNull('exit_date')
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',
+       't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
+        't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
+        't.close_image', 't.created_at', 't.updated_at');
+
+         // Handle search query
+        $search = $request->input('search');
+        if (!empty($search)) {
+            $query->where('trade_symbol', 'like', '%' . $search . '%');
+        }
+
+        // Fetch the paginated results
+        // $trades = $query->orderBy('created_at', 'desc')->paginate(10);  //dd($trades);
+        $trades = $query->orderBy('created_at', 'desc')->limit(20)->get()->all();
 
         return response()->json([
             'status' => true,
@@ -207,18 +268,21 @@ class PositionManagementController extends Controller
 
     public function openOptionsTrades(Request $request)
     {
+        return Auth()->user();
+
         $query = Trade::with('tradeDetail')
             ->where('trade_type', 'option')
             ->whereNull('exit_price')->whereNull('exit_date');  //open trade
 
-             // Handle search query
-            $search = $request->input('search');
-            if (!empty($search)) {
-                $query->where('trade_symbol', 'like', '%' . $search . '%');
-            }
+        // Handle search query
+        $search = $request->input('search');
+        if (!empty($search)) {
+            $query->where('trade_symbol', 'like', '%' . $search . '%');
+        }
 
-            // Fetch the paginated results
-            $trades = $query->orderBy('created_at', 'desc')->paginate(10);
+        // Fetch the paginated results
+        // $trades = $query->orderBy('created_at', 'desc')->paginate(10);
+        $trades = $query->orderBy('created_at', 'desc')->get()->all();
 
         return response()->json([
             'status' => true,
@@ -229,10 +293,6 @@ class PositionManagementController extends Controller
 
     public function closedOptionsTrades(Request $request)
     {
-        // $query = Trade::with('tradeDetail')
-        // ->where('trade_type', 'option')
-        // ->whereNotNull('exit_price')->whereNotNull('exit_date');  //open trade
-
         $query = DB::table('trades as t')
         ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
         ->select([
@@ -283,7 +343,71 @@ class PositionManagementController extends Controller
         }
 
         // Fetch the paginated results
-        $trades = $query->orderBy('created_at', 'desc')->paginate(10);
+        // $trades = $query->orderBy('created_at', 'desc')->paginate(10);
+        $trades = $query->orderBy('created_at', 'desc')->get()->all();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'get closed options trades Data Succeessfully',
+            'data' => $trades,
+        ], 200);
+    }
+
+    public function closedOptionsTradesNoLogged(Request $request)
+    {
+        $query = DB::table('trades as t')
+        ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
+        ->select([
+            't.id',
+            't.trade_type',
+            't.trade_symbol',
+            't.trade_direction',
+            't.entry_date',
+            DB::raw('NULL as child_direction'),
+            't.trade_option',
+            't.strike_price',
+            DB::raw('CASE
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
+                    ((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.entry_price
+                END AS entry_price'),
+            't.stop_price',
+            't.target_price',
+            DB::raw('CASE
+                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
+                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                ELSE
+                    t.position_size
+                END AS position_size'),
+            't.exit_price',
+            't.exit_date',
+            't.trade_description',
+            't.chart_image',
+            't.close_comment',
+            't.close_image',
+            't.created_at',
+            't.updated_at'
+        ])
+        ->where('trade_type', 'option')
+        ->whereNotNull('exit_price')
+        ->whereNotNull('exit_date')
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',
+       't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
+        't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
+        't.close_image', 't.created_at', 't.updated_at');
+
+         // Handle search query
+        $search = $request->input('search');
+        if (!empty($search)) {
+            $query->where('trade_symbol', 'like', '%' . $search . '%');
+        }
+
+        // Fetch the paginated results
+        // $trades = $query->orderBy('created_at', 'desc')->paginate(10);
+        $trades = $query->orderBy('created_at', 'desc')->limit(20)->get()->all();
+
 
         return response()->json([
             'status' => true,
