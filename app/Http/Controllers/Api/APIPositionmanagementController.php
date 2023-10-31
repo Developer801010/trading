@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
 
-class PositionManagementController extends Controller
+class APIPositionmanagementController extends Controller
 {
     public function mainFeed(Request $request)
     {
