@@ -50,7 +50,7 @@ Route::group(['middleware' => ['auth', 'auth.timeout'], ['prefix' => 'front']], 
     Route::delete('/account/delete-card/{id}', [AccountController::class, 'deleteCard'])->name('front.account-delete-card');
     Route::post('/account/add-card', [AccountController::class, 'addCard'])->name('front.account-add-card');
 
-    Route::get('/notify/notification-setup', [AccountController::class, 'notificationSetup'])->name('front.account-notification-setup');    
+    Route::get('/notify/notification-setup', [AccountController::class, 'notificationSetup'])->name('front.account-notifying');    
     Route::post('/notify/send-verification-code', [AccountController::class, 'sendVerificationCode'])->name('front.account.send-verification-code');
     Route::post('/notify/verify-phone-code', [AccountController::class, 'verifyPhoneCode'])->name('front.account.verify-phone-code');
 
