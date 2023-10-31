@@ -16,7 +16,10 @@
             <a class="nav-link dropdown-toggle text-white top-bar-my-account" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 My Account
             </a>
-            <div class="dropdown-menu top-bar-menu" aria-labelledby="navbarDropdown">               
+            <div class="dropdown-menu top-bar-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item @if (request()->is('notify/*')) active @endif" href="{{route('front.account-notification-setup')}}">
+                    Notification Setup
+                </a>
                 <a class="dropdown-item @if (request()->is('account/*')) active @endif" href="{{route('front.account-profile')}}">
                     Account Details
                 </a>
