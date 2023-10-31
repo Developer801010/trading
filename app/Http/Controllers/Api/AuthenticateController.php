@@ -245,7 +245,7 @@ class AuthenticateController extends Controller
         $user = User::where('email', $request->email)->first();
 
         do {
-            $obj = new APIPasswordResetToken();
+            $obj = new User();
             $token = $obj->getResetCode();
             $signature = hash('md5', $token);
             $exists = APIPasswordResetToken::where([
