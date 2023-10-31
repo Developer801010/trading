@@ -4,16 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\APIPasswordResetToken;
-use App\Models\ApiPasswordResetToken as ModelsApiPasswordResetToken;
 use App\Models\User;
 use App\Notifications\ApiPasswordResetNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\PersonalAccessToken;
-use Illuminate\Support\Str;
 use Throwable;
 
 class AuthenticateController extends Controller
