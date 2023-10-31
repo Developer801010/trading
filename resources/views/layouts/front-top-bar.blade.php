@@ -16,7 +16,14 @@
             <a class="nav-link dropdown-toggle text-white top-bar-my-account" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 My Account
             </a>
-            
+            <div class="dropdown-menu top-bar-menu" aria-labelledby="navbarDropdown">
+               
+                @role('admin')
+                    <a class="dropdown-item" href="{{route('admin.home')}}">
+                        Dashboard
+                    </a>
+                @endrole
+            </div>
             
         </div>
     </div>
