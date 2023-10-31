@@ -5,7 +5,7 @@
             <span class="login-email text-white">
                 {{auth()->user()->email}}
             </span>
-            <a class="logout-link text-danger" href="{{ route('logout') }}"  onclick="event.preventDefault(); document.getElementById('logout-form').submit();">            
+            <a class="logout-link text-danger" href="{{ route('logout') }}"  onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 Logout
             </a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -17,7 +17,7 @@
                 My Account
             </a>
             <div class="dropdown-menu top-bar-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item @if (request()->is('notify/*')) active @endif" href="/notify/notification-setup">
+                <a class="dropdown-item @if (request()->is('notify/*')) active @endif" href="{{route('front.account-notification-setup')}}">
                     Notification Setup
                 </a>
                 <a class="dropdown-item @if (request()->is('account/*')) active @endif" href="{{route('front.account-profile')}}">
@@ -29,8 +29,8 @@
                     </a>
                 @endrole
             </div>
-            
+
         </div>
     </div>
-</div>    
+</div>
 @endauth
