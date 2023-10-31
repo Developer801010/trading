@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\APIPasswordResetToken;
+use App\Models\ApiPasswordResetToken;
 use App\Models\User;
 use App\Notifications\ApiPasswordResetNotification;
 use Illuminate\Http\Request;
@@ -185,7 +185,7 @@ class AuthenticateController extends Controller
         $password_reset_code = $request->password_reset_code;
         $resetToken = ApiPasswordResetToken::where([
             ['token_signature', hash('md5', $password_reset_code)],
-            ['token_type', APIPasswordResetToken::$PASSWORD_RESET_TOKEN]
+            ['token_type', ApiPasswordResetToken::$PASSWORD_RESET_TOKEN]
         ])->first();
 
         if ($resetToken == null || $resetToken->count() <= 0 ){
@@ -245,10 +245,10 @@ class AuthenticateController extends Controller
         $user = User::where('email', $request->email)->first();
 
         do {
-            $obj = new APIPasswordResetToken();
+            $obj = new ApiPasswordResetToken();
             $token = $obj->getResetCode();
             $signature = hash('md5', $token);
-            $exists = APIPasswordResetToken::where([
+            $exists = ApiPasswordResetToken::where([
                 'user_id' => $user->id,
                 'token_signature' => $signature
             ])->exists();
@@ -295,7 +295,7 @@ class AuthenticateController extends Controller
             ], 422);
         }
 
-        $verifyToken = APIPasswordResetToken::where([
+        $verifyToken = ApiPasswordResetToken::where([
             'token_signature' => hash('md5', $request->password_token)
         ])->get();
 
