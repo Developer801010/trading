@@ -69,6 +69,43 @@ class AuthenticateController extends Controller
         }
     }
 
+    public function unauthorized(Request $request){
+        return response()->json([
+            'status' => false,
+            'message' => 'Unverified user. please login first',
+        ], 401);
+    }
+
+    public function changePassword(Request $request){
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:8|max:45|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $user = auth()->guard('sanctum')->user();
+        if (Hash::check($request->current_password, $user->password)) {
+            $user->password = bcrypt($request->new_password);
+            $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Password changed successfully'
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Current password is incorrect'
+            ], 422);
+        }
+    }
+
     /**
      * Authenticates Register User
      * @param Request request
@@ -147,19 +184,34 @@ class AuthenticateController extends Controller
         }
     }
 
-
-
     public function logout(Request $request)
     {
-        $token = $request->token;
-        $user = Auth()->user();
+        $token = $request->bearerToken();
+        $user = auth()->guard('sanctum')->user();
         $personalAccessToken = PersonalAccessToken::findToken($token);
-        if(
-            $user->id == $personalAccessToken->tokenable_id
-            && get_class($user) == $personalAccessToken->tokenable_type
-        ){
-            $personalAccessToken->delete();
+
+        try{
+            if ($personalAccessToken){
+                if(
+                    $user->id == $personalAccessToken->tokenable_id
+                    && get_class($user) == $personalAccessToken->tokenable_type
+                ){
+                    $personalAccessToken->delete();
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid or expired token, please login again',
+                ], 422);
+            }
+
+        }catch(Throwable $th){
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage(),
+            ], 500);
         }
+
 
         return [
             'message' => 'Logged out',

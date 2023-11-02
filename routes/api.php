@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//The route for unregisterd user, it redirects unauthorize warning message
+Route::get('unauthorized', [AuthenticateController::class, 'unauthorized']);
+
 Route::post('login', [AuthenticateController::class, 'login']);
 //This route takes closed stock trades for unregistered users.
 Route::get('/closed-stock-trades-no-logged', [APIPositionmanagementController::class, 'closedStockTradesNoLogged'])->name('api.closed-stock-trades-no-logged');
@@ -36,6 +39,8 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     });
 
     Route::post('logout/{token?}', [AuthenticateController::class, 'logout']);
+
+    Route::post('change-password', [AuthenticateController::class, 'changePassword']);
 
     //This route takes main-feed data.
     Route::get('/main-feed', [APIPositionmanagementController::class, 'mainFeed'])->name('api.main-feed');
