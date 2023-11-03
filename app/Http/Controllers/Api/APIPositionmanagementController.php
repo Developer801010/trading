@@ -28,23 +28,23 @@ class APIPositionmanagementController extends Controller
             't.trade_direction AS original_trade_direction',
             DB::raw('NULL as child_direction'),
             't.trade_option',
-            't.strike_price',
+            DB::raw('CAST(t.strike_price as UNSIGNED) as strike_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    ((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
-                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                    CAST(((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
+                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as UNSIGNED)
                 ELSE
-                    t.entry_price
+                    CAST(t.entry_price as UNSIGNED)
                 END AS entry_price'),
-            't.stop_price',
-            't.target_price',
+            DB::raw('CAST(t.stop_price as UNSIGNED) as stop_price'),
+            DB::raw('CAST(t.target_price as UNSIGNED) as target_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    (t.position_size + COALESCE(SUM(td.position_size), 0))
+                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as UNSIGNED)
                 ELSE
-                    t.position_size
+                    CAST(t.position_size as UNSIGNED)
                 END AS position_size'),
-            't.exit_price',
+            DB::raw('CAST(t.exit_price as UNSIGNED) as exit_price'),
             't.exit_date',
             't.trade_description',
             't.chart_image',
@@ -75,11 +75,11 @@ class APIPositionmanagementController extends Controller
             't.trade_direction as original_trade_direction',
             'td.trade_direction as child_direction',
             't.trade_option',
-            'td.strike_price',
-            'td.entry_price',
-            'td.stop_price',
-            'td.target_price',
-            'td.position_size',
+            DB::raw('CAST(t.strike_price as UNSIGNED) as strike_price'),
+            DB::raw('CAST(t.entry_price as UNSIGNED) as entry_price'),
+            DB::raw('CAST(t.stop_price as UNSIGNED) as stop_price'),
+            DB::raw('CAST(t.target_price as UNSIGNED) as target_price'),
+            DB::raw('CAST(t.position_size as UNSIGNED) as position_size'),
             DB::raw('NULL AS exit_price'),
             DB::raw('NULL AS exit_date'),
             'td.trade_description',
@@ -105,7 +105,7 @@ class APIPositionmanagementController extends Controller
         $results = $unionQuery->get()->all();
 
         //Get Account login info and Billing info
-        $billing_data = Subscription::where('user_id', auth()->user()->id)->first();  //dd($results);
+        $billing_data = Subscription::where('user_id', auth()->guard('sanctum')->user()->id)->first();  //dd($results);
 
         $data = [
             'results' => $results,
@@ -268,8 +268,6 @@ class APIPositionmanagementController extends Controller
 
     public function openOptionsTrades(Request $request)
     {
-        return Auth()->user();
-
         $query = Trade::with('tradeDetail')
             ->where('trade_type', 'option')
             ->whereNull('exit_price')->whereNull('exit_date');  //open trade
