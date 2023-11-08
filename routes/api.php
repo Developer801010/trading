@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthenticateController;
 use App\Http\Controllers\Api\APIPositionmanagementController;
+use App\Http\Controllers\FirebasePushController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -52,4 +53,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::get('/open-options-trades', [APIPositionmanagementController::class, 'openOptionsTrades'])->name('api.open-options-trades');
     //This route takes closed options trades.
     Route::get('/closed-options-trades', [APIPositionmanagementController::class, 'closedOptionsTrades'])->name('api.closed-options-trades');
+
+    Route::post('/setToken', [FirebasePushController::class, 'setToken'])->name('firebase.token_update');
+    Route::post('/removeToken', [FirebasePushController::class, 'removeToken'])->name('firebase.token_remove');
 });

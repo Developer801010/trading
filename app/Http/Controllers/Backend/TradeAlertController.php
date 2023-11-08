@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\FirebasePushController;
 use App\Jobs\SendTwilioSMS;
 use App\Mail\TradeAddAlertMail;
 use App\Mail\TradeCloseAlertMail;
@@ -24,7 +25,7 @@ class TradeAlertController extends Controller
 {
 
     public $tradeinSyncText = 'TradeInSync ';
-    public function __construct() 
+    public function __construct()
     {
         $this->middleware('permission:trade-list|trade-create|trade-edit|trade-delete', ['only' => ['index','store']]);
         $this->middleware('permission:trade-create', ['only' => ['create','store']]);
@@ -67,7 +68,7 @@ class TradeAlertController extends Controller
         $entry_price = $request->entry_price;
         $entry_date = $request->entry_date;
         $position_size = $request->position_size;
-        $trade_description = $request->quill_html; 
+        $trade_description = $request->quill_html;
 
         // Extract base64 encoded image data from Quill content
         $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -92,7 +93,7 @@ class TradeAlertController extends Controller
         }, $trade_description);
 
         //duplication issue
-        //for stock's opened trades.  by the trade symbol  
+        //for stock's opened trades.  by the trade symbol
         if($trade_type == 'stock'){
             $tradeCount = Trade::where([
                 'trade_type' => 'stock',
@@ -104,7 +105,7 @@ class TradeAlertController extends Controller
 
             $msg = 'Symbol already exists';
         }else{
-            //for option by the whole content 
+            //for option by the whole content
             $tradeCount = Trade::where([
                 'trade_type' => 'option',
                 'trade_symbol' => $trade_symbol,
@@ -117,7 +118,7 @@ class TradeAlertController extends Controller
             ->count();
 
             $msg = 'Contract already exists';
-       
+
         }
         // dd($tradeCount);
         if($tradeCount > 0)
@@ -128,7 +129,7 @@ class TradeAlertController extends Controller
 
             $tradeObj = new Trade();
             $tradeObj->trade_type = $trade_type;
-            $tradeObj->trade_symbol = $trade_symbol;            
+            $tradeObj->trade_symbol = $trade_symbol;
             $tradeObj->trade_direction = $trade_direction;
             $tradeObj->stop_price = $stop_price;
             $tradeObj->target_price = $target_price;
@@ -138,7 +139,7 @@ class TradeAlertController extends Controller
             $tradeObj->trade_description = $trade_description;
 
             if($trade_type == 'option'){
-                $tradeObj->trade_option = $trade_option;    
+                $tradeObj->trade_option = $trade_option;
                 $tradeObj->expiration_date = $expiration_date;
                 $tradeObj->strike_price = $strike_price;
             }
@@ -147,8 +148,8 @@ class TradeAlertController extends Controller
                 $request->validate([
                     'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 ]);
-        
-                $imageName = time().'.'.$request->image->extension();    
+
+                $imageName = time().'.'.$request->image->extension();
                 $request->image->move(public_path('uploads/trade'), $imageName);
 
                 $tradeObj->chart_image = 'uploads/trade/' . $imageName;
@@ -158,7 +159,7 @@ class TradeAlertController extends Controller
             DB::commit();
 
             //Bulk trade creation email to activated users's email
-            $activeSubscribers = $this->getActiveSubscriptionUsers();            
+            $activeSubscribers = $this->getActiveSubscriptionUsers();
 
             if($trade_type == 'option'){
                 $trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
@@ -193,24 +194,29 @@ class TradeAlertController extends Controller
                     'stop_price' => $stop_price,
                     'target_price' => $target_price,
                     'comments' => $trade_description,
-                    'visit' =>  $url              
+                    'visit' =>  $url
                 ]
             ];
-    
-            foreach($activeSubscribers as $subscriber){            
+
+            foreach($activeSubscribers as $subscriber){
                 Mail::to($subscriber->email)->queue(new TradeCreationAlertMail($data));
             }
-            
+
             //Bulk trade creation notification to activated users' phone
             $msg = $sms_msg.' '.$url;
             foreach($activeSubscribers as $subscriber)
-            {            
+            {
                  //if user subscribed for the mobile notification and verified the phone number
-                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
+                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)
                 {
                     SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
                 }
             }
+
+            //Send Mobile users----------------
+            $push_service = new FirebasePushController();
+            $push_service->notificationToAllMobiles($msg);
+            //-------------------------------
 
             return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
 
@@ -218,7 +224,6 @@ class TradeAlertController extends Controller
             DB::rollBack();
             return back()->withErrors($ex->getMessage())->withInput();
         }
-
 
     }
 
@@ -254,9 +259,9 @@ class TradeAlertController extends Controller
         //
     }
 
-    public function tradeAdd(Request $request) 
+    public function tradeAdd(Request $request)
     {
-        $addFormID = $request->addFormID;  
+        $addFormID = $request->addFormID;
         $addTradeType = $request->addTradeType;
         $addTradeSymbol = $request->addTradeSymbol;
         $addTradeOption = $request->addTradeOption;
@@ -268,7 +273,7 @@ class TradeAlertController extends Controller
         $addPositionSize = $request->addPositionSize;
         $addStopPrice = $request->addStopPrice;
         $addTargetPrice = $request->addTargetPrice;
-        $addComments = $request->quill_add_html;   
+        $addComments = $request->quill_add_html;
 
         // Extract base64 encoded image data from Quill content
         $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -291,26 +296,26 @@ class TradeAlertController extends Controller
 
             return $imageUrl;
         }, $addComments);
-       
+
         DB::beginTransaction();
         try{
             $tradeObj = new TradeDetail();
             $tradeObj->trade_id = $addFormID;
             $tradeObj->trade_direction = 'Add';
             $tradeObj->entry_date = $addEntryDate;
-            $tradeObj->entry_price = $addBuyPrice;            
+            $tradeObj->entry_price = $addBuyPrice;
             $tradeObj->position_size = $addPositionSize;
             $tradeObj->stop_price = $addStopPrice;
             $tradeObj->target_price = $addTargetPrice;
             $tradeObj->trade_description = $addComments;
-       
-            if($addTradeType == 'option'){                  
+
+            if($addTradeType == 'option'){
                 $tradeObj->expiration_date = \Carbon\Carbon::parse($addExpirationDate)->format('Y-m-d');
                 $tradeObj->strike_price = $addTradeStrikePrice;
             }
 
             if($request->hasFile('addImage')){
-                $imageName = time().'.'.$request->addImage->extension();    
+                $imageName = time().'.'.$request->addImage->extension();
                 $request->addImage->move(public_path('uploads/trade'), $imageName);
 
                 $tradeObj->chart_image = 'uploads/trade/' . $imageName;
@@ -319,9 +324,9 @@ class TradeAlertController extends Controller
             $tradeObj->save();
             DB::commit();
 
-             //Bulk Trade add email to activated users 
+             //Bulk Trade add email to activated users
             $activeSubscribers = $this->getActiveSubscriptionUsers();
-            
+
             if($addTradeType == 'option'){
                 $trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
 
@@ -332,7 +337,7 @@ class TradeAlertController extends Controller
                 ->format('ymd').ucfirst(substr($addTradeOption,0,1)).$addTradeStrikePrice.' (Add)';
 
                 $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol).' '.Carbon::parse($addExpirationDate)
-                ->format('M d, Y').'$'.$addTradeStrikePrice.ucfirst($addTradeOption).' (Add) @$'.$addBuyPrice.' or better'; 
+                ->format('M d, Y').'$'.$addTradeStrikePrice.ucfirst($addTradeOption).' (Add) @$'.$addBuyPrice.' or better';
 
             }else{
                 $trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
@@ -341,7 +346,7 @@ class TradeAlertController extends Controller
 
                 $body_first_title = ucfirst($addTradeType).' Alert - '.strtoupper($addTradeDirection). ' '.strtoupper($addTradeSymbol).' '. '(Add)';
 
-                $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol). ' (Add) @ $'.$addBuyPrice.' or better'; 
+                $body_title = strtoupper($addTradeDirection).' '.strtoupper($addTradeSymbol). ' (Add) @ $'.$addBuyPrice.' or better';
             }
 
             $url = route('front.trade-detail', [
@@ -363,8 +368,8 @@ class TradeAlertController extends Controller
                      'visit' => $url
                  ]
              ];
-     
-             foreach($activeSubscribers as $subscriber){            
+
+             foreach($activeSubscribers as $subscriber){
                  Mail::to($subscriber->email)->queue(new TradeAddAlertMail($data));
              }
 
@@ -372,9 +377,9 @@ class TradeAlertController extends Controller
             $msg = $sms_title.' '.$url;
 
             foreach($activeSubscribers as $subscriber)
-            {            
+            {
                  //if user subscribed for the mobile notification and verified the phone number
-                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
+                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)
                 {
                     SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
                 }
@@ -388,7 +393,7 @@ class TradeAlertController extends Controller
     }
 
 
-    public function tradeClose(Request $request) 
+    public function tradeClose(Request $request)
     {
         $closeFormID = $request->closeFormID;
         $closeTradeType = $request->closeTradeType;
@@ -402,7 +407,7 @@ class TradeAlertController extends Controller
         $closeTradeStrikePrice = $request->closeTradeStrikePrice;
         $closeTradeOption = $request->closeTradeOption;
         $closeOptionExpirationDate = $request->closeOptionExpirationDate;
-        
+
 
          // Extract base64 encoded image data from Quill content
          $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -411,7 +416,7 @@ class TradeAlertController extends Controller
              $extension = $match[1]; // Get image extension
              $base64Image = $match[2]; // Get base64 image data
              $imageData = base64_decode($base64Image); // Decode base64 data
- 
+
              // Generate a unique identifier for the image name
              $uniqueIdentifier = uniqid();
 
@@ -419,22 +424,22 @@ class TradeAlertController extends Controller
              $imageName = 'image_' . $uniqueIdentifier.'_'. time() . '.' . $extension;
              $imagePath = public_path('uploads/trade/' . $imageName);
              file_put_contents($imagePath, $imageData);
- 
+
              // Replace base64 encoded image with URL
              $imageUrl = asset('uploads/trade/' . $imageName);
- 
+
              return $imageUrl;
          }, $closedComments);
-       
+
         DB::beginTransaction();
         try{
             $tradeObj = Trade::findorFail($closeFormID);
             $tradeObj->exit_date = $closeExitDate;
             $tradeObj->exit_price = $closeExitPrice;
             $tradeObj->close_comment = $closedComments;
-       
+
             if($request->hasFile('closeImage')){
-                $imageName = time().'.'.$request->closeImage->extension();    
+                $imageName = time().'.'.$request->closeImage->extension();
                 $request->closeImage->move(public_path('uploads/trade'), $imageName);
 
                 $tradeObj->close_image = 'uploads/trade/' . $imageName;
@@ -443,24 +448,24 @@ class TradeAlertController extends Controller
             $tradeObj->save();
             DB::commit();
 
-             //Bulk Trade add email to activated users 
-             $activeSubscribers = $this->getActiveSubscriptionUsers();    
+             //Bulk Trade add email to activated users
+             $activeSubscribers = $this->getActiveSubscriptionUsers();
 
-             //converted Closed trade Direction from frontend 
-             if($closeTradeDirection == 'buy')  
+             //converted Closed trade Direction from frontend
+             if($closeTradeDirection == 'buy')
              {
                  //original: Sell Trade  [average sell price – buy price]/average sell price]*100.
-                 if ($closeTradeEntryPrice != 0) 
-                    $profits = ($closeTradeEntryPrice - $closeExitPrice) / $closeTradeEntryPrice * 100;  //closeTradeEntryPrice: it's average price.  
+                 if ($closeTradeEntryPrice != 0)
+                    $profits = ($closeTradeEntryPrice - $closeExitPrice) / $closeTradeEntryPrice * 100;  //closeTradeEntryPrice: it's average price.
                  else
                     $profits = 0;
-                 
+
              }
              else   // original: Buy Trade
              {
                 //Profit % for a buy trade = [[close price- average purchase price]/average purchase price]*100.
-                if ($closeTradeEntryPrice != 0) 
-                    $profits = ($closeExitPrice - $closeTradeEntryPrice) / $closeTradeEntryPrice * 100;  
+                if ($closeTradeEntryPrice != 0)
+                    $profits = ($closeExitPrice - $closeTradeEntryPrice) / $closeTradeEntryPrice * 100;
                 else
                     $profits = 0;
              }
@@ -468,7 +473,7 @@ class TradeAlertController extends Controller
              if($closeTradeDirection == 'buy')  $closeTradeDirection = 'cover';
 
              if($closeTradeType == 'option')
-             {  
+             {
                 $trade_mail_title = $this->tradeinSyncText.$closeTradeType.' Alert';
 
                 $sms_title = $this->tradeinSyncText.$closeTradeType.' Alert - '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeOptionExpirationDate)
@@ -478,7 +483,7 @@ class TradeAlertController extends Controller
                 ->format('ymd').ucfirst(substr($closeTradeOption,0,1)).$closeTradeStrikePrice;
 
                 $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeOptionExpirationDate)->format('M d, Y').' $'
-                .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better'; 
+                .$closeTradeStrikePrice.' '.ucfirst($closeTradeOption).' @ $'.$closeExitPrice.' or better';
             }else{
                 $trade_mail_title = $this->tradeinSyncText.$closeTradeType.' Alert';
 
@@ -486,7 +491,7 @@ class TradeAlertController extends Controller
 
                 $body_first_title = ucfirst($closeTradeType).' Alert - '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' ';
 
-                $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol); 
+                $body_title = strtoupper($closeTradeDirection).' '.strtoupper($closeTradeSymbol);
             }
 
              $url = route('front.trade-detail', [
@@ -504,12 +509,12 @@ class TradeAlertController extends Controller
                      'exit_price' => number_format($closeExitPrice, 2),
                      'profits' => number_format($profits, 2),
                      'trade_direction' => $closeTradeDirection,
-                     'comments' => $closedComments,                     
+                     'comments' => $closedComments,
                      'visit' => $url
                  ]
              ];
-     
-             foreach($activeSubscribers as $subscriber){            
+
+             foreach($activeSubscribers as $subscriber){
                  Mail::to($subscriber->email)->queue(new TradeCloseAlertMail($data));
              }
 
@@ -517,9 +522,9 @@ class TradeAlertController extends Controller
             $msg = $sms_title.' '.$url;
 
             foreach($activeSubscribers as $subscriber)
-            {            
+            {
                  //if user subscribed for the mobile notification and verified the phone number
-                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)                 
+                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)
                 {
                     SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
                 }
@@ -534,12 +539,12 @@ class TradeAlertController extends Controller
 
     private function getActiveSubscriptionUsers()
     {
-        
+
         $activeSubscribers = User::whereHas('subscriptions', function ($query) {
             $query->where('ends_at', '>', now())
-                    ->orWhereNull('ends_at'); 
+                    ->orWhereNull('ends_at');
         })->get();
-        
+
         return $activeSubscribers;
     }
 }
