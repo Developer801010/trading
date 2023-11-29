@@ -28,23 +28,23 @@ class APIPositionmanagementController extends Controller
             't.trade_direction AS original_trade_direction',
             DB::raw('NULL as child_direction'),
             't.trade_option',
-            DB::raw('CAST(t.strike_price as DECIMAL) as strike_price'),
+            DB::raw('CAST(t.strike_price as DECIMAL(10,2)) as strike_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
                     CAST(((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
-                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.entry_price as DECIMAL)
+                    CAST(t.entry_price as DECIMAL(10,2))
                 END AS entry_price'),
-            DB::raw('CAST(t.stop_price as DECIMAL) as stop_price'),
-            DB::raw('CAST(t.target_price as DECIMAL) as target_price'),
+            DB::raw('CAST(t.stop_price as DECIMAL(10,2)) as stop_price'),
+            DB::raw('CAST(t.target_price as DECIMAL(10,2)) as target_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.position_size as DECIMAL)
+                    CAST(t.position_size as DECIMAL(10,2))
                 END AS position_size'),
-            DB::raw('CAST(t.exit_price as DECIMAL) as exit_price'),
+            DB::raw('CAST(t.exit_price as DECIMAL(10,2)) as exit_price'),
             't.exit_date',
             't.trade_description',
             't.chart_image',
@@ -75,11 +75,11 @@ class APIPositionmanagementController extends Controller
             't.trade_direction as original_trade_direction',
             'td.trade_direction as child_direction',
             't.trade_option',
-            DB::raw('CAST(t.strike_price as DECIMAL) as strike_price'),
-            DB::raw('CAST(t.entry_price as DECIMAL) as entry_price'),
-            DB::raw('CAST(t.stop_price as DECIMAL) as stop_price'),
-            DB::raw('CAST(t.target_price as DECIMAL) as target_price'),
-            DB::raw('CAST(t.position_size as DECIMAL) as position_size'),
+            DB::raw('CAST(t.strike_price as DECIMAL(10,2)) as strike_price'),
+            DB::raw('CAST(t.entry_price as DECIMAL(10,2)) as entry_price'),
+            DB::raw('CAST(t.stop_price as DECIMAL(10,2)) as stop_price'),
+            DB::raw('CAST(t.target_price as DECIMAL(10,2)) as target_price'),
+            DB::raw('CAST(t.position_size as DECIMAL(10,2)) as position_size'),
             DB::raw('NULL AS exit_price'),
             DB::raw('NULL AS exit_date'),
             'td.trade_description',
@@ -124,20 +124,20 @@ class APIPositionmanagementController extends Controller
         $query = Trade::with(['tradeDetail' => function($q) {
             $q->select(
                 '*',
-                DB::raw('CAST(strike_price as DECIMAL) as strike_price'),
-                DB::raw('CAST(entry_price as DECIMAL) as entry_price'),
-                DB::raw('CAST(stop_price as DECIMAL) as stop_price'),
-                DB::raw('CAST(target_price as DECIMAL) as target_price'),
-                DB::raw('CAST(position_size as DECIMAL) as position_size'),
+                DB::raw('CAST(strike_price as DECIMAL(10,2)) as strike_price'),
+                DB::raw('CAST(entry_price as DECIMAL(10,2)) as entry_price'),
+                DB::raw('CAST(stop_price as DECIMAL(10,2)) as stop_price'),
+                DB::raw('CAST(target_price as DECIMAL(10,2)) as target_price'),
+                DB::raw('CAST(position_size as DECIMAL(10,2)) as position_size'),
             );
         }])
             ->select(
                 '*',
-                DB::raw('CAST(strike_price as DECIMAL) as strike_price'),
-                DB::raw('CAST(entry_price as DECIMAL) as entry_price'),
-                DB::raw('CAST(stop_price as DECIMAL) as stop_price'),
-                DB::raw('CAST(target_price as DECIMAL) as target_price'),
-                DB::raw('CAST(position_size as DECIMAL) as position_size'),
+                DB::raw('CAST(strike_price as DECIMAL(10,2)) as strike_price'),
+                DB::raw('CAST(entry_price as DECIMAL(10,2)) as entry_price'),
+                DB::raw('CAST(stop_price as DECIMAL(10,2)) as stop_price'),
+                DB::raw('CAST(target_price as DECIMAL(10,2)) as target_price'),
+                DB::raw('CAST(position_size as DECIMAL(10,2)) as position_size'),
             )
             ->where('trade_type', 'stock')
             ->whereNull('exit_price')->whereNull('exit_date');  //open trade
@@ -171,23 +171,23 @@ class APIPositionmanagementController extends Controller
             't.entry_date',
             DB::raw('NULL as child_direction'),
             't.trade_option',
-            DB::raw('CAST(t.strike_price as DECIMAL) as strike_price'),
+            DB::raw('CAST(t.strike_price as DECIMAL(10,2)) as strike_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
                     CAST(((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
-                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.entry_price as DECIMAL)
+                    CAST(t.entry_price as DECIMAL(10,2))
                 END AS entry_price'),
-            DB::raw('CAST(t.stop_price as DECIMAL) as stop_price'),
-            DB::raw('CAST(t.target_price as DECIMAL) as target_price'),
+            DB::raw('CAST(t.stop_price as DECIMAL(10,2)) as stop_price'),
+            DB::raw('CAST(t.target_price as DECIMAL(10,2)) as target_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.position_size as DECIMAL)
+                    CAST(t.position_size as DECIMAL(10,2))
                 END AS position_size'),
-            DB::raw('CAST(t.exit_price as DECIMAL) as exit_price'),
+            DB::raw('CAST(t.exit_price as DECIMAL(10,2)) as exit_price'),
             't.exit_date',
             't.trade_description',
             't.chart_image',
@@ -233,23 +233,23 @@ class APIPositionmanagementController extends Controller
             't.entry_date',
             DB::raw('NULL as child_direction'),
             't.trade_option',
-            DB::raw('CAST(t.strike_price as DECIMAL) as strike_price'),
+            DB::raw('CAST(t.strike_price as DECIMAL(10,2)) as strike_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
                     CAST(((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
-                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.entry_price as DECIMAL)
+                    CAST(t.entry_price as DECIMAL(10,2))
                 END AS entry_price'),
-            DB::raw('CAST(t.stop_price as DECIMAL) as stop_price'),
-            DB::raw('CAST(t.target_price as DECIMAL) as target_price'),
+            DB::raw('CAST(t.stop_price as DECIMAL(10,2)) as stop_price'),
+            DB::raw('CAST(t.target_price as DECIMAL(10,2)) as target_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.position_size as DECIMAL)
+                    CAST(t.position_size as DECIMAL(10,2))
                 END AS position_size'),
-            DB::raw('CAST(t.exit_price as DECIMAL) as exit_price'),
+            DB::raw('CAST(t.exit_price as DECIMAL(10,2)) as exit_price'),
             't.exit_date',
             't.trade_description',
             't.chart_image',
@@ -288,20 +288,20 @@ class APIPositionmanagementController extends Controller
         $query = Trade::with(['tradeDetail' => function($q) {
             $q->select(
                 '*',
-                DB::raw('CAST(strike_price as DECIMAL) as strike_price'),
-                DB::raw('CAST(entry_price as DECIMAL) as entry_price'),
-                DB::raw('CAST(stop_price as DECIMAL) as stop_price'),
-                DB::raw('CAST(target_price as DECIMAL) as target_price'),
-                DB::raw('CAST(position_size as DECIMAL) as position_size'),
+                DB::raw('CAST(strike_price as DECIMAL(10,2)) as strike_price'),
+                DB::raw('CAST(entry_price as DECIMAL(10,2)) as entry_price'),
+                DB::raw('CAST(stop_price as DECIMAL(10,2)) as stop_price'),
+                DB::raw('CAST(target_price as DECIMAL(10,2)) as target_price'),
+                DB::raw('CAST(position_size as DECIMAL(10,2)) as position_size'),
             );
         }])
             ->select(
                 '*',
-                DB::raw('CAST(strike_price as DECIMAL) as strike_price'),
-                DB::raw('CAST(entry_price as DECIMAL) as entry_price'),
-                DB::raw('CAST(stop_price as DECIMAL) as stop_price'),
-                DB::raw('CAST(target_price as DECIMAL) as target_price'),
-                DB::raw('CAST(position_size as DECIMAL) as position_size'),
+                DB::raw('CAST(strike_price as DECIMAL(10,2)) as strike_price'),
+                DB::raw('CAST(entry_price as DECIMAL(10,2)) as entry_price'),
+                DB::raw('CAST(stop_price as DECIMAL(10,2)) as stop_price'),
+                DB::raw('CAST(target_price as DECIMAL(10,2)) as target_price'),
+                DB::raw('CAST(position_size as DECIMAL(10,2)) as position_size'),
             )
             ->where('trade_type', 'option')
             ->whereNull('exit_price')->whereNull('exit_date');  //open trade
@@ -335,23 +335,23 @@ class APIPositionmanagementController extends Controller
             't.entry_date',
             DB::raw('NULL as child_direction'),
             't.trade_option',
-            DB::raw('CAST(t.strike_price as DECIMAL) as strike_price'),
+            DB::raw('CAST(t.strike_price as DECIMAL(10,2)) as strike_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
                     CAST(((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
-                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.entry_price as DECIMAL)
+                    CAST(t.entry_price as DECIMAL(10,2))
                 END AS entry_price'),
-            DB::raw('CAST(t.stop_price as DECIMAL) as stop_price'),
-            DB::raw('CAST(t.target_price as DECIMAL) as target_price'),
+            DB::raw('CAST(t.stop_price as DECIMAL(10,2)) as stop_price'),
+            DB::raw('CAST(t.target_price as DECIMAL(10,2)) as target_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.position_size as DECIMAL)
+                    CAST(t.position_size as DECIMAL(10,2))
                 END AS position_size'),
-            DB::raw('CAST(t.exit_price as DECIMAL) as exit_price'),
+            DB::raw('CAST(t.exit_price as DECIMAL(10,2)) as exit_price'),
             't.exit_date',
             't.trade_description',
             't.chart_image',
@@ -397,23 +397,23 @@ class APIPositionmanagementController extends Controller
             't.entry_date',
             DB::raw('NULL as child_direction'),
             't.trade_option',
-            DB::raw('CAST(t.strike_price as DECIMAL) as strike_price'),
+            DB::raw('CAST(t.strike_price as DECIMAL(10,2)) as strike_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
                     CAST(((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
-                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    (t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.entry_price as DECIMAL)
+                    CAST(t.entry_price as DECIMAL(10,2))
                 END AS entry_price'),
-            DB::raw('CAST(t.stop_price as DECIMAL) as stop_price'),
-            DB::raw('CAST(t.target_price as DECIMAL) as target_price'),
+            DB::raw('CAST(t.stop_price as DECIMAL(10,2)) as stop_price'),
+            DB::raw('CAST(t.target_price as DECIMAL(10,2)) as target_price'),
             DB::raw('CASE
                 WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL)
+                    CAST((t.position_size + COALESCE(SUM(td.position_size), 0)) as DECIMAL(10,2))
                 ELSE
-                    CAST(t.position_size as DECIMAL)
+                    CAST(t.position_size as DECIMAL(10,2))
                 END AS position_size'),
-            DB::raw('CAST(t.exit_price as DECIMAL) as exit_price'),
+            DB::raw('CAST(t.exit_price as DECIMAL(10,2)) as exit_price'),
             't.exit_date',
             't.trade_description',
             't.chart_image',
