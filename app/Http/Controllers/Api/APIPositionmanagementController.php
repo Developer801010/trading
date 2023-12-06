@@ -436,6 +436,8 @@ class APIPositionmanagementController extends Controller
             $query->where('trade_symbol', 'like', '%' . $search . '%');
         }
 
+        $query->orderBy('created_at', 'desc')->limit(20)->get();
+
         $query->transform(function ($item) {
             $item->strike_price = (float)$item->strike_price;
             $item->entry_price = (float)$item->entry_price;
@@ -448,7 +450,7 @@ class APIPositionmanagementController extends Controller
 
         // Fetch the paginated results
         // $trades = $query->orderBy('created_at', 'desc')->paginate(10);
-        $trades = $query->orderBy('created_at', 'desc')->limit(20)->get()->all();
+        $trades = $query->all();
 
 
         return response()->json([
