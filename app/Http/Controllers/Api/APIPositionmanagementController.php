@@ -438,7 +438,7 @@ class APIPositionmanagementController extends Controller
 
         $query->orderBy('created_at', 'desc')->limit(20)->get();
 
-        $query->transform(function ($item) {
+        $query->map(function ($item) {
             $item->strike_price = (float)$item->strike_price;
             $item->entry_price = (float)$item->entry_price;
             $item->stop_price = (float)$item->stop_price;
