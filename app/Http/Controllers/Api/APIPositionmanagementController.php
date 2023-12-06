@@ -103,6 +103,26 @@ class APIPositionmanagementController extends Controller
         // Combine both queries
         // $results = $unionQuery->paginate(10);
         $results = $unionQuery->get()->all();
+        foreach($results as $item){
+            if (isset($item->strike_price)){
+                $item->strike_price = (float)$item->strike_price;
+            }
+            if (isset($item->entry_price)){
+                $item->entry_price = (float)$item->entry_price;
+            }
+            if (isset($item->stop_price)){
+                $item->stop_price = (float)$item->stop_price;
+            }
+            if (isset($item->target_price)){
+                $item->target_price = (float)$item->target_price;
+            }
+            if (isset($item->position_size)){
+                $item->position_size = (float)$item->position_size;
+            }
+            if (isset($item->exit_price)){
+                $item->exit_price = (float)$item->exit_price;
+            }
+        }
 
         //Get Account login info and Billing info
         $billing_data = Subscription::where('user_id', auth()->guard('sanctum')->user()->id)->first();  //dd($results);
@@ -151,6 +171,26 @@ class APIPositionmanagementController extends Controller
             // Fetch the paginated results
             // $trades = $query->orderBy('created_at', 'desc')->paginate(10);
             $trades = $query->orderBy('created_at', 'desc')->get()->all();
+            foreach($trades as $item){
+                if (isset($item->strike_price)){
+                    $item->strike_price = (float)$item->strike_price;
+                }
+                if (isset($item->entry_price)){
+                    $item->entry_price = (float)$item->entry_price;
+                }
+                if (isset($item->stop_price)){
+                    $item->stop_price = (float)$item->stop_price;
+                }
+                if (isset($item->target_price)){
+                    $item->target_price = (float)$item->target_price;
+                }
+                if (isset($item->position_size)){
+                    $item->position_size = (float)$item->position_size;
+                }
+                if (isset($item->exit_price)){
+                    $item->exit_price = (float)$item->exit_price;
+                }
+            }
 
             return response()->json([
                 'status' => true,
@@ -212,7 +252,27 @@ class APIPositionmanagementController extends Controller
 
         // Fetch the paginated results
         // $trades = $query->orderBy('created_at', 'desc')->paginate(10);  //dd($trades);
-            $trades = $query->orderBy('created_at', 'desc')->get()->all();
+        $trades = $query->orderBy('created_at', 'desc')->get()->all();
+        foreach($trades as $item){
+            if (isset($item->strike_price)){
+                $item->strike_price = (float)$item->strike_price;
+            }
+            if (isset($item->entry_price)){
+                $item->entry_price = (float)$item->entry_price;
+            }
+            if (isset($item->stop_price)){
+                $item->stop_price = (float)$item->stop_price;
+            }
+            if (isset($item->target_price)){
+                $item->target_price = (float)$item->target_price;
+            }
+            if (isset($item->position_size)){
+                $item->position_size = (float)$item->position_size;
+            }
+            if (isset($item->exit_price)){
+                $item->exit_price = (float)$item->exit_price;
+            }
+        }
 
         return response()->json([
             'status' => true,
@@ -275,6 +335,26 @@ class APIPositionmanagementController extends Controller
         // Fetch the paginated results
         // $trades = $query->orderBy('created_at', 'desc')->paginate(10);  //dd($trades);
         $trades = $query->orderBy('created_at', 'desc')->limit(20)->get()->all();
+        foreach($trades as $item){
+            if (isset($item->strike_price)){
+                $item->strike_price = (float)$item->strike_price;
+            }
+            if (isset($item->entry_price)){
+                $item->entry_price = (float)$item->entry_price;
+            }
+            if (isset($item->stop_price)){
+                $item->stop_price = (float)$item->stop_price;
+            }
+            if (isset($item->target_price)){
+                $item->target_price = (float)$item->target_price;
+            }
+            if (isset($item->position_size)){
+                $item->position_size = (float)$item->position_size;
+            }
+            if (isset($item->exit_price)){
+                $item->exit_price = (float)$item->exit_price;
+            }
+        }
 
         return response()->json([
             'status' => true,
@@ -315,6 +395,26 @@ class APIPositionmanagementController extends Controller
         // Fetch the paginated results
         // $trades = $query->orderBy('created_at', 'desc')->paginate(10);
         $trades = $query->orderBy('created_at', 'desc')->get()->all();
+        foreach($trades as $item){
+            if (isset($item->strike_price)){
+                $item->strike_price = (float)$item->strike_price;
+            }
+            if (isset($item->entry_price)){
+                $item->entry_price = (float)$item->entry_price;
+            }
+            if (isset($item->stop_price)){
+                $item->stop_price = (float)$item->stop_price;
+            }
+            if (isset($item->target_price)){
+                $item->target_price = (float)$item->target_price;
+            }
+            if (isset($item->position_size)){
+                $item->position_size = (float)$item->position_size;
+            }
+            if (isset($item->exit_price)){
+                $item->exit_price = (float)$item->exit_price;
+            }
+        }
 
         return response()->json([
             'status' => true,
@@ -377,6 +477,26 @@ class APIPositionmanagementController extends Controller
         // Fetch the paginated results
         // $trades = $query->orderBy('created_at', 'desc')->paginate(10);
         $trades = $query->orderBy('created_at', 'desc')->get()->all();
+        foreach($trades as $item){
+            if (isset($item->strike_price)){
+                $item->strike_price = (float)$item->strike_price;
+            }
+            if (isset($item->entry_price)){
+                $item->entry_price = (float)$item->entry_price;
+            }
+            if (isset($item->stop_price)){
+                $item->stop_price = (float)$item->stop_price;
+            }
+            if (isset($item->target_price)){
+                $item->target_price = (float)$item->target_price;
+            }
+            if (isset($item->position_size)){
+                $item->position_size = (float)$item->position_size;
+            }
+            if (isset($item->exit_price)){
+                $item->exit_price = (float)$item->exit_price;
+            }
+        }
 
         return response()->json([
             'status' => true,
@@ -441,12 +561,24 @@ class APIPositionmanagementController extends Controller
         $trades = $query->orderBy('created_at', 'desc')->limit(20)->get()->all();
 
         foreach($trades as $item){
-            $item->strike_price = (float)$item->strike_price;
-            $item->entry_price = (float)$item->entry_price;
-            $item->stop_price = (float)$item->stop_price;
-            $item->target_price = (float)$item->target_price;
-            $item->position_size = (float)$item->position_size;
-            $item->exit_price = (float)$item->exit_price;
+            if (isset($item->strike_price)){
+                $item->strike_price = (float)$item->strike_price;
+            }
+            if (isset($item->entry_price)){
+                $item->entry_price = (float)$item->entry_price;
+            }
+            if (isset($item->stop_price)){
+                $item->stop_price = (float)$item->stop_price;
+            }
+            if (isset($item->target_price)){
+                $item->target_price = (float)$item->target_price;
+            }
+            if (isset($item->position_size)){
+                $item->position_size = (float)$item->position_size;
+            }
+            if (isset($item->exit_price)){
+                $item->exit_price = (float)$item->exit_price;
+            }
         }
 
         return response()->json([
