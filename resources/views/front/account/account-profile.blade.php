@@ -9,80 +9,150 @@
 
 
 @section('content')
-    <div class="container">
-        <section class="dashboard-section">        
-        </section>
-        <section class="account-section">
-            <div class="row">
-                <div class="col-md-3">
-                    @include('layouts.front-dashboard-sidebar')
-                </div>
-                <div class="col-md-9">
-                    <h2 class="heading pb-3 pt-3">Account Detail</h2>
-                    @include('layouts.error')
-                    
-                    <form method="post" action="{{route('front.account.store')}}" class="accountForm">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{auth()->user()->first_name}}" autofocus>
-                            </div>
-            
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Last Name<span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{auth()->user()->last_name}}">
-                            </div>
-            
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Display Name<span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" value="{{auth()->user()->name}}">
-                                <span class="account_display_name">This will be how your name will be displayed in the account section and messaging
-                                </span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" disabled id="name" name="name" value="{{auth()->user()->email}}">
-                                <span class="account_display_name">This is the email address used for this account. Not editable.</span>
-                            </div>
-                        </div>
-                        
-                        <div class="password_box">
-                            <div class="row">
-                                <h4 class="password_change_title">Password Change</h4>                                
-                                <div class="col-md-12 mb-3">
-                                    <label for="last_name" class="form-label">Current password <span class="account_display_name">(Leave blank to leave unchanged)</span></label>
-                                    <input type="password" id="current_password" name="current_password" class="form-control" value="{{old('current_password')}}" />   
-                                    <span class="account_display_name">Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).</span>                                 
-                                </div>                            
-                            </div>
-    
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="last_name" class="form-label">New Password <span class="account_display_name">(Leave blank to leave unchanged)</span></label>
-                                    <input type="password" id="password" name="password" class="form-control" />
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="last_name" class="form-label">Confirm Password</label>
-                                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" />
-                                </div>
-                            </div>                            
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-12">
-                                <button class="btn btn-sub text-uppercase">
-                                    Save Changes
-                                </button>
+    <!-- MAIN -->
+    <main class="main-wrapper">
+        <div class="main-feed">
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-md-4 col-lg-3">
+                        @include('layouts.front-dashboard-sidebar')
+                    </div>
+                    <div class="col-md-8 col-lg-9">
+                        <div class="tab-card">
+                            <div class="tab-card-header">Account Details</div>
+                            <div class="tab-card-body">
+                                @include('layouts.error')
+                                <form method="post" action="{{route('front.account.store')}}" class="usr-form accountForm">
+                                    @csrf
+                                    <div class="row mb-4">
+                                        {{-- <div class="col-12">
+                                            <div class="mb-3">
+                                                <div class="avatar-upload">
+                                                    <div class="avatar-edit">
+                                                        <input type="file" id="imageUpload" accept=".png, .jpg, .jpeg">
+                                                        <label for="imageUpload">
+                                                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M9.5103 2.5102C9.63944 2.37648 9.79393 2.26983 9.96473 2.19646C10.1355 2.12308 10.3192 2.08446 10.5051 2.08285C10.691 2.08123 10.8754 2.11665 11.0474 2.18705C11.2195 2.25744 11.3758 2.36139 11.5072 2.49284C11.6387 2.62429 11.7427 2.78061 11.813 2.95266C11.8834 3.12472 11.9189 3.30907 11.9172 3.49496C11.9156 3.68085 11.877 3.86456 11.8036 4.03536C11.7303 4.20617 11.6236 4.36065 11.4899 4.4898L10.9348 5.0449L8.9552 3.0653L9.5103 2.5102ZM7.9654 4.0551L2.1001 9.9204V11.9H4.0797L9.9457 6.0347L7.9654 4.0551Z" fill="#D6D6D6"/>
+                                                            </svg>
+                                                        </label>
+                                                    </div>
+                                                    <div class="avatar-preview">
+                                                        <div id="imagePreview" style="background-image: url({{asset('assets/images/usr.png')}});">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> --}}
+                                        <div class="col-12 col-sm-6 col-md-12 col-lg-6">
+                                            <div class="mb-3">
+                                                <label class="mb-2">First Name</label>
+                                                <input type="text" class="form-control" placeholder="Enter first name" id="first_name" name="first_name" value="{{auth()->user()->first_name}}">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-12 col-lg-6">
+                                            <div class="mb-3">
+                                                <label class="mb-2">Last Name</label>
+                                                <input type="text" class="form-control" placeholder="Enter last name" id="last_name" name="last_name" value="{{auth()->user()->last_name}}">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-12 col-lg-6">
+                                            <div class="mb-3">
+                                                <label class="mb-2">Display Name</label>
+                                                <input type="text" class="form-control" placeholder="Enter display name" id="name" name="name" value="{{auth()->user()->name}}">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-12 col-lg-6">
+                                            <div class="mb-3">
+                                                <label class="mb-2">Email</label>
+                                                <input type="text" class="form-control" placeholder="Enter email" readonly id="name" name="name" value="{{auth()->user()->email}}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <button  class="btn btn-sub">Submit</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                    </form>
+                        <div class="tab-card">
+                            <div class="tab-card-header">Change Password</div>
+                            <div class="tab-card-body">
+                                <form method="post" action="{{route('front.account.savepsw')}}" class="usr-form changepswForm">
+                                    @csrf
+                                    <div class="row mb-4">
+                                        <div class="col-12 col-md-12 col-lg-4">
+                                            <div class="mb-3">
+                                                <label class="mb-2">Current Password</label>
+                                                <div class="input-group">
+                                                    <input id="current_password" name="current_password" type="password" class="form-control shadow-none" placeholder="Current password">
+                                                    <button type="button" class="input-group-text toggle-password">
+                                                        <div class="icon password-show-icon">
+                                                            <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M3.58602 12.7622C4.33622 9.1597 7.47232 6.6 11 6.6C14.5266 6.6 17.6627 9.1597 18.414 12.7622C18.4438 12.9052 18.5291 13.0304 18.6512 13.1105C18.7733 13.1905 18.9223 13.2188 19.0652 13.189C19.2082 13.1592 19.3334 13.0739 19.4135 12.9518C19.4935 12.8297 19.5218 12.6808 19.492 12.5378C18.6373 8.4403 15.0623 5.5 11 5.5C6.93772 5.5 3.36272 8.4403 2.50802 12.5378C2.47826 12.6808 2.50651 12.8297 2.58655 12.9518C2.66659 13.0739 2.79186 13.1592 2.93482 13.189C3.07777 13.2188 3.22669 13.1905 3.34881 13.1105C3.47093 13.0304 3.55626 12.9052 3.58602 12.7622ZM11 8.8C9.97893 8.8 8.99967 9.20562 8.27766 9.92764C7.55564 10.6497 7.15002 11.6289 7.15002 12.65C7.15002 13.6711 7.55564 14.6503 8.27766 15.3724C8.99967 16.0944 9.97893 16.5 11 16.5C12.0211 16.5 13.0004 16.0944 13.7224 15.3724C14.4444 14.6503 14.85 13.6711 14.85 12.65C14.85 11.6289 14.4444 10.6497 13.7224 9.92764C13.0004 9.20562 12.0211 8.8 11 8.8ZM8.25002 12.65C8.25002 11.9207 8.53975 11.2212 9.05547 10.7055C9.5712 10.1897 10.2707 9.9 11 9.9C11.7294 9.9 12.4288 10.1897 12.9446 10.7055C13.4603 11.2212 13.75 11.9207 13.75 12.65C13.75 13.3793 13.4603 14.0788 12.9446 14.5945C12.4288 15.1103 11.7294 15.4 11 15.4C10.2707 15.4 9.5712 15.1103 9.05547 14.5945C8.53975 14.0788 8.25002 13.3793 8.25002 12.65Z" fill="currentColor"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="icon password-hide-icon">
+                                                            <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M3.13944 2.16129C3.0883 2.11016 3.02759 2.06959 2.96078 2.04192C2.89396 2.01424 2.82235 2 2.75004 2C2.67772 2 2.60611 2.01424 2.53929 2.04192C2.47248 2.06959 2.41177 2.11016 2.36064 2.16129C2.3095 2.21243 2.26894 2.27314 2.24126 2.33995C2.21359 2.40677 2.19934 2.47838 2.19934 2.55069C2.19934 2.62301 2.21359 2.69462 2.24126 2.76144C2.26894 2.82825 2.3095 2.88896 2.36064 2.94009L6.21064 6.78789C4.30386 8.08846 2.97642 10.0784 2.50804 12.3385C2.4933 12.4093 2.49265 12.4823 2.50613 12.5533C2.5196 12.6243 2.54694 12.692 2.58657 12.7525C2.6262 12.813 2.67735 12.865 2.73711 12.9057C2.79687 12.9464 2.86405 12.975 2.93484 12.9897C3.00562 13.0044 3.07861 13.0051 3.14964 12.9916C3.22068 12.9781 3.28836 12.9508 3.34883 12.9112C3.4093 12.8715 3.46137 12.8204 3.50207 12.7606C3.54277 12.7009 3.5713 12.6337 3.58604 12.5629C3.79588 11.5471 4.20623 10.5834 4.79308 9.72817C5.37993 8.87293 6.13147 8.14333 7.00374 7.5821L8.74834 9.32669C8.29598 9.65288 7.91989 10.0734 7.64609 10.5593C7.37228 11.0451 7.20729 11.5847 7.16254 12.1406C7.11779 12.6964 7.19434 13.2554 7.3869 13.7788C7.57945 14.3022 7.88342 14.7775 8.27776 15.1719C8.67211 15.5662 9.14742 15.8702 9.67081 16.0627C10.1942 16.2553 10.7532 16.3318 11.3091 16.2871C11.865 16.2423 12.4045 16.0773 12.8903 15.8035C13.3762 15.5297 13.7968 15.1536 14.1229 14.7013L18.8606 19.4401C18.9639 19.5434 19.104 19.6014 19.25 19.6014C19.3961 19.6014 19.5362 19.5434 19.6394 19.4401C19.7427 19.3368 19.8007 19.1967 19.8007 19.0507C19.8007 18.9046 19.7427 18.7646 19.6394 18.6613L3.13944 2.16129ZM13.3309 13.9093C13.1114 14.2596 12.8157 14.5559 12.4659 14.7761C12.116 14.9963 11.721 15.1349 11.3102 15.1814C10.8995 15.2279 10.4835 15.1812 10.0933 15.0448C9.70302 14.9083 9.34856 14.6857 9.05625 14.3934C8.76393 14.1011 8.54128 13.7466 8.40486 13.3564C8.26843 12.9661 8.22174 12.5502 8.26826 12.1394C8.31478 11.7286 8.45331 11.3336 8.67354 10.9838C8.89378 10.6339 9.19005 10.3382 9.54034 10.1187L13.3309 13.9093ZM11.1364 8.60289L14.8478 12.3143C14.8134 11.3409 14.4113 10.4168 13.7226 9.72812C13.0339 9.03943 12.1098 8.63735 11.1364 8.60289ZM11 6.40069C10.373 6.40069 9.75813 6.48209 9.16744 6.63499L8.28414 5.75169C9.15853 5.45325 10.0761 5.30087 11 5.30069C15.0623 5.30069 18.6362 8.24099 19.492 12.3385C19.5218 12.4814 19.4935 12.6304 19.4135 12.7525C19.3335 12.8746 19.2082 12.9599 19.0652 12.9897C18.9223 13.0195 18.7734 12.9912 18.6512 12.9112C18.5291 12.8311 18.4438 12.7058 18.414 12.5629C17.6638 8.96039 14.5277 6.40069 11 6.40069Z" fill="currentColor"/>
+                                                            </svg>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-12 col-lg-4">
+                                            <div class="mb-3">
+                                                <label class="mb-2">New Password</label>
+                                                <div class="input-group">
+                                                    <input id="password" name="password" type="password" class="form-control shadow-none" placeholder="New password">
+                                                    <button type="button" class="input-group-text toggle-password">
+                                                        <div class="icon password-show-icon">
+                                                            <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M3.58602 12.7622C4.33622 9.1597 7.47232 6.6 11 6.6C14.5266 6.6 17.6627 9.1597 18.414 12.7622C18.4438 12.9052 18.5291 13.0304 18.6512 13.1105C18.7733 13.1905 18.9223 13.2188 19.0652 13.189C19.2082 13.1592 19.3334 13.0739 19.4135 12.9518C19.4935 12.8297 19.5218 12.6808 19.492 12.5378C18.6373 8.4403 15.0623 5.5 11 5.5C6.93772 5.5 3.36272 8.4403 2.50802 12.5378C2.47826 12.6808 2.50651 12.8297 2.58655 12.9518C2.66659 13.0739 2.79186 13.1592 2.93482 13.189C3.07777 13.2188 3.22669 13.1905 3.34881 13.1105C3.47093 13.0304 3.55626 12.9052 3.58602 12.7622ZM11 8.8C9.97893 8.8 8.99967 9.20562 8.27766 9.92764C7.55564 10.6497 7.15002 11.6289 7.15002 12.65C7.15002 13.6711 7.55564 14.6503 8.27766 15.3724C8.99967 16.0944 9.97893 16.5 11 16.5C12.0211 16.5 13.0004 16.0944 13.7224 15.3724C14.4444 14.6503 14.85 13.6711 14.85 12.65C14.85 11.6289 14.4444 10.6497 13.7224 9.92764C13.0004 9.20562 12.0211 8.8 11 8.8ZM8.25002 12.65C8.25002 11.9207 8.53975 11.2212 9.05547 10.7055C9.5712 10.1897 10.2707 9.9 11 9.9C11.7294 9.9 12.4288 10.1897 12.9446 10.7055C13.4603 11.2212 13.75 11.9207 13.75 12.65C13.75 13.3793 13.4603 14.0788 12.9446 14.5945C12.4288 15.1103 11.7294 15.4 11 15.4C10.2707 15.4 9.5712 15.1103 9.05547 14.5945C8.53975 14.0788 8.25002 13.3793 8.25002 12.65Z" fill="currentColor"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="icon password-hide-icon">
+                                                            <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M3.13944 2.16129C3.0883 2.11016 3.02759 2.06959 2.96078 2.04192C2.89396 2.01424 2.82235 2 2.75004 2C2.67772 2 2.60611 2.01424 2.53929 2.04192C2.47248 2.06959 2.41177 2.11016 2.36064 2.16129C2.3095 2.21243 2.26894 2.27314 2.24126 2.33995C2.21359 2.40677 2.19934 2.47838 2.19934 2.55069C2.19934 2.62301 2.21359 2.69462 2.24126 2.76144C2.26894 2.82825 2.3095 2.88896 2.36064 2.94009L6.21064 6.78789C4.30386 8.08846 2.97642 10.0784 2.50804 12.3385C2.4933 12.4093 2.49265 12.4823 2.50613 12.5533C2.5196 12.6243 2.54694 12.692 2.58657 12.7525C2.6262 12.813 2.67735 12.865 2.73711 12.9057C2.79687 12.9464 2.86405 12.975 2.93484 12.9897C3.00562 13.0044 3.07861 13.0051 3.14964 12.9916C3.22068 12.9781 3.28836 12.9508 3.34883 12.9112C3.4093 12.8715 3.46137 12.8204 3.50207 12.7606C3.54277 12.7009 3.5713 12.6337 3.58604 12.5629C3.79588 11.5471 4.20623 10.5834 4.79308 9.72817C5.37993 8.87293 6.13147 8.14333 7.00374 7.5821L8.74834 9.32669C8.29598 9.65288 7.91989 10.0734 7.64609 10.5593C7.37228 11.0451 7.20729 11.5847 7.16254 12.1406C7.11779 12.6964 7.19434 13.2554 7.3869 13.7788C7.57945 14.3022 7.88342 14.7775 8.27776 15.1719C8.67211 15.5662 9.14742 15.8702 9.67081 16.0627C10.1942 16.2553 10.7532 16.3318 11.3091 16.2871C11.865 16.2423 12.4045 16.0773 12.8903 15.8035C13.3762 15.5297 13.7968 15.1536 14.1229 14.7013L18.8606 19.4401C18.9639 19.5434 19.104 19.6014 19.25 19.6014C19.3961 19.6014 19.5362 19.5434 19.6394 19.4401C19.7427 19.3368 19.8007 19.1967 19.8007 19.0507C19.8007 18.9046 19.7427 18.7646 19.6394 18.6613L3.13944 2.16129ZM13.3309 13.9093C13.1114 14.2596 12.8157 14.5559 12.4659 14.7761C12.116 14.9963 11.721 15.1349 11.3102 15.1814C10.8995 15.2279 10.4835 15.1812 10.0933 15.0448C9.70302 14.9083 9.34856 14.6857 9.05625 14.3934C8.76393 14.1011 8.54128 13.7466 8.40486 13.3564C8.26843 12.9661 8.22174 12.5502 8.26826 12.1394C8.31478 11.7286 8.45331 11.3336 8.67354 10.9838C8.89378 10.6339 9.19005 10.3382 9.54034 10.1187L13.3309 13.9093ZM11.1364 8.60289L14.8478 12.3143C14.8134 11.3409 14.4113 10.4168 13.7226 9.72812C13.0339 9.03943 12.1098 8.63735 11.1364 8.60289ZM11 6.40069C10.373 6.40069 9.75813 6.48209 9.16744 6.63499L8.28414 5.75169C9.15853 5.45325 10.0761 5.30087 11 5.30069C15.0623 5.30069 18.6362 8.24099 19.492 12.3385C19.5218 12.4814 19.4935 12.6304 19.4135 12.7525C19.3335 12.8746 19.2082 12.9599 19.0652 12.9897C18.9223 13.0195 18.7734 12.9912 18.6512 12.9112C18.5291 12.8311 18.4438 12.7058 18.414 12.5629C17.6638 8.96039 14.5277 6.40069 11 6.40069Z" fill="currentColor"/>
+                                                            </svg>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-12 col-lg-4">
+                                            <div class="mb-3">
+                                                <label class="mb-2">Confirm Password</label>
+                                                <div class="input-group">
+                                                    <input id="password_confirmation" name="password_confirmation" type="password" class="form-control shadow-none" placeholder="Confirm password">
+                                                    <button type="button" class="input-group-text toggle-password">
+                                                        <div class="icon password-show-icon">
+                                                            <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M3.58602 12.7622C4.33622 9.1597 7.47232 6.6 11 6.6C14.5266 6.6 17.6627 9.1597 18.414 12.7622C18.4438 12.9052 18.5291 13.0304 18.6512 13.1105C18.7733 13.1905 18.9223 13.2188 19.0652 13.189C19.2082 13.1592 19.3334 13.0739 19.4135 12.9518C19.4935 12.8297 19.5218 12.6808 19.492 12.5378C18.6373 8.4403 15.0623 5.5 11 5.5C6.93772 5.5 3.36272 8.4403 2.50802 12.5378C2.47826 12.6808 2.50651 12.8297 2.58655 12.9518C2.66659 13.0739 2.79186 13.1592 2.93482 13.189C3.07777 13.2188 3.22669 13.1905 3.34881 13.1105C3.47093 13.0304 3.55626 12.9052 3.58602 12.7622ZM11 8.8C9.97893 8.8 8.99967 9.20562 8.27766 9.92764C7.55564 10.6497 7.15002 11.6289 7.15002 12.65C7.15002 13.6711 7.55564 14.6503 8.27766 15.3724C8.99967 16.0944 9.97893 16.5 11 16.5C12.0211 16.5 13.0004 16.0944 13.7224 15.3724C14.4444 14.6503 14.85 13.6711 14.85 12.65C14.85 11.6289 14.4444 10.6497 13.7224 9.92764C13.0004 9.20562 12.0211 8.8 11 8.8ZM8.25002 12.65C8.25002 11.9207 8.53975 11.2212 9.05547 10.7055C9.5712 10.1897 10.2707 9.9 11 9.9C11.7294 9.9 12.4288 10.1897 12.9446 10.7055C13.4603 11.2212 13.75 11.9207 13.75 12.65C13.75 13.3793 13.4603 14.0788 12.9446 14.5945C12.4288 15.1103 11.7294 15.4 11 15.4C10.2707 15.4 9.5712 15.1103 9.05547 14.5945C8.53975 14.0788 8.25002 13.3793 8.25002 12.65Z" fill="currentColor"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="icon password-hide-icon">
+                                                            <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M3.13944 2.16129C3.0883 2.11016 3.02759 2.06959 2.96078 2.04192C2.89396 2.01424 2.82235 2 2.75004 2C2.67772 2 2.60611 2.01424 2.53929 2.04192C2.47248 2.06959 2.41177 2.11016 2.36064 2.16129C2.3095 2.21243 2.26894 2.27314 2.24126 2.33995C2.21359 2.40677 2.19934 2.47838 2.19934 2.55069C2.19934 2.62301 2.21359 2.69462 2.24126 2.76144C2.26894 2.82825 2.3095 2.88896 2.36064 2.94009L6.21064 6.78789C4.30386 8.08846 2.97642 10.0784 2.50804 12.3385C2.4933 12.4093 2.49265 12.4823 2.50613 12.5533C2.5196 12.6243 2.54694 12.692 2.58657 12.7525C2.6262 12.813 2.67735 12.865 2.73711 12.9057C2.79687 12.9464 2.86405 12.975 2.93484 12.9897C3.00562 13.0044 3.07861 13.0051 3.14964 12.9916C3.22068 12.9781 3.28836 12.9508 3.34883 12.9112C3.4093 12.8715 3.46137 12.8204 3.50207 12.7606C3.54277 12.7009 3.5713 12.6337 3.58604 12.5629C3.79588 11.5471 4.20623 10.5834 4.79308 9.72817C5.37993 8.87293 6.13147 8.14333 7.00374 7.5821L8.74834 9.32669C8.29598 9.65288 7.91989 10.0734 7.64609 10.5593C7.37228 11.0451 7.20729 11.5847 7.16254 12.1406C7.11779 12.6964 7.19434 13.2554 7.3869 13.7788C7.57945 14.3022 7.88342 14.7775 8.27776 15.1719C8.67211 15.5662 9.14742 15.8702 9.67081 16.0627C10.1942 16.2553 10.7532 16.3318 11.3091 16.2871C11.865 16.2423 12.4045 16.0773 12.8903 15.8035C13.3762 15.5297 13.7968 15.1536 14.1229 14.7013L18.8606 19.4401C18.9639 19.5434 19.104 19.6014 19.25 19.6014C19.3961 19.6014 19.5362 19.5434 19.6394 19.4401C19.7427 19.3368 19.8007 19.1967 19.8007 19.0507C19.8007 18.9046 19.7427 18.7646 19.6394 18.6613L3.13944 2.16129ZM13.3309 13.9093C13.1114 14.2596 12.8157 14.5559 12.4659 14.7761C12.116 14.9963 11.721 15.1349 11.3102 15.1814C10.8995 15.2279 10.4835 15.1812 10.0933 15.0448C9.70302 14.9083 9.34856 14.6857 9.05625 14.3934C8.76393 14.1011 8.54128 13.7466 8.40486 13.3564C8.26843 12.9661 8.22174 12.5502 8.26826 12.1394C8.31478 11.7286 8.45331 11.3336 8.67354 10.9838C8.89378 10.6339 9.19005 10.3382 9.54034 10.1187L13.3309 13.9093ZM11.1364 8.60289L14.8478 12.3143C14.8134 11.3409 14.4113 10.4168 13.7226 9.72812C13.0339 9.03943 12.1098 8.63735 11.1364 8.60289ZM11 6.40069C10.373 6.40069 9.75813 6.48209 9.16744 6.63499L8.28414 5.75169C9.15853 5.45325 10.0761 5.30087 11 5.30069C15.0623 5.30069 18.6362 8.24099 19.492 12.3385C19.5218 12.4814 19.4935 12.6304 19.4135 12.7525C19.3335 12.8746 19.2082 12.9599 19.0652 12.9897C18.9223 13.0195 18.7734 12.9912 18.6512 12.9112C18.5291 12.8311 18.4438 12.7058 18.414 12.5629C17.6638 8.96039 14.5277 6.40069 11 6.40069Z" fill="currentColor"/>
+                                                            </svg>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <button class="btn btn-sub">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-           
-        </section>
-    </div>    
+        </div>
+    </main>
+    <!-- MAIN -->
 @endsection
 
 
@@ -92,8 +162,22 @@
     <script src="{{ asset('app-assets/vendors/js/extensions/sweetalert2.all.min.js') }}"></script>
     <script>
         var accountForm = $('.accountForm');
+        var changepswForm = $('.changepswForm');
         // User Form Validation
-        
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+                    $('#imagePreview').hide();
+                    $('#imagePreview').fadeIn(650);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        $("#imageUpload").change(function() {
+            readURL(this);
+        });
 
     </script>
 @endsection

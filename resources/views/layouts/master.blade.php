@@ -114,6 +114,20 @@
         }
     });
 
+	function keepAlive() {
+		$.ajax({
+			type: "POST",
+			url: "{{ route('keep.alive') }}",
+			data: {
+				_token: "{{ csrf_token() }}"
+			}
+		});
+	}
+
+	setInterval(() => {
+		keepAlive();
+	}, 10000);
+
 </script>
 
 <script src="{{ asset('assets/js/scripts.js') }}"></script>

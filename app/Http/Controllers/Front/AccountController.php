@@ -27,11 +27,11 @@ class AccountController extends Controller
 {
     public function index()
     {
-        $member_date =Subscription::where('user_id', auth()->user()->id)->value('created_at'); 
+        $member_date =Subscription::where('user_id', auth()->user()->id)->value('created_at');
         $mobileVerifiedStatus = auth()->user()->mobile_verified_at;
         $emailVerifiedStatus = auth()->user()->email_verified_at;
 
-        return view('front.account.account-profile', 
+        return view('front.account.account-profile',
             compact('member_date', 'mobileVerifiedStatus', 'emailVerifiedStatus'));
     }
 
@@ -42,46 +42,47 @@ class AccountController extends Controller
         $obj->last_name = $request->last_name;
         $obj->name = $request->name;
 
-        if($request->current_password !== null){
-
-            $messages = [
-                'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
-            ];
-
-            $validator = Validator::make($request->all(), [
-                'current_password' => 'required',
-                'password' => [
-                    'required',
-                    'string',
-                    'min:8',
-                    'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
-                ],
-            ], $messages);
-
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
-            
-            // Verify the old password
-            $user = Auth::user();
-            $isPasswordValid = Hash::check($request->current_password, $user->password);
-
-            if (!$isPasswordValid) {
-                return redirect()->back()->withErrors(['current_password' => 'The current password is invalid.']);
-            }
-
-            // Hash the new password
-            $hashedPassword = Hash::make($request->password);
-
-            // Update the user's password
-            $user = Auth::user();
-            $user->password = $hashedPassword;        
-            $user->save();
-        }
-        
-
         $obj->save();
+
+        return redirect()->back()->with('flash_success', 'Account information has been updated');
+    }
+
+    public function passwordSave(Request $request){
+
+        $messages = [
+            'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
+        ];
+
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
+            ],
+        ], $messages);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Verify the old password
+        $user = Auth::user();
+        $isPasswordValid = Hash::check($request->current_password, $user->password);
+
+        if (!$isPasswordValid) {
+            return redirect()->back()->withErrors(['current_password' => 'The current password is invalid.']);
+        }
+
+        // Hash the new password
+        $hashedPassword = Hash::make($request->password);
+
+        // Update the user's password
+        $user = Auth::user();
+        $user->password = $hashedPassword;
+        $user->save();
 
         return redirect()->back()->with('flash_success', 'Account information has been updated');
     }
@@ -98,15 +99,15 @@ class AccountController extends Controller
         if ($mobileNotificationSetting == null)
             $mobileNotificationSetting = 0;
 
-        return view('front.account.notification-setup', 
+        return view('front.account.notification-setup',
         compact(
             'mobileVerifiedStatus',
             'mobileNotificationSetting'
         ));
     }
-    
+
     public function sendVerificationCode(Request $request)
-    { 
+    {
         $recipients = str_replace(' ', '', $request->input('phone'));
         $mobileVerifiedStatus = trim($request->input('mobileVerifiedStatus'));
         $mobileNotificationSetting = trim($request->input('mobileNotificationSetting'));
@@ -117,13 +118,13 @@ class AccountController extends Controller
             $obj->save();
             return response()->json(['msg' => 'It was unsubscribed successfully.']);
         }else{
-            if($mobileVerifiedStatus == 'no'){  //if the mobile isn't verified. 
+            if($mobileVerifiedStatus == 'no'){  //if the mobile isn't verified.
                  //check the duplication if the mobile notification is 0
                 $mobileUsageCount = User::where('mobile_number', 'like', "%{$recipients}%")->count();
                 if($mobileUsageCount>=1){
                     return response()->json(['error' => 'Phone number is already used!'], 400);
                 }
-                
+
                 $verificationCode = $this->generateVerificationCode();
                  // Store the verification code and its expiration time in the session
                 Session::put('verification_code', $verificationCode);
@@ -134,7 +135,7 @@ class AccountController extends Controller
                 SendTwilioSMS::dispatch('+1'.$recipients, $msg);
 
             }else{
-                //if mobile is alredy verified, it unsubscribes 
+                //if mobile is alredy verified, it unsubscribes
                 $obj = User::findorFail(auth()->user()->id);
                 $obj->mobile_notification_setting = 1;  //1:subscription. 0: unsubscription
                 $obj->save();
@@ -147,13 +148,13 @@ class AccountController extends Controller
     {
         $phone_code = $request->input('phone_code');
         $mobile_number = session('mobile_number');
-        
+
         $verificationCode = Session::get('verification_code');
         $expirationTime = Session::get('verification_code_expires_at');
 
         $obj = User::findorFail(auth()->user()->id);
         if ($obj->mobile_verified_at == null) //if phone isn't verified
-        {  
+        {
             if (Carbon::now()->greaterThan($expirationTime)) {
                 return response()->json(['msg' => 'Time is expired', 'status' => 'error']);
             }else{
@@ -182,37 +183,44 @@ class AccountController extends Controller
 
      public function membership()
      {
-        
-        //get Payment type 
-        $paymentType = auth()->user()->pm_type;   
+
+        //get Payment type
+        $paymentType = auth()->user()->pm_type;
+        // dd($paymentType);
 
         if($paymentType == 'paypal'){
 
             $agreement = new PaypalAgreement();
-            $subscription_id = Subscription::where('user_id', auth()->user()->id)->value('stripe_id');  
-            // $subscription_id = '';
-            $invoices = $agreement->getSubscriptionHistory($subscription_id);  //dd($invoices);
-            $subscriptionStatus = $agreement->getSubscriptionStatus($subscription_id);
-            $agreementDetails  = $agreement->getAgreementDetails($subscription_id);  
-            //dd($agreementDetails);
-            
-            $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name'); //dd($membership_level);
-
-            return view('front.account.account-membership', 
-            compact(
-                    'paymentType',
-                    'membership_level',
-                    'invoices',
-                    'subscription_id',
-                    'subscriptionStatus',
-                    'agreementDetails'
-                )
-            ); 
+            $subscription_id = Subscription::where('user_id', auth()->user()->id)->value('stripe_id');
+            if(isset($subscription_id) && $subscription_id){
+                // $subscription_id = '';
+                $invoices = $agreement->getSubscriptionHistory($subscription_id);  //dd($invoices);
+                $subscriptionStatus = $agreement->getSubscriptionStatus($subscription_id);
+                $agreementDetails  = $agreement->getAgreementDetails($subscription_id);
+                // $subscriptionStatus = [];
+                // $invoices = [];
+                // $agreementDetails  = [];
+                //dd($agreementDetails);
+    
+                $membership_level = Subscription::where('user_id', auth()->user()->id)->value('name'); //dd($membership_level);
+    
+                return view('front.account.account-membership',
+                compact(
+                        'paymentType',
+                        'membership_level',
+                        'invoices',
+                        'subscription_id',
+                        'subscriptionStatus',
+                        'agreementDetails'
+                    )
+                );
+            }
+            return redirect('/');
         }else{
              // Retrieve the user's Stripe customer ID
-            $customerId = auth()->user()->stripe_id;  
+            $customerId = auth()->user()->stripe_id;
             Stripe::setApiKey(config('services.stripe.secret_key'));
-        
+
             try{
                 // Retrieve the subscription history for the customer from Stripe
                 if ($customerId !== null){
@@ -231,37 +239,35 @@ class AccountController extends Controller
                     //     dd(1);
                     // }
                     // dd($invoices->data);
-                    return view('front.account.account-membership', 
+                    return view('front.account.account-membership',
                     compact(
                             'paymentType',
                             'invoices',
                             'subscriptions',
                             'membership_level'
                         )
-                    ); 
+                    );
                 }
             }catch(Exception $ex){
                 return redirect()->route('front.account-membership')->withErrors($ex->getMessage());
             }
         }
-       
 
-           
      }
 
      public function paymentMethodManagement()
      {
         $user = User::find(auth()->user()->id);
-        $paymentMethods = $user->paymentMethods();  
+        $paymentMethods = $user->paymentMethods();
         $paymentMethodCount =   count($paymentMethods);
 
         $defaultPaymentMethod = null;
         if ($user->hasPaymentMethod()) {
-            $defaultPaymentMethod = $user->defaultPaymentMethod();  
-        }     
-        
-        return view('front.account.account-payment-method-management', 
-            compact(               
+            $defaultPaymentMethod = $user->defaultPaymentMethod();
+        }
+
+        return view('front.account.account-payment-method-management',
+            compact(
                 'paymentMethods',
                 'defaultPaymentMethod',
                 'paymentMethodCount'
@@ -270,7 +276,7 @@ class AccountController extends Controller
      }
 
      public function addCard(Request $request)
-     {  
+     {
 
         try{
             $user = User::find(auth()->user()->id);
@@ -284,7 +290,7 @@ class AccountController extends Controller
                 'card' => [
                     'token' => $token
                 ]
-            ]);  
+            ]);
 
             // dd($paymentMethod);
             $user->addPaymentMethod($paymentMethod);
@@ -300,41 +306,41 @@ class AccountController extends Controller
         }catch(Exception $ex){
             return redirect()->back()->withInput()->withErrors($ex->getMessage());
         }
-       
+
      }
-    
+
 
      public function deleteCard(Request $request, $id)
      {
         $user = USer::find(auth()->user()->id);
-        $paymentMethods = $user->paymentMethods();  
+        $paymentMethods = $user->paymentMethods();
         $paymentMethodCount =   count($paymentMethods);
-        
+
         if($paymentMethodCount == 1){
-            //if there is only one payment method. 
+            //if there is only one payment method.
             return redirect()->back()->withInput()->withErrors('That payment method cannot be deleted because it is linked to an automatic subscription. Please add a payment method, before trying again.');
-            
+
         }else{
             try{
 
                 // Check if the payment method to be deleted is the default payment method
                 $paymentMethod = $user->findPaymentMethod($id);
                 $isDefaultPaymentMethod = $user->defaultPaymentMethod()->id === $id;
-    
+
                 // Delete the payment method
                 $user->deletePaymentMethod($id);
-    
+
                 // Update default payment method if the deleted method was the default
                 if ($isDefaultPaymentMethod && $user->hasPaymentMethod()) {
                     $newDefaultPaymentMethod = $user->paymentMethods()->first();
                     $user->updateDefaultPaymentMethod($newDefaultPaymentMethod->id);
                 }
-    
+
                 return redirect()->back()->with('flash_success', 'Payment method is deleted successfully');
             }catch(Exception $ex){
                 return redirect()->back()->with('error', $ex->getMessage());
             }
         }
-        
+
      }
 }

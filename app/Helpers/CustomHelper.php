@@ -59,3 +59,20 @@ function getMiddleWord($string) {
         return $words[floor($wordCount/2)];
     }
 }
+
+function check_image($url)
+{
+	if($url ?? false) {
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_exec($ch);
+		$info = curl_getinfo($ch);
+		if ($info["http_code"] != 200)
+			return false;
+		else
+			return true;
+	}
+
+	return false;
+}

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
-// use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 class ApiPasswordResetToken extends Model
@@ -27,13 +27,13 @@ class ApiPasswordResetToken extends Model
         return $randomString;
     }
 
-    public function getResetIdentifierCode($ser_id)
+    public function getResetIdentifierCode()
     {
         $token = $this->getResetCode();
 
         try{
             $obj = new ApiPasswordResetToken();
-            $obj ->user_id = $ser_id;
+            $obj ->user_id = Auth::id();
             $obj ->token_signature = hash('md5',  $token);
             $obj ->token_type = ApiPasswordResetToken::$PASSWORD_RESET_TOKEN;
             $obj ->expires_at = Carbon::now()->addMinutes(30);
@@ -43,11 +43,11 @@ class ApiPasswordResetToken extends Model
         }catch(Throwable $th){
             return response()->json([
                 'status' => false,
-                'message' => 'There is an error while validating the password reset code.',
+                'message' => 'There is an error while validating the password reset code.',       
                 'error' => $th->getMessage(),
             ], 422);
         }
     }
 
-
+    
 }

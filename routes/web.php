@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Backend\HomeController;
+use App\Http\Controllers\Backend\MessageController;
 use App\Http\Controllers\Backend\TradeAlertController;
 use App\Http\Controllers\Backend\PaymentManagementController;
 use App\Http\Controllers\Backend\PlanManagementController;
@@ -40,18 +41,22 @@ Route::post('/payment/process', [PaymentController::class, 'process'])->name('fr
 Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement'])->name('front.execute-agreement-paypal');  //PayPal execute agreement
 Route::get('/thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
 
+Route::post('/keep-alive', function () {
+	return 1;
+})->name('keep.alive');
 
 Route::group(['middleware' => ['auth', 'auth.timeout'], ['prefix' => 'front']], function() {
     Route::get('/account/profile', [AccountController::class, 'index'])->name('front.account-profile');
     Route::post('/account/store', [AccountController::class, 'store'])->name('front.account.store');
+    Route::post('/account/store-psw', [AccountController::class, 'passwordSave'])->name('front.account.savepsw');
 
-    Route::get('/account/membership', [AccountController::class, 'membership'])->name('front.account-membership');    
+
+    Route::get('/account/membership', [AccountController::class, 'membership'])->name('front.account-membership');
     Route::get('/account/payment-method-management', [AccountController::class, 'paymentMethodManagement'])->name('front.account-payment-method-management');
     Route::delete('/account/delete-card/{id}', [AccountController::class, 'deleteCard'])->name('front.account-delete-card');
     Route::post('/account/add-card', [AccountController::class, 'addCard'])->name('front.account-add-card');
 
-    Route::get('/notify/notification-setup', [AccountController::class, 'notificationSetup'])->name('front.account-notification-setup');     
-
+    Route::get('/notify/notification-setup', [AccountController::class, 'notificationSetup'])->name('front.account-notification-setup');
     Route::post('/notify/send-verification-code', [AccountController::class, 'sendVerificationCode'])->name('front.account.send-verification-code');
     Route::post('/notify/verify-phone-code', [AccountController::class, 'verifyPhoneCode'])->name('front.account.verify-phone-code');
 
@@ -89,8 +94,11 @@ Route::group(['middleware' => ['auth', 'role:admin', 'auth.timeout'], ['prefix' 
     Route::resource('articles', PostController::class);
 
     Route::resource('trades', TradeAlertController::class);
+    Route::post('trades/search', [TradeAlertController::class, 'searchTread'])->name('admin.trade-search');
     Route::post('trades/close', [TradeAlertController::class, 'tradeClose'])->name('admin.trade-close');
     Route::post('trades/add', [TradeAlertController::class, 'tradeAdd'])->name('admin.trade-add');
+
+    Route::resource('messages', MessageController::class);
 
     Route::resource('plans', PlanManagementController::class);
     Route::post('/paypal/plan/create', [PlanManagementController::class, 'createPlanPaypal'])->name('admin.create-plan-paypal');
@@ -99,6 +107,6 @@ Route::group(['middleware' => ['auth', 'role:admin', 'auth.timeout'], ['prefix' 
     Route::get('/paypal/plan/{id}/activate', [PlanManagementController::class, 'activatePlanPaypal'])->name('admin.activate-plan-paypal');
     Route::delete('/paypal/plan/{id}/delete', [PlanManagementController::class, 'deletePlanPaypal'])->name('admin.delete-plan-paypal');
 
-   
+
 });
 

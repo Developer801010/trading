@@ -5,6 +5,7 @@
 @section('page-style')
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/quill.snow.css') }}">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 @endsection
 @section('content')
 <section>
@@ -26,7 +27,7 @@
                                 <div class="row d-flex align-items-end mb-1">
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label mb-1" for="itemname">Trade Type</label><br>
+                                            <label class="form-label mb-1">Trade Type</label><br>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="trade_type" id="trade_type_stock" value="stock" 
                                                 {{ old('trade_type', 'stock') == 'stock' ? 'checked' : '' }}  />
@@ -42,8 +43,22 @@
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Symbol</label>
+                                            <label class="form-label">Symbol</label>
                                             <input type="text" class="form-control" name="trade_symbol" id="trade_symbol" value="{{old('trade_symbol')}}" />
+                                        </div>
+                                    </div>
+
+									<div class="col-md-3 col-12">
+                                        <div class="mb-1">
+                                            <label class="form-label">Company Name</label>
+                                            <input type="text" class="form-control" name="company_name" id="company_name" value="{{old('company_name')}}" />
+                                        </div>	
+                                    </div>
+
+									<div class="col-md-3 col-12">
+                                        <div class="mb-1">
+                                            <label class="form-label">Current Price($)</label>
+                                            <input type="text" class="form-control" name="current_price" id="current_price" value="{{old('current_price', '0')}}" />
                                         </div>
                                     </div>
 
@@ -57,7 +72,7 @@
                                 <div class="row">
                                     <div class="col-md-3 col-12 option_column d-none">
                                         <div class="mb-1">
-                                            <label class="form-label mb-1" for="itemname">Trade Option</label><br>
+                                            <label class="form-label mb-1">Trade Option</label><br>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="trade_option" id="trade_option_call" value="call" 
                                                 {{ old('trade_option', 'call') == 'call' ? 'checked' : '' }}  />
@@ -73,7 +88,7 @@
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label mb-1" for="itemname">Direction</label><br>
+                                            <label class="form-label mb-1">Direction</label><br>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="trade_direction" id="trade_direction_buy" value="buy" 
                                                 {{ old('trade_direction', 'buy') == 'buy' ? 'checked' : '' }} />
@@ -89,49 +104,49 @@
 
                                     <div class="col-md-3 col-12  option_column d-none">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Expiration Date (YYYY-MM-DD)</label>
+                                            <label class="form-label">Expiration Date (YYYY-MM-DD)</label>
                                             <input type="text" class="form-control picker" name="expiration_date" id="expiration_date" value="{{old('expiration_date')}}" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12  option_column d-none">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Strike Price($)</label>
-                                            <input type="text" class="form-control numeral-mask" name="strike_price" id="strike_price" value="{{old('strike_price', '0')}}" />
+                                            <label class="form-label">Strike Price($)</label>
+                                            <input type="text" class="form-control" name="strike_price" id="strike_price" value="{{old('strike_price', '0')}}" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Entry Price($)</label>
-                                            <input type="text" class="form-control numeral-mask" name="entry_price" id="entry_price" value="{{old('entry_price')}}" />
+                                            <label class="form-label">Entry Price($)</label>
+                                            <input type="text" class="form-control" name="entry_price" id="entry_price" value="{{old('entry_price')}}" />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Stop Price($)</label>
+                                            <label class="form-label">Stop Price($)</label>
                                             <input type="text" class="form-control" name="stop_price" id="stop_price" value="{{old('stop_price') }}"  />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Target Price($)</label>
-                                            <input type="text" class="form-control numeral-mask" name="target_price" id="target_price" value="{{old('target_price')}}"  />
+                                            <label class="form-label">Target Price($)</label>
+                                            <input type="text" class="form-control" name="target_price" id="target_price" value="{{old('target_price')}}"  />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Entry Date</label>
+                                            <label class="form-label">Entry Date</label>
                                             <input type="text" class="form-control picker" name="entry_date" id="entry_date" value="{{old('entry_date')}}"  />
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 col-12">
                                         <div class="mb-1">
-                                            <label class="form-label" for="itemname">Position Size(%)</label>
+                                            <label class="form-label">Position Size(%)</label>
                                             <select class="form-select" name="position_size" id="position_size">
                                                 @for ($i = 0.5; $i <= 10; $i += 0.5)
                                                     <option value="{{$i}}" {{ old('position_size') == $i ? 'selected' : '' }}>{{$i}}</option>
@@ -143,8 +158,8 @@
                                 </div>
                               
                                 <div class="row">
-                                    <div class="col-md-12 mb-1">
-                                        <label class="form-label" for="itemname">Comment on Trade</label>
+                                    <div class="col-md-12 mb-5">
+                                        <label class="form-label">Comment on Trade</label>
                                         <div class="quill-toolbar">
                                             <span class="ql-formats">
                                                 <select class="ql-header">
@@ -187,23 +202,25 @@
                                                 
                                         </div>                                       
                                     </div>
-                                    <input type="hidden" id="quill_html" name="quill_html"></input>
+                                    <input type="hidden" id="quill_html" name="quill_html">
                                 </div>
 
-                                <div class="col-12 mb-1 image_row">
+                                <div class="col-12 mt-2 mb-1 image_row">
                                     <label for="customFile" class="form-label">Chart Image</label>
                                     <input class="form-control" type="file" id="image" name="image" />
                                 </div>
+								<input type="hidden" id="symbol_image" name="symbol_image" value="{{ old('image') }}"/>
+
 
                                 {{-- <div class="col-12 mb-1 d-none">
-                                    <label class="form-label" for="itemname">Trade Date (yyyy-mm-dd)</label>
+                                    <label class="form-label">Trade Date (yyyy-mm-dd)</label>
                                     <input type="text" class="form-control picker" name="trade_date" id="trade_date" />
                                 </div> --}}
 
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-12 mt-2">
                                 {{-- <button class="btn btn-icon btn-primary" type="button" data-repeater-create>
                                     <i data-feather="plus" class="me-25"></i>
                                     <span>Add New</span>
@@ -226,10 +243,13 @@
 <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
 <script src="{{asset('app-assets/vendors/js/editors/quill/quill.min.js')}}"></script>
 {{-- <script src="{{asset('app-assets/js/scripts/forms/form-quill-editor.js')}}"></script> --}}
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <script>
 
 
     var option_column = $('.option_column');
+	var msg_column = $('.message-column');
+	
     var tradeForm = $('.tradeForm');
     
     // $('.trade-repeater, .repeater-default').repeater({
@@ -260,12 +280,11 @@
     $(document).ready(function () {
 
         var tradeType = @json(old('trade_type'));
-        console.log(tradeType);
         if(tradeType == 'option'){
             option_column.removeClass('d-none');
         }else if (tradeType == 'stock'){
             option_column.addClass('d-none');
-        }
+        } 
         // var tradeType = $('input[name="trade_type"]').val();
 
       
@@ -299,6 +318,7 @@
             if (selectedValue === "stock") 
             {
                 option_column.addClass('d-none');
+				msg_column.addClass('d-none');
 
                 tradeForm.validate({
                     rules: {
@@ -323,7 +343,8 @@
             else if (selectedValue === "option") 
             {
                 option_column.removeClass('d-none');
-            
+				msg_column.addClass('d-none');
+
                 tradeForm.validate({
                     rules: {
                         'trade_symbol': {
@@ -349,7 +370,7 @@
                         },
                     }
                 });
-            }      
+            } 
         });
 
 
@@ -364,6 +385,43 @@
         quill.on('text-change', function(delta, oldDelta, source) {
             document.getElementById("quill_html").value = quill.root.innerHTML; 
         });
+
+		$( "#trade_symbol" ).autocomplete({
+			source: function( request, response ) {
+				$.ajax({
+					method: "POST",
+					url: "{{ route('admin.trade-search') }}",
+					dataType: "json",
+					data: {
+						_token: "{{ csrf_token() }}",
+						symbol: request.term,
+						type: 'list-companies'
+					},
+					success: function( data ) {
+						response( data );
+					}
+				});
+			},
+			minLength: 2,
+			select: function( event, ui ) {
+				$.ajax({
+					method: "POST",
+					url: "{{ route('admin.trade-search') }}",
+					data: {
+						_token: "{{ csrf_token() }}",
+						symbol: ui.item.value,
+						type: 'company-details'
+					},
+					dataType: "json",
+					success: function (response) {
+						$('#current_price').val(response.price);
+						$('#company_name').val(response.company_name);
+
+						$('#symbol_image').val(response.image);
+					}
+				});
+			}
+		});
         
     });
 

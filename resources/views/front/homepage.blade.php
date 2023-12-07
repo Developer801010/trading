@@ -8,7 +8,7 @@
 
 @section('content')
     <section class="home-banner">
-        <img src="{{ asset('assets/image/banner.png') }}" />
+        <img src="{{ asset('assets/images/banner.png') }}" />
     </section>
     <section class="home-content">
         <div class="container">
@@ -22,12 +22,12 @@
             <div class="row">
                 <div class="col-md-7">
                     <h4 class="welcome-msg mobile-pt-0">
-                        We make trading quick, simple and accessible for new and experienced traders. We help our members gain confidence in their trades by equipping them with the tools they need to expand their portfolio & earn profits. 
-        
+                        We make trading quick, simple and accessible for new and experienced traders. We help our members gain confidence in their trades by equipping them with the tools they need to expand their portfolio & earn profits.
+
                     </h4>
                 </div>
                 <div class="col-md-5">
-                    <img src="{{asset('assets/image/computer.png')}}" />
+                    <img src="{{asset('assets/images/computer.png')}}" />
                 </div>
             </div>
         </div>

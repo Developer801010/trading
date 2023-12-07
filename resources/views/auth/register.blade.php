@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="keywords" content="">
     <meta name="author" content="PIXINVENT">
-    <title>@yield('title', 'Register Page')</title>    
+    <title>@yield('title', 'Register Page')</title>
     <link rel="apple-touch-icon" href="{{ asset('app-assets/images/ico/apple-icon-120.png') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('app-assets/images/ico/favicon.ico') }}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
@@ -22,7 +22,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/bootstrap.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/bootstrap-extended.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/colors.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/components.css') }}">   
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/components.css') }}">
     <!-- BEGIN: Page CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/forms/form-validation.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/pages/authentication.css') }}">
@@ -58,7 +58,7 @@
                     <div class="auth-inner row m-0">
                         <!-- Brand logo-->
                         <a class="brand-logo" href="{{route('front.home')}}">
-                            <img src="{{asset('assets/image/logo.png')}}" class="brand-logo" />
+                            <img src="{{asset('assets/images/Logo.png')}}" class="brand-logo" />
                         </a>
                         <!-- /Brand logo-->
 
@@ -127,11 +127,11 @@
                                                             <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                                                             <span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span>
                                                         </div>
-                                                    </div>                                                   
+                                                    </div>
                                                     <div class="col-md-6 mb-1">
                                                         <label class="form-label" for="mobile_number">Mobile number</label>
                                                         <input type="text" name="mobile_number" id="mobile_number" class="form-control mobile-number-mask" placeholder="(472) 765-3654" />
-                                                    </div>                                                  
+                                                    </div>
                                                 </div>
 
                                                 <div class="row mt-1">
