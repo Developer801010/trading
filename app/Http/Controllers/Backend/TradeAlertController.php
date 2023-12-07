@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers\Backend;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\FirebasePushController;
+use Exception;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Trade;
+use GuzzleHttp\Client;
 use App\Jobs\SendTwilioSMS;
+use App\Models\TradeDetail;
+use Illuminate\Http\Request;
 use App\Mail\TradeAddAlertMail;
 use App\Mail\TradeCloseAlertMail;
-use App\Mail\TradeCreationAlertMail;
-use App\Models\Trade;
-use App\Models\TradeDetail;
-use App\Models\User;
-use App\Service\SmsService;
-use Carbon\Carbon;
-use Exception;
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Mail\TradeCreationAlertMail;
 use Illuminate\Support\Facades\Mail;
-use Laravel\Cashier\Subscription;
+use Illuminate\Support\Facades\Artisan;
 
 class TradeAlertController extends Controller
 {
@@ -27,10 +25,10 @@ class TradeAlertController extends Controller
     public $tradeinSyncText = 'TradeInSync ';
     public function __construct()
     {
-        $this->middleware('permission:trade-list|trade-create|trade-edit|trade-delete', ['only' => ['index','store']]);
-        $this->middleware('permission:trade-create', ['only' => ['create','store']]);
-        $this->middleware('permission:trade-edit', ['only' => ['edit','update']]);
-        $this->middleware('permission:trade-delete', ['only' => ['destroy']]);
+        // $this->middleware('permission:trade-list|trade-create|trade-edit|trade-delete', ['only' => ['index','store']]);
+        // $this->middleware('permission:trade-create', ['only' => ['create','store']]);
+        // $this->middleware('permission:trade-edit', ['only' => ['edit','update']]);
+        // $this->middleware('permission:trade-delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -38,6 +36,7 @@ class TradeAlertController extends Controller
     public function index()
     {
         $parentTrades = Trade::with('tradeDetail')
+			->where('trade_type', '!=', 'message')
             ->whereNull('exit_price')->whereNull('exit_date')  //open trade
             ->orderBy('created_at','desc')->paginate(10);
 
@@ -70,160 +69,161 @@ class TradeAlertController extends Controller
         $position_size = $request->position_size;
         $trade_description = $request->quill_html;
 
-        // Extract base64 encoded image data from Quill content
-        $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
+		// Extract base64 encoded image data from Quill content
+		$pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
+	
+		$trade_description = preg_replace_callback($pattern, function ($match) {
+			$extension = $match[1]; // Get image extension
+			$base64Image = $match[2]; // Get base64 image data
+			$imageData = base64_decode($base64Image); // Decode base64 data
 
-        $trade_description = preg_replace_callback($pattern, function ($match) {
-            $extension = $match[1]; // Get image extension
-            $base64Image = $match[2]; // Get base64 image data
-            $imageData = base64_decode($base64Image); // Decode base64 data
+			 // Generate a unique identifier for the image name
+			$uniqueIdentifier = uniqid();
 
-             // Generate a unique identifier for the image name
-            $uniqueIdentifier = uniqid();
+			// Combine unique identifier and current timestamp for the image name
+			$imageName = 'image_' . $uniqueIdentifier.'_'. time() . '.' . $extension;
+			$imagePath = public_path('uploads/trade/' . $imageName);
+			file_put_contents($imagePath, $imageData);
 
-            // Combine unique identifier and current timestamp for the image name
-            $imageName = 'image_' . $uniqueIdentifier.'_'. time() . '.' . $extension;
-            $imagePath = public_path('uploads/trade/' . $imageName);
-            file_put_contents($imagePath, $imageData);
+			// Replace base64 encoded image with URL
+			$imageUrl = asset('uploads/trade/' . $imageName);
 
-            // Replace base64 encoded image with URL
-            $imageUrl = asset('uploads/trade/' . $imageName);
+			return $imageUrl;
+		}, $trade_description);
 
-            return $imageUrl;
-        }, $trade_description);
+		//duplication issue
+		//for stock's opened trades.  by the trade symbol
+		if($trade_type == 'stock'){
+			$tradeCount = Trade::where([
+				'trade_type' => 'stock',
+				'trade_symbol' => $trade_symbol
+			])
+			->whereNull('exit_price')
+			->whereNull('exit_date')
+			->count();
 
-        //duplication issue
-        //for stock's opened trades.  by the trade symbol
-        if($trade_type == 'stock'){
-            $tradeCount = Trade::where([
-                'trade_type' => 'stock',
-                'trade_symbol' => $trade_symbol
-            ])
-            ->whereNull('exit_price')
-            ->whereNull('exit_date')
-            ->count();
+			$msg = 'Symbol already exists';
+		}else{
+			//for option by the whole content
+			$tradeCount = Trade::where([
+				'trade_type' => 'option',
+				'trade_symbol' => $trade_symbol,
+				'expiration_date' => $expiration_date,
+				'trade_option' => $trade_option,
+				'strike_price' => $strike_price
+			])
+			->whereNull('exit_price')
+			->whereNull('exit_date')
+			->count();
 
-            $msg = 'Symbol already exists';
-        }else{
-            //for option by the whole content
-            $tradeCount = Trade::where([
-                'trade_type' => 'option',
-                'trade_symbol' => $trade_symbol,
-                'expiration_date' => $expiration_date,
-                'trade_option' => $trade_option,
-                'strike_price' => $strike_price
-            ])
-            ->whereNull('exit_price')
-            ->whereNull('exit_date')
-            ->count();
+			$msg = 'Contract already exists';
 
-            $msg = 'Contract already exists';
+		}
+		// dd($tradeCount);
+		if($tradeCount > 0)
+			return back()->withErrors($msg)->withInput();
 
-        }
-        // dd($tradeCount);
-        if($tradeCount > 0)
-            return back()->withErrors($msg)->withInput();
+		DB::beginTransaction();
+		try{
 
-        DB::beginTransaction();
-        try{
+			$tradeObj = new Trade();
+			$tradeObj->trade_type = $trade_type;
+			$tradeObj->trade_symbol = $trade_symbol;
+			$tradeObj->trade_direction = $trade_direction;
+			$tradeObj->stop_price = $stop_price;
+			$tradeObj->target_price = $target_price;
+			$tradeObj->entry_date = $entry_date;
+			$tradeObj->entry_price = $entry_price;
+			$tradeObj->current_price = $request->current_price;
+			$tradeObj->company_name = $request->company_name;
+			$tradeObj->position_size = $position_size;
+			$tradeObj->trade_description = $trade_description;
 
-            $tradeObj = new Trade();
-            $tradeObj->trade_type = $trade_type;
-            $tradeObj->trade_symbol = $trade_symbol;
-            $tradeObj->trade_direction = $trade_direction;
-            $tradeObj->stop_price = $stop_price;
-            $tradeObj->target_price = $target_price;
-            $tradeObj->entry_date = $entry_date;
-            $tradeObj->entry_price = $entry_price;
-            $tradeObj->position_size = $position_size;
-            $tradeObj->trade_description = $trade_description;
+			if($trade_type == 'option'){
+				$tradeObj->trade_option = $trade_option;
+				$tradeObj->expiration_date = $expiration_date;
+				$tradeObj->strike_price = $strike_price;
+			}
 
-            if($trade_type == 'option'){
-                $tradeObj->trade_option = $trade_option;
-                $tradeObj->expiration_date = $expiration_date;
-                $tradeObj->strike_price = $strike_price;
-            }
+			if($request->hasFile('image')){
+			    $request->validate([
+			        'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+			    ]);
 
-            if($request->hasFile('image')){
-                $request->validate([
-                    'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                ]);
+			    $imageName = time().'.'.$request->image->extension();
+			    $request->image->move(public_path('uploads/trade'), $imageName);
 
-                $imageName = time().'.'.$request->image->extension();
-                $request->image->move(public_path('uploads/trade'), $imageName);
+			    $tradeObj->chart_image = 'uploads/trade/' . $imageName;
+			}
 
-                $tradeObj->chart_image = 'uploads/trade/' . $imageName;
-            }
+			$tradeObj->symbol_image = $request->symbol_image;
 
-            $tradeObj->save();
-            DB::commit();
+			$tradeObj->save();
+			DB::commit();
 
-            //Bulk trade creation email to activated users's email
-            $activeSubscribers = $this->getActiveSubscriptionUsers();
+			//Bulk trade creation email to activated users's email
+			$activeSubscribers = $this->getActiveSubscriptionUsers();
 
-            if($trade_type == 'option'){
-                $trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
+			if($trade_type == 'option'){
+				$trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
 
-                $sms_msg = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+				$sms_msg = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
 
-                $body_first_title = ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
+				$body_first_title = ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('ymd').ucfirst(substr($trade_option,0,1)).$strike_price;
 
-                $body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('M d, Y').' $'.number_format($strike_price, 0).' '.ucfirst($trade_option).'@$'.$entry_price.' or better';
-            }else{
-                $trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
+				$body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol).' '.Carbon::parse($expiration_date)->format('M d, Y').' $'.number_format($strike_price, 0).' '.ucfirst($trade_option).'@$'.$entry_price.' or better';
+			}else{
+				$trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
 
-                $sms_msg = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol);
+				$sms_msg = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol);
 
-                $body_first_title = ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol);
+				$body_first_title = ucfirst($trade_type).' '.'Alert - New Trade '.strtoupper($trade_direction). ' '.strtoupper($trade_symbol);
 
-                $body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol);
-            }
-            $url = route('front.trade-detail', [
-                'id'=>$tradeObj->id,
-                'type'=>'n'
-            ]);
+				$body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol);
+			}
+			$url = route('front.trade-detail', [
+				'id'=>$tradeObj->id,
+				'type'=>'n'
+			]);
 
-            $data = [
-                'title' => $trade_mail_title,
-                'body' => [
-                    'first_title' => $body_first_title,
-                    'title' => $body_title,
-                    'trade_entry_date' => Carbon::parse($entry_date)->format('m/d/Y'),
-                    'trade_entry_price' => $entry_price,
-                    'position_size' => $position_size,
-                    'stop_price' => $stop_price,
-                    'target_price' => $target_price,
-                    'comments' => $trade_description,
-                    'visit' =>  $url
-                ]
-            ];
+			$data = [
+				'title' => $trade_mail_title,
+				'body' => [
+					'first_title' => $body_first_title,
+					'title' => $body_title,
+					'trade_entry_date' => Carbon::parse($entry_date)->format('m/d/Y'),
+					'trade_entry_price' => $entry_price,
+					'position_size' => $position_size,
+					'stop_price' => $stop_price,
+					'target_price' => $target_price,
+					'comments' => $trade_description,
+					'visit' =>  $url
+				]
+			];
 
-            foreach($activeSubscribers as $subscriber){
-                Mail::to($subscriber->email)->queue(new TradeCreationAlertMail($data));
-            }
+			foreach($activeSubscribers as $subscriber){
+				Mail::to($subscriber->email)->queue(new TradeCreationAlertMail($data));
+			}
+			
+			Artisan::call('queue:work --stop-when-empty');
 
-            //Bulk trade creation notification to activated users' phone
-            $msg = $sms_msg.' '.$url;
-            foreach($activeSubscribers as $subscriber)
-            {
-                 //if user subscribed for the mobile notification and verified the phone number
-                if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)
-                {
-                    SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
-                }
-            }
+			//Bulk trade creation notification to activated users' phone
+			$msg = $sms_msg.' '.$url;
+			foreach($activeSubscribers as $subscriber)
+			{
+					//if user subscribed for the mobile notification and verified the phone number
+				if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)
+				{
+					SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
+				}
+			}
 
-            //Send Mobile users----------------
-            $push_service = new FirebasePushController();
-            $push_service->notificationToAllMobiles($msg);
-            //-------------------------------
+			return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
 
-            return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
-
-        }catch(Exception $ex){
-            DB::rollBack();
-            return back()->withErrors($ex->getMessage())->withInput();
-        }
+		}catch(Exception $ex){
+			DB::rollBack();
+			return back()->withErrors($ex->getMessage())->withInput();
+		}
 
     }
 
@@ -369,9 +369,10 @@ class TradeAlertController extends Controller
                  ]
              ];
 
-             foreach($activeSubscribers as $subscriber){
-                 Mail::to($subscriber->email)->queue(new TradeAddAlertMail($data));
-             }
+			foreach($activeSubscribers as $subscriber){
+				Mail::to($subscriber->email)->queue(new TradeAddAlertMail($data));
+			}
+			Artisan::call('queue:work --stop-when-empty');
 
             //Bulk trade creation notification to activated users' phone
             $msg = $sms_title.' '.$url;
@@ -514,9 +515,11 @@ class TradeAlertController extends Controller
                  ]
              ];
 
-             foreach($activeSubscribers as $subscriber){
-                 Mail::to($subscriber->email)->queue(new TradeCloseAlertMail($data));
-             }
+			foreach($activeSubscribers as $subscriber){
+				Mail::to($subscriber->email)->queue(new TradeCloseAlertMail($data));
+			}
+			Artisan::call('queue:work --stop-when-empty');
+
 
             //Bulk trade creation notification to activated users' phone
             $msg = $sms_title.' '.$url;
@@ -547,6 +550,50 @@ class TradeAlertController extends Controller
 
         return $activeSubscribers;
     }
+
+	function searchTread(Request $request) : JsonResponse {
+		
+		$symbol = $request->get('symbol');
+		$type = $request->get('type');
+		$apiKey = 'rVepuhvI6BzfIXsCa6P3JdygCmXAYL7p';
+		$apiDomain = 'https://financialmodelingprep.com/api/v3';
+
+		$resultLists = [];
+		switch($type) {
+			case 'list-companies':
+				$url_info = "$apiDomain/search?query=$symbol&limit=10&apikey=$apiKey";
+			
+				$http = new Client();
+				$response = $http->request('GET', $url_info);
+				$companyLists = json_decode($response->getBody());
+		
+				foreach($companyLists as $company) {
+					$resultLists[] = [
+						'value' => $company->symbol,
+						'label' => $company->name . " - " . $company->symbol
+					];
+				}
+				break;
+
+			case 'company-details':
+				$url_info = "$apiDomain/profile/$symbol?apikey=$apiKey";
+			
+				$http = new Client();
+				$response = $http->request('GET', $url_info);
+				$company = json_decode($response->getBody());
+				$company = $company[0];
+		
+				$resultLists = [
+					'price' => $company->price,
+					'image' => $company->image,
+					'company_name' => $company->companyName
+				];
+				break;
+		}
+
+		return response()->json($resultLists);
+		
+	}
 }
 
 

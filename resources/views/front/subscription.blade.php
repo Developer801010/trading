@@ -13,10 +13,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="side-by-side__image clipped-image blue-underlay">
-                        <img src="{{ asset('assets/image/man-desktop-screens-2-1066px.jpg')}}" />
+                        <img src="{{ asset('assets/images/man-desktop-screens-2-1066px.jpg')}}" />
                     </div>
                 </div>
-                <div class="col-md-6 subscription_content">                
+                <div class="col-md-6 subscription_content">
                     <h2 class="text-center">This is what you will get when you join:</h2>
                     <ul>
                         <li>Real-Time Trade Alerts</li>
@@ -25,7 +25,7 @@
                         <li>Exclusive weekly Newsletter</li>
                         <li>Member Only Educational Center</li>
                         <li>Quick email response</li>
-                    </ul>                
+                    </ul>
                 </div>
             </div>
             <div class="subscription_row">
@@ -49,12 +49,12 @@
                         @if (count($activeSubscription) > 0)
                             <a href="#" class="btn_subscribe">Subscribed</a>
                         @else
-                            <a href="{{ route('front.checkout', 'm') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>    
+                            <a href="{{ route('front.checkout', 'm') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>
                         @endif
                     @else
                         <a href="{{ route('front.checkout', 'm') }}" class="btn_subscribe">Subscribe</a>
                     @endauth
-                    
+
                 </div>
 
                 <div class="subscription_box subsscription_box_popular">
@@ -78,13 +78,13 @@
                         @if (count($activeSubscription) > 0)
                             <a href="#" class="btn_subscribe btn_subscribe_popular">Subscribed</a>
                         @else
-                            <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>    
+                            <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>
                         @endif
                     @else
                         <a href="{{ route('front.checkout', 'y') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>
                     @endauth
-                    
-                </div> 
+
+                </div>
 
                 <div class="subscription_box">
                     <p class="title text-center">Quarterly</p>
@@ -106,20 +106,20 @@
                         @if (count($activeSubscription) > 0)
                             <a href="#" class="btn_subscribe">Subscribed</a>
                         @else
-                            <a href="{{ route('front.checkout', 'q') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>    
+                            <a href="{{ route('front.checkout', 'q') }}" class="btn_subscribe btn_subscribe_popular">Subscribe</a>
                         @endif
                     @else
                         <a href="{{ route('front.checkout', 'q') }}" class="btn_subscribe">Subscribe</a>
                     @endauth
-                    
-                </div>           
+
+                </div>
             </div>
             <p class="short-description text-center">(All memberships renew automatically - cancel anytime)</p>
             <p class="short-description text-center">*Number of alerts is fully dependent upon the market conditions and the number of high quality opportunities that present themselves</p>
             <p class="short-description text-center">**Savings displayed on this page are calculated based on the standard monthly price of $147 per month</p>
         </section>
     </div>
-    
+
 @endsection
 
 

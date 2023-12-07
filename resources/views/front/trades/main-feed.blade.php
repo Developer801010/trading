@@ -2,193 +2,195 @@
 @section('title', 'Main Feed')
 
 @section('page-style')
+<style>
+	.view-comment img {
+		width: 100%;
+	}
+	.view-comment p {
+		color: #6c757d !important;
+	}
+</style>
 @endsection
 
 
 @section('content')
-    <div class="container">
-        <section class="dashboard-section">        
-    
-           
-        </section>
-        <section class="main-feed-section position-section">
-            @if(auth()->user()->close_feed == 0)
-                <div class="alert alert-warning alert-dismissible fade show alertPanel" role="alert">
-                    <h3 style="text-align: center">Congratulations…</h3>
-                    <h3 style="text-align: center" class="mb-4">And thank you for your order. You’ve made a great decision! Important Next Steps:</h3>
-                    <ul>
-                        <li><strong>If you wish to receive alerts via SMS then you will need to activate SMS under the nonfiction settings. </strong></li>
-                        <li><strong>You can access all the member content right now by clicking on the tabs above. There, you’ll find current open positions and some important information.</strong></li>
-                        <li><strong>You will receive new trade posts as soon as they are available to the registered email address.</strong></li>
-                        <li><strong>You will also receive a separate welcome email explaining a ton of important information. Make sure you check it out!</strong></li>
-                    </ul>
-                    
-                    <p class="feed-divide"></p>
-
-                    <div class="row accountInfoCard">
-                        <div class="col-12">
-                            <p><strong>Thank you for your order, {{auth()->user()->first_name}}!</strong></p>
-                            <p>Your login credentials are:</p>                                
-                            <p>Username: {{auth()->user()->name}}</p>
-                            <p>Email: {{auth()->user()->email}}</p>                                
-                            <br>
-                            <p><strong>Here are your order details:</strong></p>
-                            <p>Name: {{auth()->user()->first_name}}  {{auth()->user()->last_name}}</p>
-                            <p>Email: {{auth()->user()->email}}</p>                                
-                            <p>Order ID: {{ $billing_data->id }}</p>
-                            <p>Subtotal: ${{ getPlanPrice(getMiddleWord($billing_data->name)) }}</p>
-                            <p>Subscription: {{ getMiddleWord($billing_data->name) }}</p>
-                            {{-- <p>Billing Address:</p> --}}
-                                
-                            <p>If you have any questions concerning your order, feel free to contact us at <a target="_blank" href="mailto:support@tradeinsync.com">support@tradeinsync.com</a></p>
-                        </div>
-                    </div>                
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    
-                </div>            
-            @endif
-
-            <form action="{{ route('front.main-feed') }}" method="GET" class="mainFeedSearch">
-                <div class="mb-3 mt-5 row" style="justify-content: flex-end">                    
-                    <div class="col-sm-3 input-container">
-                        <input type="text" name="search" class="form-control col-md-8 search_input" value="{{ request()->get('search') }}" />      
-                        <i class="fas fa-times-circle close-icon"></i>      
-                    </div>
-                    <div class="col-sm-1">
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </div>
-                </div>
-            </form>
-            @foreach ($results as $trade)
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card mainFeedCard">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-12 col-md-8">  
-                                        {{-- A: Add trade, C: Close trade, N:New trade --}}
-                                        @php
-                                            $tradeDirection = ucfirst($trade->original_trade_direction);
-                                            $tradeSymbol = strtoupper($trade->trade_symbol);
-                                            $formattedExpirationDate = \Carbon\Carbon::parse($trade->expiration_date)->format('M d, Y');
-                                            $formattedStrikePrice = number_format($trade->strike_price, 2);
-                                            $formattedEntryPrice = number_format($trade->entry_price, 2);
-                                            $formattedExitPrice = number_format($trade->exit_price, 2);
-                                            $tradeOption = ucfirst($trade->trade_option);
-
-                                        @endphp     
-                                        <h5 class="card-title" style="font-weight: bold">                                            
-                                            {{ucfirst($trade->trade_type)}} Alert - 
-
-                                            @if( $trade->exit_price == null && $trade->exit_date == null && $trade->child_direction == null )
-                                                New Trade
-                                            @endif
-                                             {{-- closed trade    --}}
-                                            @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                                @if ($trade->original_trade_direction == 'buy')
-                                                    Sell to Close
-                                                @else
-                                                    Cover to Close
-                                                @endif
-                                            @else
-                                                {{$tradeDirection}}                                  
-                                            @endif
-                                          
-                                            
-                                            {{$tradeSymbol}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->expiration_date)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}} @endif
-
-                                            @if ($trade->child_direction !== null )
-                                                ({{$trade->child_direction}})
-                                            @endif
-                                            
-                                        </h5>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <p class="main-feed-published-time">{{\Carbon\Carbon::parse($trade->updated_at)->format('F d, Y h:i A')}}</p>
-                                    </div>
-                                </div>                          
-                            <p class="mb-1">
-                                {{-- close trade --}}
-                                @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                    {{ $tradeDirection == 'Buy' ? 'Sell' : 'Buy' }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedExpirationDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}@endif
-                                @else
-                                    {{ $tradeDirection }} {{ $tradeSymbol }} @if($trade->trade_type == 'option'){{ $formattedExpirationDate }} ${{ $formattedStrikePrice }} {{ $tradeOption }}@endif
-                                @endif
-                            </p>
-                            @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                <p class="mb-1"><b>Exit Price: </b>${{$formattedExitPrice}}</p>  
-                            @else
-                                <p class="mb-1"><b>Entry Price: </b>${{$formattedEntryPrice}}</p>    
-                            @endif
-                            <p class="mb-1"><b>Position Size: </b>{{rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.')}}% of Portfolio</p> 
-                            
-                            @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                <p class="mb-1"><b>Average Entry Price: </b>
-                                    <span class="average_entry_price">${{$formattedEntryPrice}}</span>
-                                </p>                                
-                            @else
-                                <p class="mb-1"><b>Stop Price: </b>
-                                    {{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 2) : $trade->stop_price }}
-                                </p>
-                                <p class="mb-1"><b>Target Price: </b> ${{number_format($trade->target_price, 2)}}</p>
-                            @endif
-                           
-                            @if ($trade->exit_price !== null && $trade->exit_date !== null)  
-                                <p class="mb-1"><b>Profits: </b>
-                                    @if ($trade->original_trade_direction == 'buy')
-                                        @php
-                                            $buyProfits = number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
-                                        @endphp
-                                        <span class="@if($buyProfits >= 0 )text-success @else text-danger @endif">
-                                            @if ($trade->entry_price != 0 )
-                                                {{ $buyProfits }}%
-                                            @else
-                                                0%
-                                            @endif                                            
-                                        </span>
-                                    @else
-                                        @php
-                                            $sellProfits = number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
-                                        @endphp
-                                        <span class="@if($sellProfits >= 0 )text-success @else text-danger @endif">
-                                            @if ($trade->entry_price != 0 )
-                                                {{ $sellProfits }}%
-                                            @else
-                                                0%
-                                            @endif
-                                            
-                                        </span>
-                                    @endif
-                                </p>
-                            @endif
-                            <p class="mb-1"><b>Comments: </b>
-                                @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                    {!! $trade->close_comment !!}
-                                @else
-                                    {!! $trade->trade_description !!}
-                                @endif
-                                
-                            </p>
-                            {{-- for Close trade --}}
-                            @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                @if($trade->close_image && file_exists(public_path($trade->close_image)))
-                                    <img src="{{ asset($trade->close_image) }}" class="mb-1 comment_img"
-                                    data-image="{{ asset($trade->close_image) }}"  />
-                                @endif
-                            @else
-                                @if($trade->chart_image && file_exists(public_path($trade->chart_image)))
-                                    <img src="{{ asset($trade->chart_image) }}" class="mb-1 comment_img"
-                                    data-image="{{ asset($trade->chart_image) }}"  />
-                                @endif
-                            @endif
+     <!-- MAIN -->
+     <main class="main-wrapper">
+        <div class="main-feed">
+            <div class="container-lg">
+                <div class="d-flex gap-3 flex-wrap justify-content-between mb-4">
+                    <h1 class="title">Main Feed</h1>
+                    <div class="search-input">
+                        <form action="{{ route('front.main-feed') }}" method="GET" class="mainFeedSearch">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text svg-24" id="basic-addon1">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.319 14.433C19.566 12.8254 20.1537 10.803 19.9625 8.77748C19.7714 6.7519 18.8157 4.87524 17.29 3.52927C15.7642 2.1833 13.783 1.46913 11.7494 1.53206C9.71584 1.59499 7.7826 2.43028 6.34301 3.86801C4.90217 5.30674 4.06414 7.24073 3.99971 9.27588C3.93528 11.311 4.64929 13.2942 5.99624 14.8211C7.34319 16.3481 9.22171 17.304 11.249 17.4941C13.2763 17.6842 15.2997 17.094 16.907 15.844L16.95 15.889L21.192 20.132C21.2849 20.2249 21.3952 20.2986 21.5166 20.3489C21.638 20.3992 21.7681 20.4251 21.8995 20.4251C22.0309 20.4251 22.161 20.3992 22.2824 20.3489C22.4038 20.2986 22.5141 20.2249 22.607 20.132C22.6999 20.0391 22.7736 19.9288 22.8239 19.8074C22.8742 19.686 22.9001 19.5559 22.9001 19.4245C22.9001 19.2931 22.8742 19.163 22.8239 19.0416C22.7736 18.9202 22.6999 18.8099 22.607 18.717L18.364 14.475C18.3494 14.4606 18.3344 14.4466 18.319 14.433ZM16.243 5.28301C16.8076 5.83849 17.2566 6.50026 17.5642 7.23015C17.8718 7.96004 18.0318 8.7436 18.035 9.53563C18.0382 10.3277 17.8846 11.1125 17.583 11.8449C17.2814 12.5772 16.8378 13.2426 16.2777 13.8027C15.7176 14.3628 15.0522 14.8064 14.3199 15.108C13.5875 15.4096 12.8027 15.5632 12.0106 15.56C11.2186 15.5568 10.435 15.3968 9.70514 15.0892C8.97526 14.7816 8.31349 14.3326 7.75801 13.768C6.64793 12.6397 6.02866 11.1185 6.03511 9.53563C6.04156 7.95281 6.67319 6.43666 7.79242 5.31742C8.91165 4.19819 10.4278 3.56656 12.0106 3.56011C13.5935 3.55367 15.1147 4.17293 16.243 5.28301Z" fill="#737373"/>
+                                    </svg>
+                                </span>
+                                <input type="text" name="search" class="form-control search_input" placeholder="Search" value="{{ request()->get('search') }}">
+                                <i class="fas fa-times-circle close-icon m-auto"></i>
+                                <button type="submit" class="btn btn-primary opacity-0" >Search</button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
-            @endforeach
-            {{ $results->appends(request()->query())->links() }}
-        </section>
-    </div>    
+                <div class="row g-3">
+                    @foreach ($results as $trade)
+						@if ($trade->trade_type == 'message')
+							<div class="col-12 col-sm-6 col-lg-4">
+								<div class="feed-card-msg">
+									<div class="card-badge">
+										Message
+									</div>
+									<div class="card-header">
+										<h4 class="feed-card-title">{{ $trade->trade_title }}</h4>
+										<h6 class="feed-card-subtitle">{{ date('F d, Y', strtotime($trade->updated_at)) }} | Update</h6>
+									</div>
+									<div class="card-body">
+										<div class="msg-content d-none">
+											{!! $trade->trade_description  !!}
+										</div>
+										<div class="msg-content-10">
+											{!! Str::limit(strip_tags($trade->trade_description), 150, '...')  !!}
+										</div>
+										<a href="javascript:;" class="msgreadmore">Read More</a>
+									</div>
+									<div class="card-footer">
+										{{ date('F d, Y H:i A', strtotime($trade->created_at)) }}
+									</div>
+								</div>
+							</div>
+						@else
+							<div class="col-12 col-md-6 col-lg-4">
+								<div class="feed-card">
+									<div class="card-header">
+										@php
+											$tradeDirection = ucfirst($trade->original_trade_direction);
+											$tradeSymbol = strtoupper($trade->trade_symbol);
+
+											$formattedEntryPrice = number_format($trade->entry_price, 2);
+											$formattedExitPrice = number_format($trade->exit_price, 2);
+										@endphp
+										<div class="card-badge">
+											{{$tradeDirection}} {{$tradeSymbol}}
+										</div>
+										<h4 class="feed-card-title">
+											{{ucfirst($trade->trade_type)}} Alert -
+
+											@if( $trade->exit_price == null && $trade->exit_date == null && $trade->child_direction == null ) New Trade @endif
+
+											{{-- closed trade    --}}
+											@if ($trade->exit_price !== null && $trade->exit_date !== null)
+												@if ($trade->original_trade_direction == 'buy') Sell to Close @else Cover to Close @endif
+											@else
+												{{$tradeDirection}}
+											@endif
+
+
+											{{$tradeSymbol}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->expiration_date)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}} @endif
+
+											@if ($trade->child_direction !== null )
+												({{$trade->child_direction}})
+											@endif
+										</h4>
+									</div>
+									<div class="card-body">
+										<ul class="nav feed-card-list">
+											@if ( $trade->company_name ?? false)
+												<li>
+													<span class="listtitle fw-bold">Company Name:</span>
+													<span class="listamt fw-bold text-uppercase">{{ $trade->company_name }}</span>
+												</li>
+											@endif
+											{{-- <li>
+												<span class="listtitle fw-bold">Current Price:</span>
+												<span class="listamt fw-bold">${{ number_format($trade->current_price, 2) }}</span>
+											</li> --}}
+											<li>
+												<span class="listtitle fw-bold">Entry Price:</span>
+												<span class="listamt fw-bold">${{ number_format($trade->entry_price, 2) }}</span>
+											</li>
+											@if ($trade->exit_price !== null && $trade->exit_date !== null)
+											<li>
+												<span class="listtitle">Exit Price:</span>
+												<span class="listamt">${{$formattedExitPrice}}</span>
+											</li>
+											@endif
+											<li>
+												<span class="listtitle">Position Size:</span>
+												<span class="listamt">{{rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.')}}% of Portfolio</span>
+											</li>
+
+											@if ($trade->exit_price !== null && $trade->exit_date !== null)
+												<li>
+													<span class="listtitle">Average Entry Price:</span>
+													<span class="listamt">${{$formattedEntryPrice}}</span>
+												</li>
+											@else
+												<li>
+													<span class="listtitle">Stop Price:</span>
+													<span class="listamt">{{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 2) : $trade->stop_price }}</span>
+												</li>
+												<li>
+													<span class="listtitle">Target Price:</span>
+													<span class="listamt">{{number_format($trade->target_price, 2)}}</span>
+												</li>
+											@endif
+
+											@if ($trade->exit_price !== null && $trade->exit_date !== null)
+											<li class="profit">
+												<span class="listtitle">Profits:</span>
+												<span class="listamt">
+													@if ($trade->original_trade_direction == 'buy')
+														@php
+															$buyProfits = number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
+														@endphp
+
+														@if ($trade->entry_price != 0 ) {{ $buyProfits }}% @else 0% @endif
+													@else
+														@php
+															$sellProfits = number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
+														@endphp
+														@if ($trade->entry_price != 0 ) {{ $sellProfits }}% @else 0% @endif
+													@endif
+												</span>
+											</li>
+											@endif
+											<li class="view-comment">
+												<span class="listtitle">Comments:</span>
+												@if ($trade->exit_price !== null && $trade->exit_date !== null)
+													{!! $trade->close_comment !!}
+												@else
+													{!! $trade->trade_description !!}
+												@endif
+											</li>
+										</ul>
+										@if ($trade->exit_price !== null && $trade->exit_date !== null)
+											@if($trade->close_image && file_exists(public_path($trade->close_image)))
+												<img src="{{ asset($trade->close_image) }}" class="mb-1 comment_img" 
+												data-image="{{ asset($trade->close_image) }}" width="50%"/>
+											@endif
+										@else
+											@if($trade->chart_image && file_exists(public_path($trade->chart_image)))
+												<img src="{{ asset($trade->chart_image) }}" class="mb-1 comment_img" 
+												data-image="{{ asset($trade->chart_image) }}" width="50%"/>
+											@endif
+										@endif
+									</div>
+									<div class="card-footer">
+										{{\Carbon\Carbon::parse($trade->updated_at)->format('F d, Y h:i A')}}
+									</div>
+								</div>
+							</div>
+						@endif
+                    @endforeach
+                </div>
+                {{ $results->appends(request()->query())->links() }}
+            </div>
+        </div>
+    </main>
+    <!-- MAIN -->
 
     <div class="modal fade" id="commentImage" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-add-trade">
@@ -197,7 +199,23 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body pb-5 px-sm-5 pt-50">
-                    <img class="modalImg" src="" />
+                    <img class="modalImg" src="" width="100%"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<div class="modal fade" id="MsgModal" tabindex="-1" aria-labelledby="MsgModalLabel">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="MsgModalLabel">Message</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="msgtitle"></div>
+                    <div class="msgsubtitle"></div>
+                    <div class="msgcontent" id="msgcontent"></div>
                 </div>
             </div>
         </div>
@@ -205,10 +223,10 @@
 @endsection
 
 
-@section('page-script')    
+@section('page-script')
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
-        $('.btn-close').click(function (e) { 
+        $('.btn-close').click(function (e) {
             e.preventDefault();
             $.ajax({
                 url: '{{ route("front.update-close-event") }}',
@@ -222,16 +240,15 @@
             })
         });
 
-        $('body').on('click', 'img', function(e) {
-            e.preventDefault();
-
+        $('.comment_img, .view-comment img').on('click', function(e) {
+			console.log('clicked');
             var comment_img = $(this).attr('src');
-            $('#commentImage').modal('show');
             $('.modalImg').attr('src', comment_img);
+            $('#commentImage').modal('show');
         });
-        
+
         $('#commentImage').draggable({
-            handle: ".modal-header" 
+            handle: ".modal-header"
         });
 
         var search_input = $('.search_input');
@@ -242,7 +259,23 @@
            } else {
                 $('.close-icon').hide();
            }
-            
+        });
+
+        function delay(callback, ms) {
+            var timer = 0;
+            return function() {
+                var context = this, args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                callback.apply(context, args);
+                }, ms || 0);
+            };
+        }
+
+        $(document).ready(function() {
+            $('.mainFeedSearch').keyup(delay(function (e) {
+                $(".mainFeedSearch").submit();
+            }, 500));
         });
 
        // JavaScript to handle the close icon click event
@@ -251,7 +284,7 @@
             input.val('');
             input.focus();
             $(this).hide();
-            
+            $(".mainFeedSearch").submit();
         });
 
         search_input.on('input', function() {
@@ -262,5 +295,11 @@
                 icon.hide();
             }
         });
+
+		$('.msgreadmore').click(function (e) { 
+			e.preventDefault();
+			$('#msgcontent').html($(this).closest('.card-body').find('.msg-content').html());
+			$('#MsgModal').modal('show');
+		});
     </script>
 @endsection

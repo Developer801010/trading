@@ -25,12 +25,12 @@ class CheckSubscriptionCancellation
         //      return $next($request); // Allow access to other pages
         // }
 
-        $membership_name = Subscription::where('user_id', $user->id)->value('name');
+        // $membership_name = Subscription::where('user_id', $user->id)->value('name');
 
-        if ($request->user() && ! $request->user()->subscribed($membership_name)) {
-            return redirect()->route('front.account-membership')->withErrors(['error' => 'Your subscription was cancelled. You can renew your subscription.']);
-        }
+        // if ($request->user() && ! $request->user()->subscribed($membership_name)) {
+        //     return redirect()->route('front.account-membership')->withErrors(['error' => 'Your subscription was cancelled. You can renew your subscription.']);
+        // }
 
-        return $next($request);        
+        return $next($request);
     }
 }

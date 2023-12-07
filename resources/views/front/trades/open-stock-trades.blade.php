@@ -11,151 +11,147 @@
 
 
 @section('content')
-    <div class="container">
-        <section class="dashboard-section">        
-           
-        </section>
-        <section class="open-position-section  position-section">
-            <div class="table">
-                <h1 class="table-title">Open Stock Trades</h1>
-                <form action="{{ route('front.open-stock-trades') }}" method="GET">
-                    <div class="mb-3 row search-row-position">
-                        <label class="col-md-1 col-form-label" style="padding-top:10px;"><b>Search</b></label>                    
-                        <div class="col-sm-3 input-container">
-                            <input type="text" name="search" class="form-control col-md-8 search_input" value="{{ request()->get('search') }}" />      
-                            <i class="fas fa-times-circle close-icon"></i>      
+<!-- MAIN -->
+<main class="main-wrapper">
+    <div class="main-feed">
+        <div class="container-lg">
+            <div class="d-flex gap-3 flex-wrap justify-content-between mb-4">
+                <h1 class="title">Open Stock Trades</h1>
+                <div class="search-input">
+                    <form action="{{ route('front.open-stock-trades') }}" method="GET" class="mainFeedSearch">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text svg-24" id="basic-addon1">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18.319 14.433C19.566 12.8254 20.1537 10.803 19.9625 8.77748C19.7714 6.7519 18.8157 4.87524 17.29 3.52927C15.7642 2.1833 13.783 1.46913 11.7494 1.53206C9.71584 1.59499 7.7826 2.43028 6.34301 3.86801C4.90217 5.30674 4.06414 7.24073 3.99971 9.27588C3.93528 11.311 4.64929 13.2942 5.99624 14.8211C7.34319 16.3481 9.22171 17.304 11.249 17.4941C13.2763 17.6842 15.2997 17.094 16.907 15.844L16.95 15.889L21.192 20.132C21.2849 20.2249 21.3952 20.2986 21.5166 20.3489C21.638 20.3992 21.7681 20.4251 21.8995 20.4251C22.0309 20.4251 22.161 20.3992 22.2824 20.3489C22.4038 20.2986 22.5141 20.2249 22.607 20.132C22.6999 20.0391 22.7736 19.9288 22.8239 19.8074C22.8742 19.686 22.9001 19.5559 22.9001 19.4245C22.9001 19.2931 22.8742 19.163 22.8239 19.0416C22.7736 18.9202 22.6999 18.8099 22.607 18.717L18.364 14.475C18.3494 14.4606 18.3344 14.4466 18.319 14.433ZM16.243 5.28301C16.8076 5.83849 17.2566 6.50026 17.5642 7.23015C17.8718 7.96004 18.0318 8.7436 18.035 9.53563C18.0382 10.3277 17.8846 11.1125 17.583 11.8449C17.2814 12.5772 16.8378 13.2426 16.2777 13.8027C15.7176 14.3628 15.0522 14.8064 14.3199 15.108C13.5875 15.4096 12.8027 15.5632 12.0106 15.56C11.2186 15.5568 10.435 15.3968 9.70514 15.0892C8.97526 14.7816 8.31349 14.3326 7.75801 13.768C6.64793 12.6397 6.02866 11.1185 6.03511 9.53563C6.04156 7.95281 6.67319 6.43666 7.79242 5.31742C8.91165 4.19819 10.4278 3.56656 12.0106 3.56011C13.5935 3.55367 15.1147 4.17293 16.243 5.28301Z" fill="#737373"/>
+                                </svg>
+                            </span>
+                            <input type="text" name="search" class="form-control search_input" placeholder="Search"value="{{ request()->get('search') }}">
+                            <i class="fas fa-times-circle close-icon m-auto"></i>
+                            <button type="submit" class="btn btn-primary opacity-0">Search</button>
                         </div>
-                        <div class="col-sm-1">
-                            <button type="submit" class="btn btn-primary">Search</button>
-                        </div>
-                    </div>
-                </form>
-                <table class="list-table table">
-                    <thead class="table-light">
-                        <tr>
-                            <th></th>
-                            <th>Symbol</th>                                                  
-                            <th>Long/Short</th> 
-                            <th>BUY/SELL</th>
-                            <th>Entry Date</th>
-                            <th>Entry Price</th>
-                            <th>Stop Price</th>
-                            <th>Target Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($trades as $trade)
-                            <tr class="expanded">
-                                <td class="expand-icon text-primary" style="text-align: center;">
-                                    @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
-                                        <i class="expand-toggle fa-solid fa-chevron-down" style="cursor: pointer;"></i>
-                                    @endif
-                                </td>
-                                <td class="parent-trade text-primary" data-trade-id="{{ $trade->id }}">
-                                    {{strtoupper($trade->trade_symbol)}}
-                                </td>    
-                                <td>
-                                    @if($trade->trade_direction == 'buy') 
-                                        Long
-                                    @else
-                                        Short
-                                    @endif
-                                </td>                            
-                                <td>{{ucfirst($trade->trade_direction)}}</td>
-                                <td>{{\Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y')}}</td>
-                                <td class="average-price">
-                                    <span class="price">${{ $trade->entry_price }}</span>
-                                    <span class="size">({{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%)</span>
-                                </td>
-                                <td>{{$trade->stop_price}}</td>
-                                <td>${{$trade->target_price}}</td>
-                            </tr>
-                            @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
-                                @php
-                                    //parent row's data
-                                    $totalPrice = 0;  $averagePrice = 0;
-                                    $totalPrice = $trade->entry_price * $trade->position_size / 100;
-                                    $totalPercentage = $trade->position_size / 100;  
-                                    
-                                 @endphp
-                                 <tr class="child-trade child-trade-{{ $trade->id }}" >
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>{{ \Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y') }}</td>
-                                    <td>
-                                        <span>${{ $trade->entry_price }}</span>
-                                        <span>({{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%)</span>
-                                    </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                @foreach($trade->tradeDetail as $childTrade)
-                                    @php
-                                        $totalPrice += $childTrade->entry_price * $childTrade->position_size /100;
-                                        $totalPercentage += $childTrade->position_size / 100;
-                                    @endphp
-                                    <tr class="child-trade child-trade-{{ $trade->id }}">
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>{{ \Carbon\Carbon::parse($childTrade->entry_date)->format('m/d/Y') }}</td>
-                                        <td>
-                                            <span>${{ $childTrade->entry_price }}</span>
-                                            <span>({{ rtrim(rtrim(number_format($childTrade->position_size, 1), '0'), '.') }}%)</span>
-                                        </td>
-                                        <td>{{$childTrade->stop_price}}</td>
-                                        <td>${{$childTrade->target_price}}</td>
-                                    </tr>
-                                @endforeach
-                                @php
-                                    $averagePrice = $totalPrice / $totalPercentage;
-                                @endphp
-                                <script>
-                                    $(document).ready(function() {
-                                        var averagePrice = {{ $averagePrice }};
-                                        var totalPercentage = {{$totalPercentage}}
-        
-                                        $('.parent-trade[data-trade-id="{{ $trade->id }}"]').closest('tr').find('.average-price').
-                                        find('.price').text('$'+parseFloat(averagePrice).toFixed(2));
-        
-                                        $('.parent-trade[data-trade-id="{{ $trade->id }}"]').closest('tr').find('.average-price')
-                                        .find('.size').text(' ('+totalPercentage * 100+'%)');
-        
-                                        // Show/hide child rows on expand icon click
-                                        $(".expand-toggle").off('click').on('click', function() {
-                                            // console.log('toggle icon is clicked');
-                                            var parentRow = $(this).closest('tr');  
-                                            var tradeId = parentRow.find('.parent-trade').data('trade-id');
-                                            var childRows = $('.child-trade-' + tradeId);
-                                            if (parentRow.hasClass('expanded')) {
-                                                parentRow.removeClass('expanded');
-                                                childRows.hide();
-                                                $(this).removeClass('fa-chevron-down').addClass('fa-chevron-right');
-                                            } else {
-                                                parentRow.addClass('expanded');
-                                                childRows.show();
-                                                $(this).removeClass('fa-chevron-right').addClass('fa-chevron-down');
-                                            }    
-                                        });
-                                    });
-                                </script>
-                            @endif
-                        @endforeach
-                    </tbody>
-                </table>
-
-                {{ $trades->appends(request()->query())->links() }}
+                    </form>
+                </div>
             </div>
-        </section>
-    </div>    
+            <div class="tbl-card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle list">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Symbol</th>
+                                <th class="tbl-sm-w-220">Company</th>
+                                <th>Long/Short</th>
+                                {{-- <th>Buy/Sell</th> --}}
+                                <th>Entry Date</th>
+                                <th>Average Price</th>
+                                <th>Current Price</th>
+                                <th class="tbl-sm-w-100">Stop Price</th>
+                                <th>Target Price</th>
+								<th>Percentage of Portfolio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(isset($trades) && (count($trades) > 0))
+                                @foreach ($trades as $trade)
+                                    <tr @if($trade->tradeDetail !== null && $trade->tradeDetail->count()) class="view" @endif>
+                                        <td>
+                                            @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
+                                            <span class="svg-18 drow-arrow">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m12 26l10-10L12 6"/></svg>
+                                            </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="stock-profile">
+                                                <span class="stock-img">
+                                                {{-- @if ($trade->exit_price !== null && $trade->exit_date !== null)
+                                                    @if($trade->close_image && file_exists(public_path($trade->close_image)))
+                                                        <img src="{{ asset($trade->close_image) }}" data-image="{{ asset($trade->close_image) }}"  />
+                                                    @endif
+                                                @else
+                                                    @if($trade->symbol_image && file_exists(public_path($trade->symbol_image)))
+                                                        <img src="{{ asset($trade->symbol_image) }}" data-image="{{ asset($trade->symbol_image) }}"  />
+                                                    @endif
+                                                @endif --}}
+                                                    {{-- <img src="images/soxs.png"> --}}
+													@if (check_image($trade->symbol_image) ?? false)
+														<img src="{{ $trade->symbol_image }}" data-image="{{ $trade->symbol_image }}"  />
+													@endif
+                                                </span>
+                                                <span class="text-uppercase">{{strtoupper($trade->trade_symbol)}}</span>
+                                            </div>
+                                        </td>
+										<td class="text-uppercase">{{ $trade->company_name }}</td>
+                                        <td>
+                                            @if($trade->trade_direction == 'buy') Long @else Short @endif
+                                        </td>
+                                        {{-- <td>
+                                            @if($trade->trade_direction == 'buy')
+                                            <span class="stby">{{ucfirst($trade->trade_direction)}}</span>
+                                            @else
+                                            <span class="stsl">{{ucfirst($trade->trade_direction)}}</span>
+                                            @endif
+                                        </td> --}}
+                                        <td>{{\Carbon\Carbon::parse($trade->entry_date)->format('m/d/Y')}}</td>
+                                        <td>${{ $trade->entry_price }}</td>{{-- ({{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%) --}}
+                                        <td>${{ number_format($trade->current_price, 2) }}</td>
+                                        <td>{{$trade->stop_price}}</td>
+                                        <td>${{$trade->target_price}}</td>
+										<td>{{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%</td>
+                                    </tr>
+                                    @if($trade->tradeDetail !== null && $trade->tradeDetail->count())
+                                        @php
+                                            //parent row's data
+                                            $totalPrice = 0;  $averagePrice = 0;
+                                            $totalPrice = $trade->entry_price * $trade->position_size / 100;
+                                            $totalPercentage = $trade->position_size / 100;
+                                        @endphp
+
+                                        @if(isset($trade->tradeDetail) && !empty(($trade->tradeDetail)))
+                                            @foreach($trade->tradeDetail as $childTrade)
+                                                @php
+                                                    $totalPrice += $childTrade->entry_price * $childTrade->position_size /100;
+                                                    $totalPercentage += $childTrade->position_size / 100;
+                                                @endphp
+                                                <tr class="fold">
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>{{ \Carbon\Carbon::parse($childTrade->entry_date)->format('m/d/Y') }}</td>
+                                                    <td>
+														<span>${{ $childTrade->entry_price }}</span>
+                                                        {{-- <span>({{ rtrim(rtrim(number_format($childTrade->position_size, 1), '0'), '.') }}%)</span> --}}
+                                                    </td>
+                                                    <td>$0.00</td>
+                                                    <td>{{$childTrade->stop_price}}</td>
+                                                    <td>${{$childTrade->target_price}}</td>
+													<td>{{ rtrim(rtrim(number_format($childTrade->position_size, 1), '0'), '.') }}%</td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+                                    @endif
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="9" class="text-center py-5">
+                                        <h4 class="fw-bold text-dark">No data Found</h4>
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {{ $trades->appends(request()->query())->links() }}
+        </div>
+    </div>
+</main>
+<!-- MAIN -->
 @endsection
 
 
-@section('page-script')    
+@section('page-script')
 <script>
     var search_input = $('.search_input');
        $(document).ready(function () {
@@ -165,17 +161,35 @@
           } else {
                $('.close-icon').hide();
           }
-           
+
        });
 
-      // JavaScript to handle the close icon click event
-      $('.close-icon').click(function() {
+       function delay(callback, ms) {
+            var timer = 0;
+            return function() {
+                var context = this, args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                callback.apply(context, args);
+                }, ms || 0);
+            };
+        }
+
+
+        $(document).ready(function() {
+            $('.mainFeedSearch').keyup(delay(function (e) {
+                $(".mainFeedSearch").submit();
+            }, 500));
+        });
+
+        // JavaScript to handle the close icon click event
+        $('.close-icon').click(function() {
            const input = $(this).parent().find('input');
            input.val('');
            input.focus();
            $(this).hide();
-           
-       });
+           $(".mainFeedSearch").submit();
+        });
 
        search_input.on('input', function() {
            const icon = $(this).parent().find('.close-icon');

@@ -1,7 +1,7 @@
 @extends('layouts.front-master')
 @section('title', 'My Account')
 
-@section('page-style')    
+@section('page-style')
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/forms/form-validation.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/extensions/ext-component-sweet-alerts.css') }}">
     <style>
@@ -28,117 +28,136 @@
 
 
 @section('content')
-    <div class="container">
-        <section class="dashboard-section">        
-        </section>
-        <section class="account-section">
-            <div class="row">
-                <div class="col-md-3">
-                    @include('layouts.front-dashboard-sidebar')
-                </div>
-                <div class="col-md-9">
-                    <h2 class="heading pb-3 pt-3">Account Detail</h2>
-                    @include('layouts.error')
-                    
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Method</th>
-                                <th>Expires</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if($paymentMethods !== null)
-                                @foreach ($paymentMethods as $paymentMethod)
-                                    <tr>
-                                        <td class="align-middle">{{$paymentMethod->card->brand}} ending in {{$paymentMethod->card->last4}}</td>
-                                        <td class="align-middle">{{sprintf('%02d/%02d', $paymentMethod->card->exp_month, $paymentMethod->card->exp_year % 100)}}</td>
-                                        <td style="position: relative;">
-                                            <form method="post" class="btn_payment_delete_form"  style="display: inline;"
-                                            action = "{{ route('front.account-delete-card', ['id'=>$paymentMethod->id]) }}">
-                                                @csrf
-                                                @method('delete')
-                                                <button type="submit" class="btn btn-danger btn_payment_delete">
-                                                    Delete
-                                                </button>                                                
-                                            </form>
-                                            @if ($defaultPaymentMethod && $paymentMethod->id === $defaultPaymentMethod->id)
-                                                <span class="text-primary">(Default)</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach                                
-                            @else
-                                <tr class="text-center">
-                                    <td colspan="3">There is no available payment method</td>
-                                </tr>
-                            @endif
-                        </tbody>
-                    </table>
-                    <p>                       
-                        <a class="text-danger" data-bs-toggle="collapse" href="#PaymentForm" role="button" aria-expanded="false" aria-controls="PaymentForm">
-                            Add payment method
-                        </a>
-                    </p>
-
-                    <div class="collapse {{ old('isPaymentFormExpanded') ? 'show' : '' }}" id="PaymentForm">
-                        <div class="card card-body">
-                            
-                            <form class="payment-form mt-2" id="payment-form" action="{{ route('front.account-add-card') }}" method="POST">
-                                {{ csrf_field() }}
-                                <div id="card-element"></div>
-                                <div id="card-errors" role="alert"></div>
-
-                                {{-- <div class="row mb-2">
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <label class="form-label" for="addCardCvv">Nmae on Card</label>
-                                        <input type="text" id="card-name" name="card-name" class="form-control" value="{{ old('card-name', '') }}" placeholder="John" />
-                                    </div>
-
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <label class="form-label" for="addCardNumber">Card Number</label>                                        
-                                        <input id="card-number" name="card-number" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" 
-                                        aria-describedby="addCard" value="{{old('card-number')}}" />
-                                    </div>
-
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <label class="form-label" for="addCardCvv">CVC</label>
-                                        <input type="text" id="card-cvc" name="card-cvc" class="form-control cvv-code-mask"  value="{{old('card-cvc')}}"  placeholder="123" />
-                                    </div>
-
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <label class="form-label" for="addCardExpiryDate">Exp. Date</label>
-                                        <input type="text" id="card-expire-date" name="card-expire-date" class="form-control expiry-date-mask"  value="{{old('card-expire-date')}}" placeholder="MM/YYYY" />
-                                    </div>
-                                </div> --}}
-                                <div class="row">
-                                    <div class="col-auto">
-                                        <input type="hidden" name="isPaymentFormExpanded" value="{{ old('isPaymentFormExpanded') ? 'true' : 'false' }}">
-                                        <button class="btn btn-danger w-100 text-uppercase btn-payment">Add payment method</button>
+    <!-- MAIN -->
+    <main class="main-wrapper">
+        <div class="main-feed">
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-lg-3">
+                        @include('layouts.front-dashboard-sidebar')
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="tab-card">
+                            <div class="tab-card-header">Payment Method</div>
+                            <div class="tab-card-body">
+                                @include('layouts.error')
+                                <div class="row g-3">
+                                    @if(isset($paymentMethods) && !empty($paymentMethods))
+                                        @foreach ($paymentMethods as $paymentMethod)
+                                            <div class="col-md-6 col-lg-12 col-xl-6">
+                                                <div class="add-card">
+                                                    <div class="card-head">
+                                                        <div class="card-holder-name">John</div>
+                                                        <div>
+                                                            <label class="radio-button-container">
+                                                                <input type="radio" name="radio" value="Primary" hidden @if ($defaultPaymentMethod && $paymentMethod->id === $defaultPaymentMethod->id) checked @endif>
+                                                                <span class="checkmark"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="about-card">
+                                                        {{-- <div class="card-img"><img src="images/mastercard.png"></div> --}}
+                                                        <div class="card-detail">
+                                                            <h6>{{$paymentMethod->card->brand}} ending in {{$paymentMethod->card->last4}}</h6>
+                                                            <span>Card expires at {{sprintf('%02d/%02d', $paymentMethod->card->exp_month, $paymentMethod->card->exp_year % 100)}}</span>
+                                                        </div>
+                                                        <div class="ms-auto">
+                                                            <form method="post" class="btn_payment_delete_form" action="{{ route('front.account-delete-card', ['id'=>$paymentMethod->id]) }}">
+                                                                @csrf
+                                                                @method('delete')
+                                                                <button type="submit" class="btn btn-dang py-2 px-3">Delete</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                    <div class="col-md-6 col-lg-12 col-xl-6">
+                                        <div class="add-card">
+                                            <div class="add-card-detail">
+                                                <div class="card-txt">
+                                                    <h4>Add Card</h4>
+                                                    <span>Add your payment card</span>
+                                                </div>
+                                                <div>
+                                                    <a class="btn btn-grn" data-bs-toggle="modal" data-bs-target="#Addcard">Add Card</a>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </form>    
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="overlay" style="display: none;"></div>
 
-            <div id="loadingSpinner" style="display: none;">
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    Please wait while we add a new card...
+                <div id="overlay" style="display: none;"></div>
+
+                <div id="loadingSpinner" style="display: none;">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Please wait while we add a new card...
+                </div>
             </div>
-        </section>
-    </div>    
+        </div>
+    </main>
+    <!-- MAIN -->
 @endsection
 
 
 @section('page-script')
-    <script src="https://js.stripe.com/v3/"></script>    
+<!-- ADD CARD MODAL -->
+<div class="modal fade msg-modal" id="Addcard" tabindex="-1" aria-labelledby="AddcardLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <form id="payment-form" action="{{ route('front.account-add-card') }}" method="POST" class="usr-form payment-form">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="AddcardLabel">Add New Card</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="card-element"></div>
+                    <div id="card-errors" role="alert"></div>
+                    {{-- <div class="mb-3">
+                        <label class="mb-2">Card Holder Name</label>
+                        <input class="form-control"name="card-holders-name" placeholder="Name on card">
+                    </div>
+                    <div class="mb-3">
+                        <label class="mb-2">Card Number</label>
+                        <input class="form-control" name="card-number" placeholder="Enter Card Number">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="mb-2">Expiry Date</label>
+                                <input class="form-control" name="expiry-date" placeholder="MM/YY">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label class="mb-2">CVV</label>
+                                <input class="form-control" name="cvc" placeholder="CVV">
+                            </div>
+                        </div>
+                    </div> --}}
+
+                    <!-- <div class="card-js" id="example"></div> -->
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="isPaymentFormExpanded" value="{{ old('isPaymentFormExpanded') ? 'true' : 'false' }}">
+                    <button class="btn btn-gray px-4 py-2 fs-14 fw-semibold">Cancel</button>
+                    <button class="btn btn-grn px-4 py-2 fs-14 fw-semibold">Add payment method</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ADD CARD MODAL -->
+    <script src="https://js.stripe.com/v3/"></script>
     {{-- <script src="{{ asset('app-assets/vendors/js/forms/validation/jquery.validate.min.js') }}"></script> --}}
     <script src="{{asset('app-assets/vendors/js/forms/cleave/cleave.min.js')}}"></script>
-    <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>    
+    <script src="{{asset('app-assets/vendors/js/forms/cleave/addons/cleave-phone.us.js')}}"></script>
     <script src="{{asset('app-assets/vendors/js/extensions/sweetalert2.all.min.js')}}"></script>
     <script src="{{ asset('app-assets/js/scripts/extensions/ext-component-sweet-alerts.js') }}"></script>
     <script>
@@ -194,11 +213,11 @@
                 // Display an error message to the user.
                     var errorElement = document.getElementById('card-errors');
                     errorElement.textContent = result.error.message;
-                    
+
                 } else {
-                    // You can now use the Payment Method ID on your server to make a payment.                    
-                    stripeTokenHandler(result.token.id);    
-                    $('#overlay, #loadingSpinner').show();           
+                    // You can now use the Payment Method ID on your server to make a payment.
+                    stripeTokenHandler(result.token.id);
+                    $('#overlay, #loadingSpinner').show();
                 }
             });
         });
@@ -215,7 +234,7 @@
             payment_form.submit();
         }
 
-        // User Form Validation        
+        // User Form Validation
         // Credit Card
         // if (creditCard.length) {
         //     creditCard.each(function () {
@@ -256,18 +275,18 @@
         //     });
         // }
 
-       
+
 
         // $.validator.addMethod('expiryDate', function(value, element) {
         //     // Get the current date
         //     var currentDate = new Date();
-            
+
         //     // Split the expiration date into month and year
         //     var expiryDate = value.split('/');
         //     var expiryMonth = parseInt(expiryDate[0], 10);
         //     var expiryYear = parseInt(expiryDate[1], 10);
 
-            
+
         //     // Compare the expiry date with the current date
         //     if (expiryYear > currentDate.getFullYear()) {
         //         return true;
@@ -283,7 +302,7 @@
         //     expiryDate: true
         // });
 
-       
+
         // if(paymentForm.length){
         //     paymentForm.validate({
         //         errorClass: 'error',
@@ -292,7 +311,7 @@
         //                 required: true
         //             },
         //             'card-number': {
-        //                 required: true,                        
+        //                 required: true,
         //             },
         //             'card-cvc': {
         //                 required: true,
@@ -314,6 +333,6 @@
         //         }
         //     });
         // }
-        
+
     </script>
 @endsection

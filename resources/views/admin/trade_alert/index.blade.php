@@ -42,9 +42,9 @@
                         <td class="parent-trade text-primary" data-trade-id="{{ $parentTrade->id }}"  style="width: 15%">                                                    
                             @if($parentTrade->trade_type === 'stock')
                                 {{ $parentTrade->trade_symbol }}
-                            @else
+                            @elseif ($parentTrade->trade_type === 'option')
                                 {{ $parentTrade->trade_symbol .''. \Carbon\Carbon::parse($parentTrade->expiration_date)->format('ymd').''.ucfirst(substr($parentTrade->trade_option, 0, 1)).''.number_format($parentTrade->strike_price, '0')}}
-                            @endif                            
+                            @endif  
                         </td>                       
                         <td style="width:10%">{{ $parentTrade->trade_type }}</td>
                         <td style="width: 15%">
@@ -73,6 +73,7 @@
                                 data-strikeprice = "{{$parentTrade->strike_price}}" 
                                 data-option="{{$parentTrade->trade_option}}" 
                                 data-entryprice="{{$parentTrade->entry_price}}" 
+                                data-currentprice="{{$parentTrade->current_price}}" 
                                 data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('Ymd')}}" >
                                 Close
                             </a>
@@ -221,7 +222,7 @@
                             <input type="text" id="addTargetPrice" name="addTargetPrice" class="form-control numeral-mask" value="{{old('addTargetPrice')}}" />
                         </div>
 
-                        <div class="col-12 col-md-12">
+                        <div class="col-12 col-md-12 mb-5">
                             <label class="form-label" for="itemname">Comment on Trade</label>
                             <div class="quill-add-toolbar">
                                 <span class="ql-formats">
@@ -264,13 +265,13 @@
                             <div class="quill_add_editor">
                                                 
                             </div>        
-                            <input type="hidden" id="quill_add_html" name="quill_add_html"></input>
+                            <input type="hidden" id="quill_add_html" name="quill_add_html">
                         </div>
 
-                        <div class="col-12 col-md-12 addImgRow">
+                        {{-- <div class="col-12 col-md-12 addImgRow">
                             <label for="customFile" class="form-label">Chart Image</label>
                             <input class="form-control" type="file" id="addImage" name="addImage" />
-                        </div>
+                        </div> --}}
                        
                         <div class="col-12 text-center mt-2 pt-50">
                             <button type="submit" class="btn btn-primary me-1">Submit</button>
@@ -327,7 +328,7 @@
                             <input type="text" id="PositionSize" name="PositionSize" class="form-control" value="All" disabled />
                         </div>
 
-                        <div class="col-12 col-md-12">
+                        <div class="col-12 col-md-12 mb-5">
                             <label class="form-label" for="itemname">Comment on Trade</label>
                             <div class="quill-close-toolbar">
                                 <span class="ql-formats">
@@ -370,7 +371,7 @@
                             <div class="quill_close_editor">
                                                 
                             </div>        
-                            <input type="hidden" id="quill_close_html" name="quill_close_html"></input>
+                            <input type="hidden" id="quill_close_html" name="quill_close_html">
                         </div>
 
                         <div class="col-12 col-md-12 closeImgRow">
@@ -471,6 +472,8 @@
                 entryprice = $(this).data('entryprice');
 
             var symbol = $(this).data('symbol');
+			var currentprice = $(this).data('currentprice');
+			
             var strikeprice = $(this).data('strikeprice');
             var option = $(this).data('option');
           
@@ -483,10 +486,9 @@
             }else{
                 var tradeTitle = direction.toUpperCase()+space+symbol;
             }
+
+			$('.modal_trade_title').html('Close Trade (<span class="text-success">$'+ currentprice +'</span>)');
            
-            // console.log(tradeTitle);
-            
-            $('#closeTrade').modal('show');
             $('.tradeCloseTitle').text(tradeTitle);
             $('#closeFormID').val(id);
             $('#closeTradeType').val(type);
@@ -496,7 +498,9 @@
             $('#closeTradePositionSize').val(position_size);
             $('#closeTradeStrikePrice').val(strikeprice);
             $('#closeTradeOption').val(option);
-            $('#closeOptionExpirationDate').val(expirationdate);          
+            $('#closeOptionExpirationDate').val(expirationdate);  
+            $('#closeExitPrice').val(currentprice);
+
 
             var quill_close = new Quill('.quill_close_editor', {
                 modules: {
@@ -508,6 +512,8 @@
             quill_close.on('text-change', function(delta, oldDelta, source) {
                 document.getElementById("quill_close_html").value = quill_close.root.innerHTML; 
             });
+
+            $('#closeTrade').modal('show');
         });
 
         $('#closeTrade').draggable({

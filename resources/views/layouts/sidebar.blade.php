@@ -4,7 +4,7 @@
         <ul class="nav navbar-nav flex-row">
             <li class="nav-item me-auto" style="margin: 0 auto;">
                 <a class="navbar-brand" href="{{route('admin.home')}}">
-                    <img src="{{ asset('assets/image/logo.png') }}" />
+                    <img src="{{ asset('assets/images/Logo.png') }}" style="width: 50px;"/>
                 </a>
             </li>
             <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pe-0" data-bs-toggle="collapse"><i class="d-block d-xl-none text-primary toggle-icon font-medium-4" data-feather="x"></i><i class="d-none d-xl-block collapse-toggle-icon font-medium-4  text-primary" data-feather="disc" data-ticon="disc"></i></a></li>
@@ -84,6 +84,13 @@
                             </a>
                         </li>
                     </ul>
+                </li>
+
+				<li class="nav-item  @if(request()->is('messages*')) active @endif">
+                    <a class="d-flex align-items-center" href="{{ route('messages.index') }}">
+                        <i data-feather="message-circle"></i>
+                        <span class="menu-title text-truncate">Messages</span>
+                    </a>
                 </li>
 
                 <li class="navigation-header">

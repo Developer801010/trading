@@ -2,28 +2,29 @@
 
 namespace App\Http\Controllers\Front;
 
-use App\Http\Controllers\Controller;
-use App\Mail\StripeSubscriptionCancelEmail;
-use App\Mail\Welcome;
+use Exception;
+use Stripe\Stripe;
 use App\Models\Plan;
 use App\Models\User;
-use App\Paypal\PaypalAgreement;
-use Exception;
+use App\Mail\Welcome;
+use Stripe\PaymentMethod;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
+use App\Paypal\PaypalAgreement;
+use function PHPSTORM_META\type;
 use Laravel\Cashier\Subscription;
-use Laravel\Cashier\SubscriptionItem;
-use PayPal\Exception\PayPalConnectionException;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Stripe\Exception\CardException;
-use Stripe\PaymentMethod;
-use Stripe\Stripe;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Laravel\Cashier\SubscriptionItem;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 
-use function PHPSTORM_META\type;
+use App\Mail\StripeSubscriptionCancelEmail;
+use PayPal\Exception\PayPalConnectionException;
 
 class PaymentController extends Controller
 {
@@ -145,6 +146,7 @@ class PaymentController extends Controller
                     'user_name' => $username
                 ];
                 Mail::to($email)->queue(new Welcome($data));
+				Artisan::call('queue:work --stop-when-empty');
 
                 return redirect()->route('front.main-feed')->with('success', 'Subscription successful! You are now logged in.');
                 // return redirect()->route('front.thanks')->with('success','You can see the trade alert page real time');
@@ -204,6 +206,7 @@ class PaymentController extends Controller
                 ];
         
                 Mail::to(auth()->user()->email)->queue(new StripeSubscriptionCancelEmail($data));
+				Artisan::call('queue:work --stop-when-empty');
 
                 return redirect()->back()->with('flash_success', 'Subscription cancelation requested successfully.');
             }catch(Exception $ex){
@@ -271,6 +274,7 @@ class PaymentController extends Controller
                     'user_name' => session('user_name')
                 ];
                 Mail::to(session('email'))->queue(new Welcome($data));
+				Artisan::call('queue:work --stop-when-empty');
 
                 return redirect()->route('front.main-feed')->with('success', 'Subscription successful! You are now logged in.');
 
