@@ -103,7 +103,7 @@ class PositionManagementController extends Controller
             $tradeDetails->where('t.trade_symbol', 'LIKE', '%' . $search . '%');
         }
 
-        $unionQuery = $trades->union($tradeDetails)->orderBy('created_at', 'desc');
+        $unionQuery = $trades->union($tradeDetails)->orderBy('updated_at', 'desc');
 
         // Combine both queries
         $results = $unionQuery->paginate(12);
