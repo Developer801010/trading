@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('	', function (Blueprint $table) {
+        Schema::table('trades', function (Blueprint $table) {
             $table->decimal('current_price', 10, 2)->nullable()->default(0.00)->after('expiration_date');
         });
     }
