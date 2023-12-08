@@ -27,13 +27,13 @@ class ApiPasswordResetToken extends Model
         return $randomString;
     }
 
-    public function getResetIdentifierCode()
+    public function getResetIdentifierCode($ser_id)
     {
         $token = $this->getResetCode();
 
         try{
             $obj = new ApiPasswordResetToken();
-            $obj ->user_id = Auth::id();
+            $obj ->user_id = $ser_id;
             $obj ->token_signature = hash('md5',  $token);
             $obj ->token_type = ApiPasswordResetToken::$PASSWORD_RESET_TOKEN;
             $obj ->expires_at = Carbon::now()->addMinutes(30);

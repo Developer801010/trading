@@ -2,26 +2,37 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\RouteServiceProvider;
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
 
-class RedirectIfAuthenticated
+class RedirectIfNotAuthenticated
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param \Illuminate\Http\Request $request
+     * @param string|null              $guard
+     *
+     * @return mixed
      */
-    public function handle(Request $request, Closure $next, string ...$guards): Response
+    public function handle($request, Closure $next, $guard = 'web')
     {
-        $guards = empty($guards) ? [null] : $guards;
-
-        foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+        if (!$request->hasValidSignature()) {
+            switch ($guard) {
+                case 'sanctum':
+                    $redirect_url = '/api/unauthorized';
+                    break;
+                case 'admin':
+                    $redirect_url = '/admin/login';
+                    break;
+                case 'web':
+                    $redirect_url = '/login';
+                default:
+                    $redirect_url = '/login';
+                    break;
+            }
+            if (!Auth::guard($guard)->check()) {
+                return redirect($redirect_url);
             }
         }
 
