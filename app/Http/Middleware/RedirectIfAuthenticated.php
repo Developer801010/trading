@@ -10,30 +10,15 @@ class RedirectIfAuthenticated
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string|null              $guard
-     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string|null  $guard
      * @return mixed
      */
-    public function handle($request, Closure $next, $guard = 'web')
+    public function handle($request, Closure $next, $guard = null)
     {
-        if (!$request->hasValidSignature()) {
-            switch ($guard) {
-                case 'sanctum':
-                    $redirect_url = '/api/unauthorized';
-                    break;
-                case 'admin':
-                    $redirect_url = '/admin/login';
-                    break;
-                case 'web':
-                    $redirect_url = '/login';
-                default:
-                    $redirect_url = '/login';
-                    break;
-            }
-            if (!Auth::guard($guard)->check()) {
-                return redirect($redirect_url);
-            }
+        if (Auth::guard($guard)->check()) {
+            return redirect()->route('home');
         }
 
         return $next($request);
