@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 class ApiPasswordResetToken extends Model
@@ -43,11 +43,11 @@ class ApiPasswordResetToken extends Model
         }catch(Throwable $th){
             return response()->json([
                 'status' => false,
-                'message' => 'There is an error while validating the password reset code.',       
+                'message' => 'There is an error while validating the password reset code.',
                 'error' => $th->getMessage(),
             ], 422);
         }
     }
 
-    
+
 }
