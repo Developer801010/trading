@@ -78,12 +78,15 @@ class FirebasePushController extends Controller
             $message = CloudMessage::fromArray([
                 'token' => $user->fcm_token,
                 'notification' => [
-                    'data' => $data,
+                    // 'data' => $data,
+                    'title' => 'test_title',
+                    'body' => "test_body"
                 ],
             ]);
 
             try{
                 $res = $this->notification->send($message);
+                var_dump($res);exit;
             } catch(Throwable $th){
                 return response()->json([
                     'status' => false,
