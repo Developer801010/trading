@@ -82,7 +82,15 @@ class FirebasePushController extends Controller
                 ],
             ]);
 
-            $this->notification->send($message);
+            try{
+                $this->notification->send($message);
+            } catch(Throwable $th){
+                return response()->json([
+                    'status' => false,
+                    'message' => $th->getMessage(),
+                ], 500);
+            }
+
         }
     }
 }
