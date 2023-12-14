@@ -74,7 +74,6 @@ class FirebasePushController extends Controller
     public function notificationToAllMobiles($data)
     {
         $users = User::whereNotNull('fcm_token')->get()->all();
-        var_dump($users);exit;
         foreach($users as $user){
             $message = CloudMessage::fromArray([
                 'token' => $user->fcm_token,
@@ -86,6 +85,7 @@ class FirebasePushController extends Controller
             try{
                 $this->notification->send($message);
             } catch(Throwable $th){
+                var_dump($th->getMessage());exit;
                 return response()->json([
                     'status' => false,
                     'message' => $th->getMessage(),
