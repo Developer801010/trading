@@ -81,6 +81,7 @@ class FirebasePushController extends Controller
                     'data' => $data,
                 ],
             ]);
+            var_dump($message);exit;
 
             try{
                 $this->notification->send($message);
