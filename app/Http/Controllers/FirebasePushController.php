@@ -79,7 +79,7 @@ class FirebasePushController extends Controller
                 'token' => $user->fcm_token,
                 'notification' => [
                     // 'data' => $data,
-                    'title' => 'test_title',
+                    'title' => 'Austin test test',
                     'body' => "test_body"
                 ],
             ]);
