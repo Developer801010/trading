@@ -77,12 +77,6 @@ class FirebasePushController extends Controller
         foreach($users as $user){
             $message = CloudMessage::fromArray([
                 'token' => $user->fcm_token,
-                'notification' => [
-                    // 'data' => $data,
-                    'title' => 'Austin test test',
-                    'body' => "test_body"
-                ],
-                
                  'apns' => [
                          'payload' => [
                              'aps' => [
