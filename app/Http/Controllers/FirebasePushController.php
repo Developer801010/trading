@@ -82,6 +82,15 @@ class FirebasePushController extends Controller
                     'title' => 'Austin test test',
                     'body' => "test_body"
                 ],
+                
+                 'apns' => [
+                         'payload' => [
+                             'aps' => [
+                                 'sound' => 'default',
+                                 "content-available" => 1
+                             ],
+                         ],
+                     ],
             ]);
 
             try{
