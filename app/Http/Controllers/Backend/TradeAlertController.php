@@ -221,7 +221,7 @@ class TradeAlertController extends Controller
 
 			//Send Mobile users----------------
 			$push_service = new FirebasePushController();
-			$push_service->notificationToAllMobiles($msg);
+			$push_service->notificationToAllMobiles($data);
 			//-------------------------------
 
 			return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
@@ -558,7 +558,7 @@ class TradeAlertController extends Controller
 	}
 
 	function searchTread(Request $request) : JsonResponse {
-		
+
 		$symbol = $request->get('symbol');
 		$type = $request->get('type');
 		$apiKey = 'rVepuhvI6BzfIXsCa6P3JdygCmXAYL7p';
@@ -568,11 +568,11 @@ class TradeAlertController extends Controller
 		switch($type) {
 			case 'list-companies':
 				$url_info = "$apiDomain/search?query=$symbol&limit=10&apikey=$apiKey";
-			
+
 				$http = new Client();
 				$response = $http->request('GET', $url_info);
 				$companyLists = json_decode($response->getBody());
-		
+
 				foreach($companyLists as $company) {
 					$resultLists[] = [
 						'value' => $company->symbol,
@@ -583,12 +583,12 @@ class TradeAlertController extends Controller
 
 			case 'company-details':
 				$url_info = "$apiDomain/profile/$symbol?apikey=$apiKey";
-			
+
 				$http = new Client();
 				$response = $http->request('GET', $url_info);
 				$company = json_decode($response->getBody());
 				$company = $company[0];
-		
+
 				$resultLists = [
 					'price' => $company->price,
 					'image' => $company->image,
@@ -598,7 +598,7 @@ class TradeAlertController extends Controller
 		}
 
 		return response()->json($resultLists);
-		
+
 	}
 }
 
