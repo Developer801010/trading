@@ -75,13 +75,13 @@ class FirebasePushController extends Controller
     {
         $title = $data['title'];
         $body =  $data['body']['first_title'];
-        // ' ' .  $data['body']['trade_entry_date'] .
-        // ' ' . $data['body']['trade_entry_price'] .
-        // ' ' . $data['body']['position_size'] .
-        // ' ' . $data['body']['stop_price'] .
-        // ' ' . $data['body']['target_price'] .
-        // ' ' . $data['body']['comments'] .
-        // ' ' . $data['body']['visit'];
+        ' ' .  $data['body']['trade_entry_date'] .
+        ' ' . $data['body']['trade_entry_price'] .
+        ' ' . $data['body']['position_size'] .
+        ' ' . $data['body']['stop_price'] .
+        ' ' . $data['body']['target_price'] .
+        ' ' . $data['body']['comments'] .
+        ' ' . $data['body']['visit'];
 
         $users = User::whereNotNull('fcm_token')->get()->all();
         foreach($users as $user){
