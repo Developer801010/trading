@@ -74,7 +74,7 @@ class FirebasePushController extends Controller
     public function notificationToAllMobiles($data)
     {
         $title = $data['title'];
-        $body =  $data['body']['first_title'];
+        $body =  $data['body']['first_title'].
         ' ' .  $data['body']['trade_entry_date'] .
         ' ' . $data['body']['trade_entry_price'] .
         ' ' . $data['body']['position_size'] .
