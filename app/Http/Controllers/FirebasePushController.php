@@ -79,8 +79,7 @@ class FirebasePushController extends Controller
         ' ' . $data['body']['trade_entry_price'] .
         ' ' . $data['body']['position_size'] .
         ' ' . $data['body']['stop_price'] .
-        ' ' . $data['body']['target_price'] .
-        ' ' . $data['body']['comments'] .
+        ' ' . $data['body']['target_price'] .        
         ' ' . $data['body']['visit'];
 
         $users = User::whereNotNull('fcm_token')->get()->all();
