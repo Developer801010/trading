@@ -73,6 +73,7 @@ class APIPositionmanagementController extends Controller
             't.trade_type',
             't.entry_date',
             't.trade_symbol',
+            't.company_name',
             't.trade_direction as original_trade_direction',
             'td.trade_direction as child_direction',
             't.trade_option',
