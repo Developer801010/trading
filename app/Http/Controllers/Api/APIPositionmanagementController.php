@@ -241,7 +241,7 @@ class APIPositionmanagementController extends Controller
         ->where('trade_type', 'stock')
         ->whereNotNull('exit_price')
         ->whereNotNull('exit_date')
-        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date', 't.company_name',
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image', 't.created_at', 't.updated_at');
@@ -435,7 +435,7 @@ class APIPositionmanagementController extends Controller
             't.trade_symbol',
             't.trade_direction',
             't.entry_date',
-            't.company_name as company_name',
+            't.company_name',
             DB::raw('NULL as child_direction'),
             't.trade_option',
             DB::raw('CAST(t.strike_price as DECIMAL(10,2)) + 0 as strike_price'),
@@ -466,7 +466,7 @@ class APIPositionmanagementController extends Controller
         ->where('trade_type', 'option')
         ->whereNotNull('exit_price')
         ->whereNotNull('exit_date')
-        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',  't.company_name',
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image', 't.created_at', 't.updated_at');
