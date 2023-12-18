@@ -435,7 +435,7 @@ class APIPositionmanagementController extends Controller
             't.trade_symbol',
             't.trade_direction',
             't.entry_date',
-            't.company_name',
+            't.company_name as company_name',
             DB::raw('NULL as child_direction'),
             't.trade_option',
             DB::raw('CAST(t.strike_price as DECIMAL(10,2)) + 0 as strike_price'),
