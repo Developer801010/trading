@@ -104,7 +104,7 @@ class FirebasePushController extends Controller
                          ],
                      ],
             ]);
-
+            dd($message);
             try{
                 $res = $this->notification->send($message);
                 dd($res);
