@@ -84,7 +84,7 @@ class FirebasePushController extends Controller
         ' ' . $data['body']['visit'];
 
         $users = User::whereNotNull('fcm_token')->get()->all();
-        dd($users);
+        
         foreach($users as $user){
             $message = CloudMessage::fromArray([
                 'token' => $user->fcm_token,
