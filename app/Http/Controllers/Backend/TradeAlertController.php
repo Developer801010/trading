@@ -361,20 +361,18 @@ class TradeAlertController extends Controller
 			]);
 
 			 $data = [
-				//  'title' => $trade_mail_title,
-				//  'body' => [
-				// 	'first_title' => $body_first_title,
-				// 	 'title' => $body_title,
-				// 	 'trade_entry_date' => Carbon::parse($addEntryDate)->format('m/d/Y'),
-				// 	 'trade_entry_price' => $addBuyPrice,
-				// 	 'position_size' => $addPositionSize,
-				// 	 'stop_price' => $addStopPrice,
-				// 	 'target_price' => $addTargetPrice,
-				// 	 'comments' => $addComments,
-				// 	 'visit' => $url
-				//  ]
-				'title' => 'test title',
-				'body' => 'test body'
+				 'title' => $trade_mail_title,
+				 'body' => [
+					'first_title' => $body_first_title,
+					 'title' => $body_title,
+					 'trade_entry_date' => Carbon::parse($addEntryDate)->format('m/d/Y'),
+					 'trade_entry_price' => $addBuyPrice,
+					 'position_size' => $addPositionSize,
+					 'stop_price' => $addStopPrice,
+					 'target_price' => $addTargetPrice,
+					 'comments' => $addComments,
+					 'visit' => $url
+				 ]			
 			 ];
 
 			foreach($activeSubscribers as $subscriber){
