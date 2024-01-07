@@ -79,7 +79,7 @@ class AuthenticateController extends Controller
     public function changePassword(Request $request){
         return response()->json([
             'status' => true,
-            'message' => $_POST,
+            'message' => $request,
         ], 200);
         $validator = Validator::make($request->all(), [
             'current_password' => 'required',
