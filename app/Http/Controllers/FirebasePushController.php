@@ -73,6 +73,7 @@ class FirebasePushController extends Controller
 
     public function notificationToAllMobiles($data)
     {
+        
         $title = $data['title'];
         $body =  $data['body']['first_title'].
         ' ' .  $data['body']['trade_entry_date'] .
@@ -83,12 +84,13 @@ class FirebasePushController extends Controller
         ' ' . $data['body']['visit'];
 
         $users = User::whereNotNull('fcm_token')->get()->all();
+        
         foreach($users as $user){
             $message = CloudMessage::fromArray([
                 'token' => $user->fcm_token,
                 'notification' => [                 
                     'title' => $title,
-                    'body' => $body
+                    'body' => $body                    
                 ],
                 
                  'apns' => [
@@ -100,7 +102,6 @@ class FirebasePushController extends Controller
                          ],
                      ],
             ]);
-
             try{
                 $res = $this->notification->send($message);
             } catch(Throwable $th){

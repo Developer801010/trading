@@ -372,7 +372,7 @@ class TradeAlertController extends Controller
 					 'target_price' => $addTargetPrice,
 					 'comments' => $addComments,
 					 'visit' => $url
-				 ]
+				 ]			
 			 ];
 
 			foreach($activeSubscribers as $subscriber){
