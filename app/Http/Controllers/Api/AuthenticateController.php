@@ -79,7 +79,7 @@ class AuthenticateController extends Controller
     public function changePassword(Request $request){
         $validator = Validator::make($request->all(), [
             'current_password' => 'required',
-            'new_password' => 'required|string|min:8|max:45|confirmed',
+            'new_password' => 'required|string|min:8|max:45|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -91,6 +91,10 @@ class AuthenticateController extends Controller
 
         $user = auth()->guard('sanctum')->user();
         if (Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => true,
+                'message' => $request->new_password
+            ], 200);
             $user->password = Hash::make($request->new_password);
 
             $user->save();
