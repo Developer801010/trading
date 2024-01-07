@@ -91,7 +91,8 @@ class AuthenticateController extends Controller
 
         $user = auth()->guard('sanctum')->user();
         if (Hash::check($request->current_password, $user->password)) {
-            $user->password = bcrypt($request->new_password);
+            $user->password = Hash::make($request->new_password);
+
             $user->save();
 
             return response()->json([
@@ -161,7 +162,7 @@ class AuthenticateController extends Controller
                 'last_name' => $lastName,
                 'email' => $email,
                 'mobile_number' => trim($mobile_number),
-                'password' => bcrypt($password),
+                'password' => Hash::make($password),
             ]);
 
             $token = $user->createToken('myAppToken')->plainTextToken;
@@ -374,7 +375,7 @@ class AuthenticateController extends Controller
         }
 
         $userObj = User::findOrFail($user_id);
-        $userObj->password = bcrypt($request->password);
+        $userObj->password = Hash::make($request->password);
         $userObj->update();
 
         $verifyToken[0]->update([
