@@ -79,7 +79,7 @@ class AuthenticateController extends Controller
     public function changePassword(Request $request){
         $validator = Validator::make($request->all(), [
             'current_password' => 'required',
-            'new_password' => 'required|string|min:8|max:45|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
+            'new_password' => 'required|string|min:8|max:45|confirmed',
         ]);
         if ($validator->fails()) {
             return response()->json([
