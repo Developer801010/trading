@@ -64,16 +64,6 @@
                                         <td>
                                             <div class="stock-profile">
                                                 <span class="stock-img">
-                                                {{-- @if ($trade->exit_price !== null && $trade->exit_date !== null)
-                                                    @if($trade->close_image && file_exists(public_path($trade->close_image)))
-                                                        <img src="{{ asset($trade->close_image) }}" data-image="{{ asset($trade->close_image) }}"  />
-                                                    @endif
-                                                @else
-                                                    @if($trade->symbol_image && file_exists(public_path($trade->symbol_image)))
-                                                        <img src="{{ asset($trade->symbol_image) }}" data-image="{{ asset($trade->symbol_image) }}"  />
-                                                    @endif
-                                                @endif --}}
-                                                    {{-- <img src="images/soxs.png"> --}}
 													@if (check_image($trade->symbol_image) ?? false)
 														<img src="{{ $trade->symbol_image }}" data-image="{{ $trade->symbol_image }}"  />
 													@endif
