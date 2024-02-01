@@ -56,8 +56,8 @@ class PositionManagementController extends Controller
             't.created_at',
             't.updated_at'
         ])
-        ->groupBy( 't.id', 't.trade_type', 't.entry_date', 't.trade_symbol', 't.trade_direction', 't.trade_option',
-       't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
+        ->groupBy( 't.id', 't.trade_type', 't.entry_date', 't.trade_symbol', 't.trade_title', 't.current_price', 't.company_name',
+         't.trade_direction', 't.trade_option', 't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image',  't.expiration_date', 't.created_at', 't.updated_at');
 
@@ -179,8 +179,8 @@ class PositionManagementController extends Controller
         ->where('trade_type', 'stock')
         ->whereNotNull('exit_price')
         ->whereNotNull('exit_date')
-        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',  't.company_name',
-       't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_title', 't.current_price', 
+        't.trade_option',  't.entry_date', 't.company_name', 't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image', 't.created_at', 't.updated_at');
 
