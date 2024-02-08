@@ -24,6 +24,15 @@ use App\Http\Controllers\FirebasePushController;
 class APITradeAlertController extends Controller
 {
     public $tradeinSyncText = 'TradeInSync ';
+
+	public function __construct()
+	{
+		$this->middleware('permission:trade-list|trade-create|trade-edit|trade-delete', ['only' => ['index','store']]);
+		$this->middleware('permission:trade-create', ['only' => ['create','store']]);
+		$this->middleware('permission:trade-edit', ['only' => ['edit','update']]);
+		$this->middleware('permission:trade-delete', ['only' => ['destroy']]);
+	}
+	
     public function tradeAlerts()
     {
         $data = Trade::with('tradeDetail')
