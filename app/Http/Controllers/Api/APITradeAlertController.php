@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Backend;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Backend\TradeAlertController;
 use Exception;
 use Carbon\Carbon;
 use App\Models\User;
@@ -20,44 +21,26 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\FirebasePushController;
 
-class TradeAlertController extends Controller
+class APITradeAlertController extends Controller
 {
-
-	public $tradeinSyncText = 'TradeInSync ';
-	public function __construct()
-	{
-		$this->middleware('permission:trade-list|trade-create|trade-edit|trade-delete', ['only' => ['index','store']]);
-		$this->middleware('permission:trade-create', ['only' => ['create','store']]);
-		$this->middleware('permission:trade-edit', ['only' => ['edit','update']]);
-		$this->middleware('permission:trade-delete', ['only' => ['destroy']]);
-	}
-	/**
-	 * Display a listing of the resource.
-	 */
-	public function index()
-	{
-		$parentTrades = Trade::with('tradeDetail')
+    public $tradeinSyncText = 'TradeInSync ';
+    public function tradeAlerts()
+    {
+        $data = Trade::with('tradeDetail')
 			->where('trade_type', '!=', 'message')
 			->whereNull('exit_price')->whereNull('exit_date')  //open trade
 			->orderBy('created_at','desc')->paginate(10);
 
-		return view('admin.trade_alert.index', compact('parentTrades'));
-	}
+        return response()->json([
+            'status' => true,
+            'message' => 'Get TradeAlert Data Successfully',
+            'data' => $data,
+        ], 200);  
+    }
 
-	/**
-	 * Show the form for creating a new resource.
-	 */
-	public function create()
-	{
-		return view('admin.trade_alert.create');
-	}
-
-	/**
-	 * Store a newly created resource in storage.
-	 */
-	public function store(Request $request)
-	{
-		$trade_type = $request->trade_type;
+    public function tradeStore(Request $request)
+    {
+        $trade_type = $request->trade_type;
 		$trade_symbol = $request->trade_symbol;
 		$trade_option = $request->trade_option;
 		$trade_direction = $request->trade_direction;
@@ -122,7 +105,10 @@ class TradeAlertController extends Controller
 		}
 		
 		if($tradeCount > 0)
-			return back()->withErrors($msg)->withInput();
+            return response()->json([
+                'status' => false,
+                'message' => $msg
+            ], 422);
 
 		DB::beginTransaction();
 		try{
@@ -163,7 +149,8 @@ class TradeAlertController extends Controller
 			DB::commit();
 
 			//Bulk trade creation email to activated users's email
-			$activeSubscribers = $this->getActiveSubscriptionUsers();
+            $tradeAlertObj = new TradeAlertController();
+			$activeSubscribers = $tradeAlertObj->getActiveSubscriptionUsers();
 
 			if($trade_type == 'option'){
 				$trade_mail_title = $this->tradeinSyncText.ucfirst($trade_type).' '.'Alert';
@@ -182,6 +169,7 @@ class TradeAlertController extends Controller
 
 				$body_title = strtoupper($trade_direction).' '.strtoupper($trade_symbol);
 			}
+
 			$url = route('front.trade-detail', [
 				'id'=>$tradeObj->id,
 				'type'=>'n'
@@ -224,48 +212,24 @@ class TradeAlertController extends Controller
 			$push_service->notificationToAllMobiles($data);
 			//-------------------------------
 
-			return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
+            return response()->json([
+                'status' => true,
+                'message' => 'Trade was created successfully!',
+                'data' => $data,
+            ], 200);
 
 		}catch(Exception $ex){
 			DB::rollBack();
-			return back()->withErrors($ex->getMessage())->withInput();
+
+            return response()->json([
+                'status' => false,
+                'message' => $ex->getMessage()
+            ], 422);
+
 		}
+    }
 
-	}
-
-	/**
-	 * Display the specified resource.
-	 */
-	public function show(string $id)
-	{
-		//
-	}
-
-	/**
-	 * Show the form for editing the specified resource.
-	 */
-	public function edit(string $id)
-	{
-		//
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 */
-	public function update(Request $request, string $id)
-	{
-		//
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 */
-	public function destroy(string $id)
-	{
-		//
-	}
-
-	public function tradeAdd(Request $request)
+    public function tradeAdd(Request $request)
 	{
 		$addFormID = $request->addFormID;
 		$addTradeType = $request->addTradeType;
@@ -280,7 +244,6 @@ class TradeAlertController extends Controller
 		$addStopPrice = $request->addStopPrice;
 		$addTargetPrice = $request->addTargetPrice;
 		$addComments = $request->quill_add_html;
-		
 
 		// Extract base64 encoded image data from Quill content
 		$pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -332,7 +295,8 @@ class TradeAlertController extends Controller
 			DB::commit();
 
 			 //Bulk Trade add email to activated users
-			$activeSubscribers = $this->getActiveSubscriptionUsers();
+			$tradeAlertObj = new TradeAlertController();
+			$activeSubscribers = $tradeAlertObj->getActiveSubscriptionUsers();
 
 			if($addTradeType == 'option'){
 				$trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
@@ -393,15 +357,24 @@ class TradeAlertController extends Controller
 				}
 			}
 
-			return back()->with('flash_success', 'Trade was added successfully!')->withInput();
+            return response()->json([
+                'status' => true,
+                'message' => 'Trade was added successfully!',
+                'data' => $data,
+            ], 200);
+
 		}catch(Exception $ex){
 			DB::rollBack();
-			return back()->withErrors($ex->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => $ex->getMessage()
+            ], 422);
+			
 		}
 	}
 
 
-	public function tradeClose(Request $request)
+    public function tradeClose(Request $request)
 	{
 		$closeFormID = $request->closeFormID;
 		$closeTradeType = $request->closeTradeType;
@@ -415,7 +388,7 @@ class TradeAlertController extends Controller
 		$closeTradeStrikePrice = $request->closeTradeStrikePrice;
 		$closeTradeOption = $request->closeTradeOption;
 		$closeOptionExpirationDate = $request->closeOptionExpirationDate;
-		
+
 
 		 // Extract base64 encoded image data from Quill content
 		 $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -457,7 +430,8 @@ class TradeAlertController extends Controller
 			DB::commit();
 
 			 //Bulk Trade add email to activated users
-			 $activeSubscribers = $this->getActiveSubscriptionUsers();
+			 $tradeAlertObj = new TradeAlertController();
+			 $activeSubscribers = $tradeAlertObj->getActiveSubscriptionUsers();
 
 			 //converted Closed trade Direction from frontend
 			 if($closeTradeDirection == 'buy')
@@ -540,67 +514,20 @@ class TradeAlertController extends Controller
 				}
 			}
 
-			return back()->with('flash_success', 'Trade was closed successfully!')->withInput();
+            return response()->json([
+                'status' => true,
+                'message' => 'Trade was closed successfully!',
+                'data' => $data,
+            ], 200);
+
 		}catch(Exception $ex){
 			DB::rollBack();
-			return back()->withErrors($ex->getMessage());
+			
+            return response()->json([
+                'status' => false,
+                'message' => $ex->getMessage()
+            ], 422);
 		}
 	}
 
-	public function getActiveSubscriptionUsers()
-	{
-
-		$activeSubscribers = User::whereHas('subscriptions', function ($query) {
-			$query->where('ends_at', '>', now())
-					->orWhereNull('ends_at');
-		})->get();
-
-		return $activeSubscribers;
-	}
-
-	function searchTread(Request $request) : JsonResponse {
-
-		$symbol = $request->get('symbol');
-		$type = $request->get('type');
-		$apiKey = 'rVepuhvI6BzfIXsCa6P3JdygCmXAYL7p';
-		$apiDomain = 'https://financialmodelingprep.com/api/v3';
-
-		$resultLists = [];
-		switch($type) {
-			case 'list-companies':
-				$url_info = "$apiDomain/search?query=$symbol&limit=10&apikey=$apiKey";
-
-				$http = new Client();
-				$response = $http->request('GET', $url_info);
-				$companyLists = json_decode($response->getBody());
-
-				foreach($companyLists as $company) {
-					$resultLists[] = [
-						'value' => $company->symbol,
-						'label' => $company->name . " - " . $company->symbol
-					];
-				}
-				break;
-
-			case 'company-details':
-				$url_info = "$apiDomain/profile/$symbol?apikey=$apiKey";
-
-				$http = new Client();
-				$response = $http->request('GET', $url_info);
-				$company = json_decode($response->getBody());
-				$company = $company[0];
-
-				$resultLists = [
-					'price' => $company->price,
-					'image' => $company->image,
-					'company_name' => $company->companyName
-				];
-				break;
-		}
-
-		return response()->json($resultLists);
-
-	}
 }
-
-
