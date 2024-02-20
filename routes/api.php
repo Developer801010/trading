@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\APIMessageManagementController;
 use App\Http\Controllers\Api\AuthenticateController;
 use App\Http\Controllers\Api\APIPositionManagementController;
 use App\Http\Controllers\Api\APITradeAlertController;
@@ -60,12 +61,23 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     //This route removes the token on firebase.
     Route::post('/removeToken', [FirebasePushController::class, 'removeToken'])->name('firebase.token_remove');
 
-    //This route takes tradeAlerts data.
-    Route::get('/trade-alerts', [APITradeAlertController::class, 'tradeAlerts'])->name('api.trade-alerts');
-    //This route creates tradeAlerts data.
-    Route::post('/trade-store', [APITradeAlertController::class, 'tradeStore'])->name('api.trade-store');
-    //This route closes an existing tradeAlerts data.
-    Route::post('trade-close', [APITradeAlertController::class, 'tradeClose'])->name('api.trade-close');
-    //This route adds a new trade into an existing tradeAlerts data.
-    Route::post('trade-add', [APITradeAlertController::class, 'tradeAdd'])->name('api.trade-add');
+    Route::group(['middleware' => 'sanctum.role_permissions'], function(){
+        //This route takes tradeAlerts data.
+        Route::get('/trade-alerts', [APITradeAlertController::class, 'tradeAlerts'])->name('api.trade-alerts');
+        //This route creates tradeAlerts data.
+        Route::post('/trade-store', [APITradeAlertController::class, 'tradeStore'])->name('api.trade-store');
+        //This route closes an existing tradeAlerts data.
+        Route::post('trade-close', [APITradeAlertController::class, 'tradeClose'])->name('api.trade-close');
+        //This route adds a new trade into an existing tradeAlerts data.
+        Route::post('trade-add', [APITradeAlertController::class, 'tradeAdd'])->name('api.trade-add');
+
+
+        //This route takes message data.
+        Route::get('/message-display', [APIMessageManagementController::class, 'messageIndex'])->name('api.message-display');
+        //This route creates message data.
+        Route::post('/message-store', [APIMessageManagementController::class, 'messageStore'])->name('api.message-store');
+        //This route deletes an existing message data.
+        Route::post('/message-delete', [APIMessageManagementController::class, 'messageDestroy'])->name('api.message-delete');
+    });
+ 
 });

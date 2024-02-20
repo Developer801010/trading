@@ -20,6 +20,7 @@ use App\Mail\TradeCreationAlertMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\FirebasePushController;
+use Illuminate\Support\Facades\Auth;
 
 class APITradeAlertController extends Controller
 {
@@ -27,14 +28,12 @@ class APITradeAlertController extends Controller
 
 	public function __construct()
 	{
-		$this->middleware('permission:trade-list|trade-create|trade-edit|trade-delete', ['only' => ['index','store']]);
-		$this->middleware('permission:trade-create', ['only' => ['create','store']]);
-		$this->middleware('permission:trade-edit', ['only' => ['edit','update']]);
-		$this->middleware('permission:trade-delete', ['only' => ['destroy']]);
+		
 	}
 	
     public function tradeAlerts()
     {
+		
         $data = Trade::with('tradeDetail')
 			->where('trade_type', '!=', 'message')
 			->whereNull('exit_price')->whereNull('exit_date')  //open trade

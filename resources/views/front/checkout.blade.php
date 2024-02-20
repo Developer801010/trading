@@ -337,7 +337,7 @@
 			display: flex;
 			align-items: baseline;
 			padding-bottom: 15px;
-		}ay: flex;
+			display: flex;
 			align-items: baseline;
 			padding-bottom: 15px;
 		}
@@ -492,41 +492,11 @@
 									<img class="payment-image paypal-image" src="{{ asset('assets/images/paypal.png') }}" />
 								</div>
 							</div>
-							<div class="stripe_payment">
-								{{-- <div class="row">
-                                    <div class="col-12 col-md-6 mb-1">
-                                        <label class="form-label" for="addCardNumber">Card Number</label>
-                                        <div class="input-group input-group-merge">
-                                            <input id="card-number" name="card-number" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" 
-                                            aria-describedby="addCard" data-msg="Please enter your credit card number" value="{{old('card-number')}}" />
-                                            <span class="input-group-text cursor-pointer p-25" id="addCard">
-                                                <span class="card-type"></span>
-                                            </span>
-                                        </div>
-                                        <span class="error card-error d-none">This field is required.</span>
-                                    </div>
-
-                                    <div class="col-12 col-md-3 mb-1">
-                                        <label class="form-label" for="addCardCvv">CVC</label>
-                                        <input type="text" id="card-cvc" name="card-cvc" class="form-control cvv-code-mask"  value="{{old('card-cvc')}}"  maxlength="4" placeholder="654" />
-                                        <span class="error card-cvc-error d-none">This field is required.</span>
-                                    </div>
-
-                                    <div class="col-12 col-md-3 mb-1">
-                                        <label class="form-label" for="addCardExpiryDate">Exp. Date</label>
-                                        <input type="text" id="card-expire-date" name="card-expire-date" class="form-control expiry-date-mask"  value="{{old('card-expire-date')}}" placeholder="MM/YY" />
-                                        <span class="error card-exp-error d-none">This field is required.</span>
-                                    </div>
-                                </div> --}}
+							<div class="stripe_payment">								
 								<div id="card-element"></div>
 
 								<div id="card-errors" role="alert"></div>
-								{{-- <div class="row">
-                                    <div class="col-md-12">
-                                        <span class="payment-errors" style="color: red;margin-top:10px;"></span>
-                                    </div>
-                                </div> --}}
-
+							
 							</div>
 
 							<button type="submit" id="card-button" class="btn btn_payment">Pay with Credit/Debit Card</button>
@@ -664,7 +634,7 @@
 			if (subscription_type_title == 'monthly') {
 				activeMonthlyIcon();
 			} else if (subscription_type_title == 'quarterly') {
-				activeQuareterlyIcon();
+				activeQuarterIcon();
 			} else if (subscription_type_title == 'yearly') {
 				activeYearlyIcon();
 			}
@@ -688,7 +658,7 @@
 			yearly_membership.find('.inactive-icon').removeClass('d-none');
 		}
 
-		function activeQuareterlyIcon() {
+		function activeQuarterIcon() {
 			monthly_membership.find('.active-icon').addClass('d-none');
 			monthly_membership.find('.inactive-icon').removeClass('d-none');
 			quarterly_membership.find('.active-icon').removeClass('d-none');
@@ -705,7 +675,7 @@
 				//Add class again
 				$(this).addClass('payment_active');
 
-				//remove radion button
+				//remove radio button
 				if ($(this).hasClass('stripe-option')) {
 					stripe_option.prop('checked', true);
 					paypal_option.prop('checked', false);
@@ -759,7 +729,7 @@
 				$('.quarterly-membership').addClass('membership_active');
 				stripe_plan_id.val(quarter_plan_stripe);
 				paypal_plan_id.val(quarter_plan_paypal);
-				activeQuareterlyIcon();
+				activeQuarterIcon();
 			} else if ($(this).hasClass('yearly-membership')) {
 				updateCheckoutAttributes('yearly', 787, 'yr');
 				clearMembershipClass();
@@ -837,46 +807,6 @@
 			});
 		}
 
-		// Credit Card
-		// if (creditCard.length) {
-		//         creditCard.each(function () {
-		//             new Cleave($(this), {
-		//                 creditCard: true,
-		//                 onCreditCardTypeChanged: function (type) {
-		//                 const elementNodeList = document.querySelectorAll('.card-type');
-		//                     if (type != '' && type != 'unknown') {
-		//                         //! we accept this approach for multiple credit card masking
-		//                         for (let i = 0; i < elementNodeList.length; i++) {
-		//                         elementNodeList[i].innerHTML =
-		//                             '<img src="' + assetsPath + '/image/icons/payments/' + type + '-cc.png" height="24"/>';
-		//                         }
-		//                     } else {
-		//                         for (let i = 0; i < elementNodeList.length; i++) {
-		//                         elementNodeList[i].innerHTML = '';
-		//                         }
-		//                     }
-		//                 }
-		//             });
-		//         });
-		//     }
-
-		// // Expiry Date Mask
-		// if (expiryDateMask.length) {
-		//     new Cleave(expiryDateMask, {
-		//         date: true,
-		//         delimiter: '/',
-		//         datePattern: ['m', 'y']
-		//     });
-		// }
-
-		// // CVV
-		// if (cvvMask.length) {
-		//     new Cleave(cvvMask, {
-		//         numeral: true,
-		//         numeralPositiveOnly: true
-		//     });
-		// }
-
 		// Handle form submission
 		var payment_form = document.getElementById('payment-form');
 
@@ -946,34 +876,6 @@
 
 			if (paymentOption == 'stripe') {
 
-				// var card_number = $('#card-number');
-				// var card_cvc = $('#card-cvc');
-				// var card_date = $('#card-expire-date');
-
-				// if(card_number.val() == ''){
-				//     isValid = false;
-				//     card_number.addClass('error');
-				//     $('.card-error').removeClass('d-none');
-				// }else{
-				//     card_number.removeClass('error');
-				// }
-
-				// if(card_cvc.val() == ''){
-				//     isValid = false;
-				//     card_cvc.addClass('error');
-				//     $('.card-cvc-error').removeClass('d-none');
-				// }else{
-				//     card_cvc.removeClass('error');
-				// }
-
-				// if(card_date.val() == ''){
-				//     isValid = false;
-				//     card_date.addClass('error');
-				//     $('.card-exp-error').removeClass('d-none');
-				// }else{
-				//     card_date.removeClass('error');
-				// }
-
 				if (!termsChecked) {
 					isValid = false;
 					$('.terms').addClass('error');
@@ -991,20 +893,22 @@
 				if (isValid) {
 
 					stripe.createToken(card).then(function(result) {
+						
 						if (result.error) {
 							// Display an error message to the user.
 							var errorElement = document.getElementById('card-errors');
 							errorElement.textContent = result.error.message;
 						} else {
 							// You can now use the Payment Method ID on your server to make a payment.
-							// console.log(result.token.id);
-							stripeTokenHandler(result.token.id);
+							console.log(result.token.id);
+							stripeTokenHandler(result.token.id); 
 							// Send the Payment Method ID to your server for further processing.
 							$('#overlay, #loadingSpinner').show();
 						}
 					});
 				} else {
 					// $('#overlay, #loadingSpinner').hide();
+					console.log('isValid false');
 				}
 
 
@@ -1038,6 +942,7 @@
 
 		function stripeTokenHandler(token) {
 			// Insert the token ID into the form so it gets submitted to the server
+			console.log("stripe-token:"+token);
 			var payment_form = document.getElementById('payment-form');
 			var hiddenInput = document.createElement('input');
 			hiddenInput.setAttribute('type', 'hidden');
