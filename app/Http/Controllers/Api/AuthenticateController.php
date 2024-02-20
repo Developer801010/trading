@@ -257,7 +257,10 @@ class AuthenticateController extends Controller
                 ];
             
                 $agreement = new PaypalAgreement();
-                return $agreement->create($data, $description);
+                return response()->json([
+                    'message' => 'Registration successful',
+                    'data' => $agreement->create($data, $description)
+                ], 200);     
             }    
 
         } catch (\Exception $exception) {
