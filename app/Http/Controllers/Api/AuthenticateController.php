@@ -264,7 +264,7 @@ class AuthenticateController extends Controller
             DB::rollback();
             return response()->json([
                 'status' => false,
-                $exception
+                'message' =>  $exception->getMessage(),               
             ], 500);
         }
     }
