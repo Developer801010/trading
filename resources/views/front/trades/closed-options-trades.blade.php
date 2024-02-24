@@ -26,8 +26,8 @@
                                     </svg>
                                 </span>
                                 <input type="text" name="search" class="form-control search_input" placeholder="Search"value="{{ request()->get('search') }}">
-                                <i class="fas fa-times-circle close-icon m-auto"></i>
-                                <button type="submit" class="btn btn-primary opacity-0">Search</button>
+                                <i class="fas fa-times-circle close-icon m-auto p-2"></i>
+                                <button type="submit" class="btn btn-primary opacity-0 d-none">Search</button>
                             </div>
                         </form>
                     </div>
@@ -83,7 +83,7 @@
                                                 @php
                                                     $sellProfit =  number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
                                                 @endphp
-                                                <span class="@if($buyProfit > 0) tblprofit @else tblloss @endif">{{ $sellProfit }}%</span>
+                                                <span class="@if($sellProfit > 0) tblprofit @else tblloss @endif">{{ $sellProfit }}%</span>
                                             @endif
                                         </td>
                                     </tr>

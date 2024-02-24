@@ -2,7 +2,7 @@
 @section('title', 'Checkout')
 
 @section('page-style')
-	<style>
+	{{-- <style>
 		.input-group-text {
 			padding: 0;
 		}
@@ -349,270 +349,373 @@
 		.rule input {
 			margin-right: 10px;
 		}
-	</style>
+	</style> --}}
+    <style>
+        /* INTL NUM SELECT */
+        .iti.iti--allow-dropdown {width: 100%;}
+        .iti__country-list {border: none;border-radius: 4px;box-shadow: 0px 0px 50px 0px rgba(82, 63, 105, 0.15);}
+        .iti__country-list::-webkit-scrollbar {width: 4px;background: transparent;}
+        .iti__country-list::-webkit-scrollbar-thumb {border-radius: 10px;background: #e1e1e1;}
+        .iti__country.iti__highlight {background-color: #0D6EFD;color: #FFF;}
+        .iti__country.iti__highlight .iti__dial-code {color: #FFF;}
+        /* INTL NUM SELECT */
+        .phone-txt{font-size: 14px; position:absolute; left: 10px; right: 0;}
+        @media(max-width:991px){
+            .phone-txt{position: unset}
+        }
+    </style>
 	<link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/forms/form-validation.css') }}">
 @endsection
 
 @section('content')
-	<div class="container">
-		<section class="checkout-section">
-			<h1 class="text-center checkout-title ">
-				<span class="subscription_type_title">
-					{{ $subscription_type }}</span> Checkout
-				($<span class="price">{{ $price }}</span>/<span class="period">{{ $units }}</span> )
-			</h1>
-			<div class="row">
-				<div class="col-md-12">
-					<p> Returning customer?
-						<a class="text-danger" data-bs-toggle="collapse" href="#LoginForm" role="button" aria-expanded="false"
-							aria-controls="LoginForm">
-							Click here to login
-						</a>
-					</p>
-					<div class="collapse {{ old('isLoginFormExpanded') ? 'show' : '' }}" id="LoginForm">
-						<div class="card card-body">
-							<p>If you have shopped with us before, please enter your details below. If you are a new customer, please proceed
-								to the Billing section.</p>
-
-							<form class="auth-login-form mt-2" action="{{ route('login') }}" method="POST">
-								@csrf
-								<div class="row">
-									<div class="col-md-5  mb-3">
-										<label for="login-email" class="form-label">Email</label>
-										<input type="email" class="form-control" id="email" placeholder="Email" name="email"
-											value="{{ old('email') }}" required autofocus>
-									</div>
-
-									<div class="col-md-5  mb-3">
-										<div class="d-flex justify-content-between">
-											<label class="form-label" for="login-password">Password</label>
-											<a href="{{ url('/password/reset') }}">
-												<small>Forgot Password?</small>
-											</a>
-										</div>
-										<div class="input-group input-group-merge form-password-toggle">
-											<input type="password" class="form-control form-control-merge" required id="password" name="password"
-												aria-describedby="login-password" />
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-auto">
-										<input type="hidden" name="isLoginFormExpanded" value="{{ old('isLoginFormExpanded') ? 'true' : 'false' }}">
-										<button class="btn btn-primary w-100">Sign in</button>
-									</div>
-								</div>
-							</form>
-
-						</div>
-					</div>
-
-				</div>
-			</div>
-			<form method="post" action="{{ route('front.payment.process') }}" id="payment-form">
-				@csrf
-
-				<input type="hidden" name="stripe_plan_id" id="stripe_plan_id"
-					value="@if ($units == 'mo') {{ $month_plan['stripe_plan'] }} @elseif ($units == 'qu') {{ $quarter_plan['stripe_plan'] }}  @elseif($units == 'yr') {{ $year_plan['stripe_plan'] }} @endif" />
-
-				<input type="hidden" name="paypal_plan_id" id="paypal_plan_id"
-					value="@if ($units == 'mo') {{ $month_plan['paypal_plan'] }} @elseif ($units == 'qu') {{ $quarter_plan['paypal_plan'] }}  @elseif($units == 'yr') {{ $year_plan['paypal_plan'] }} @endif" />
-
-				<input type="hidden" name="price" id="price" value="{{ $price }}" />
-				<input type="hidden" name="period" id="period" value="{{ $units }}" />
-
-				@include('layouts.error')
-
-				<div class="row">
-					<div class="col-md-8">
-						<div class="account-box white-box">
-							<h4 class="checkout-subtitle">Create an account</h4>
-							<div class="row">
-								<div class="col-md-6 mb-3">
-									<label class="form-label" for="email">First Name</label>
-									<input type="text" name="first_name" id="first_name" class="form-control" placeholder="First Name"
-										value="{{ old('first_name') }}" />
-									<span class="first-name-error error d-none">This field is required.</span>
-								</div>
-								<div class="col-md-6 mb-3">
-									<label class="form-label" for="email">Last Name</label>
-									<input type="text" name="last_name" id="last_name" class="form-control" placeholder="Last Name"
-										value="{{ old('last_name') }}" />
-									<span class="last-name-error error d-none">This field is required.</span>
-								</div>
-
-								<div class="col-md-6 mb-3">
-									<label class="form-label" for="email">Email</label>
-									<input type="email" name="email" id="email" class="form-control" placeholder="Email Address"
-										value="{{ old('email') }}" />
-									<span class="email-error error d-none">This field is required.</span>
-								</div>
-								<div class="col-md-6 mb-3">
-									<label class="form-label" for="mobile_number">Mobile number</label>
-									<input type="text" name="mobile_number" id="mobile_number" class="form-control mobile-number-mask"
-										placeholder="Mobile Number" value="{{ old('mobile_number') }}" />
-									<span class="mobile-number-error error d-none">This field is required.</span>
-								</div>
-
-								<div class="col-md-6 mb-3">
-									<label class="form-label" for="password">Password</label>
-									<div class="input-group input-group-merge form-password-toggle">
-										<input type="password" name="password" id="password" class="form-control" value="{{ old('password') }}"
-											placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
-									</div>
-									<span class="password-error error d-none">This field is required.</span>
-								</div>
-								<div class="col-md-6 mb-3">
-									<label class="form-label" for="confirm-password">Confirm Password</label>
-									<div class="input-group input-group-merge form-password-toggle">
-										<input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
-											value="{{ old('password_confirmation') }}"
-											placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
-									</div>
-									<span class="password-confirmation-error error d-none">This field is required.</span>
-								</div>
-							</div>
-						</div>
-						<div class="checkout-box white-box">
-							<h4 class="checkout-subtitle">Easy checkout with Stripe or PayPal. All major credit cards accepted.</h4>
-							<div class="payment-options">
-								<div class="stripe-option payment-option payment_active">
-									<div class="payment_radio">
-										<input type="radio" name="payment_option" id="stripe" value="stripe" checked>
-										<label for="stripe">Credit / Debit Cards(Stripe)</label>
-									</div>
-									<img class="payment-image stripe-image" src="{{ asset('assets/images/stripe.png') }}" />
-								</div>
-
-								<div class="paypal-option payment-option">
-									<div class="payment_radio">
-										<input type="radio" name="payment_option" id="paypal" value="paypal">
-										<label for="paypal">PayPal</label>
-									</div>
-									<img class="payment-image paypal-image" src="{{ asset('assets/images/paypal.png') }}" />
-								</div>
-							</div>
-							<div class="stripe_payment">
-								{{-- <div class="row">
-                                    <div class="col-12 col-md-6 mb-1">
-                                        <label class="form-label" for="addCardNumber">Card Number</label>
-                                        <div class="input-group input-group-merge">
-                                            <input id="card-number" name="card-number" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" 
-                                            aria-describedby="addCard" data-msg="Please enter your credit card number" value="{{old('card-number')}}" />
-                                            <span class="input-group-text cursor-pointer p-25" id="addCard">
-                                                <span class="card-type"></span>
-                                            </span>
+	<!-- REGISTER -->
+    <section class="auth-register">
+        <form method="post" action="{{ route('front.payment.process') }}" id="payment-form">
+            @csrf
+            <div class="container-lg">
+                <h1 class="title"> <span class="subscription_type_title">{{ $subscription_type }}</span> Checkout (<span id="plan-price">$<span class="price">{{ $price }}</span>/ <span class="period">{{ $units }}</span></span>)</h1>
+                <input type="hidden" name="stripe_plan_id" id="stripe_plan_id" value="@if ($units == 'mo') {{ $month_plan['stripe_plan'] }} @elseif ($units == 'qu') {{ $quarter_plan['stripe_plan'] }}  @elseif($units == 'yr') {{ $year_plan['stripe_plan'] }} @endif" />
+                <input type="hidden" name="paypal_plan_id" id="paypal_plan_id" value="@if ($units == 'mo') {{ $month_plan['paypal_plan'] }} @elseif ($units == 'qu') {{ $quarter_plan['paypal_plan'] }}  @elseif($units == 'yr') {{ $year_plan['paypal_plan'] }} @endif" />
+                <input type="hidden" name="price" id="price" value="{{ $price }}" />
+                <input type="hidden" name="period" id="period" value="{{ $units }}" />
+                @include('layouts.error')
+                <div class="row checkout-row g-3 g-lg-4">
+                    <div class="col-12 col-md-7 col-lg-7">
+                        <div class="card mb-4">
+                            <div class="card-header">Create an account</div>
+                            <div class="card-body">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-lg-6">
+                                        <label>First Name :</label>
+                                        <input type="text" name="first_name" id="first-name" class="form-control" value="{{ old('first_name') }}">
+                                        <span class="first-name-error error d-none">This field is required.</span>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label>Last Name :</label>
+                                        <input type="text" name="last_name" id="last-name" class="form-control" value="{{ old('last_name') }}">
+                                        <span class="last-name-error error d-none">This field is required.</span>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label>Email Address :</label>
+                                        <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}">
+                                        <span class="email-error error d-none">This field is required.</span>
+										<span class="email-error-invelid error d-none">This email address not a valid.</span>
+                                    </div>
+                                    <div class="col-lg-6 position-relative">
+                                        <label>Phone Number :</label>
+                                        <div class="form-group">
+                                            <input type="text" name="mobile_number" id="mobile-number" class="form-control mobile-number-mask w-100"
+                                            value="{{ old('mobile_number') }}">
                                         </div>
-                                        <span class="error card-error d-none">This field is required.</span>
+                                        <span class="mobile-number-error error d-none">This field is required.</span>
+                                        <span class="phone-txt">Where Text Message (SMS) Alerts Will Be Sent (optional)</span>
                                     </div>
+                                    <div class="col-lg-6">
+                                        <label>Password :</label>
+                                        {{-- <input type="password" name="password" id="password" class="form-control" value="{{ old('password') }}"> --}}
+                                        <div class="input-box position-relative with-icon">
+                                            <input name="password" type="password" class="form-control" id="password1" value="">
+                                            <button type="button" class="input-group-text bg-transparent border-0 p-0 pe-1 position-absolute end-0 top-50 translate-middle toggle-passwords-btn">
+                                                <div class="icon password-show-icon" style="">
+                                                    <svg width="15" height="28" viewBox="0 0 41 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M40.9333 14.062C40.9333 14.062 33.4083 0.266113 20.8666 0.266113C8.32491 0.266113 0.799896 14.062 0.799896 14.062C0.799896 14.062 8.32491 27.8578 20.8666 27.8578C33.4083 27.8578 40.9333 14.062 40.9333 14.062ZM3.74218 14.062C4.95499 12.2187 6.34995 10.5019 7.90602 8.93744C11.1342 5.70419 15.5489 2.77445 20.8666 2.77445C26.1843 2.77445 30.5964 5.70419 33.8297 8.93744C35.3858 10.5019 36.7807 12.2187 37.9935 14.062C37.848 14.2802 37.6875 14.521 37.5044 14.7844C36.6641 15.9884 35.4225 17.5937 33.8297 19.1865C30.5964 22.4198 26.1818 25.3495 20.8666 25.3495C15.5489 25.3495 11.1368 22.4198 7.90351 19.1865C6.34745 17.6221 4.95501 15.9053 3.74218 14.062Z" fill="black"></path>
+                                                        <path d="M20.8666 7.79117C19.2035 7.79117 17.6085 8.45185 16.4324 9.62786C15.2564 10.8039 14.5958 12.3989 14.5958 14.062C14.5958 15.7252 15.2564 17.3202 16.4324 18.4962C17.6085 19.6722 19.2035 20.3329 20.8666 20.3329C22.5297 20.3329 24.1247 19.6722 25.3008 18.4962C26.4768 17.3202 27.1374 15.7252 27.1374 14.062C27.1374 12.3989 26.4768 10.8039 25.3008 9.62786C24.1247 8.45185 22.5297 7.79117 20.8666 7.79117ZM12.0874 14.062C12.0874 11.7336 13.0124 9.50062 14.6588 7.8542C16.3052 6.20778 18.5382 5.28284 20.8666 5.28284C23.195 5.28284 25.428 6.20778 27.0744 7.8542C28.7208 9.50062 29.6458 11.7336 29.6458 14.062C29.6458 16.3904 28.7208 18.6234 27.0744 20.2698C25.428 21.9163 23.195 22.8412 20.8666 22.8412C18.5382 22.8412 16.3052 21.9163 14.6588 20.2698C13.0124 18.6234 12.0874 16.3904 12.0874 14.062Z" fill="black"></path>
+                                                    </svg>
+                                                </div>
+                                                <div class="icon password-hide-icon" style="display: none;">
+                                                    <svg width="15" height="32" viewBox="0 0 41 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M33.5756 24.184C37.8423 20.3763 40.2001 16.062 40.2001 16.062C40.2001 16.062 32.6751 2.26611 20.1334 2.26611C17.7244 2.27441 15.3426 2.77637 13.1351 3.74102L15.0666 5.67494C16.6905 5.08336 18.405 4.77866 20.1334 4.77445C25.4511 4.77445 29.8632 7.70419 33.0965 10.9374C34.6525 12.5019 36.0475 14.2187 37.2603 16.062C37.1148 16.2802 36.9543 16.521 36.7712 16.7844C35.9309 17.9884 34.6893 19.5937 33.0965 21.1865C32.6826 21.6004 32.2512 22.0092 31.7997 22.4056L33.5756 24.184Z" fill="black"></path>
+                                                        <path d="M28.4034 19.0118C28.9631 17.4462 29.0668 15.7538 28.7023 14.1316C28.3378 12.5094 27.5202 11.024 26.3445 9.84834C25.1688 8.67267 23.6835 7.85502 22.0612 7.49053C20.439 7.12604 18.7467 7.2297 17.1811 7.78945L19.2454 9.85381C20.2094 9.71584 21.1923 9.80426 22.1162 10.1121C23.04 10.4199 23.8795 10.9387 24.5681 11.6272C25.2567 12.3158 25.7754 13.1553 26.0833 14.0792C26.3911 15.0031 26.4795 15.9859 26.3415 16.9499L28.4034 19.0118ZM21.0213 22.2701L23.0832 24.3319C21.5176 24.8917 19.8252 24.9953 18.203 24.6309C16.5808 24.2664 15.0955 23.4487 13.9198 22.273C12.7441 21.0974 11.9265 19.612 11.562 17.9898C11.1975 16.3676 11.3011 14.6752 11.8609 13.1096L13.9253 15.174C13.7873 16.138 13.8757 17.1208 14.1835 18.0447C14.4913 18.9686 15.0101 19.8081 15.6987 20.4967C16.3873 21.1852 17.2267 21.704 18.1506 22.0118C19.0745 22.3196 20.0574 22.4081 21.0213 22.2701Z" fill="black"></path>
+                                                        <path d="M8.46963 9.71591C8.01813 10.1172 7.58418 10.5236 7.17031 10.9375C5.61425 12.5019 4.2193 14.2187 3.00647 16.062L3.49559 16.7844C4.33589 17.9884 5.57751 19.5937 7.17031 21.1865C10.4036 24.4198 14.8182 27.3495 20.1334 27.3495C21.9294 27.3495 23.62 27.0159 25.2002 26.4465L27.1317 28.383C24.9242 29.3475 22.5424 29.8495 20.1334 29.8579C7.59171 29.8579 0.0666962 16.062 0.0666962 16.062C0.0666962 16.062 2.42203 11.7452 6.69122 7.94L8.46712 9.71842L8.46963 9.71591ZM34.2955 32L4.19542 1.89993L5.97132 0.124023L36.0714 30.2241L34.2955 32Z" fill="black"></path>
+                                                    </svg>
+                                                </div>
+                                            </button>
+                                        </div>
+                                        <span class="password1-error error d-none">This field is required.</span>
 
-                                    <div class="col-12 col-md-3 mb-1">
-                                        <label class="form-label" for="addCardCvv">CVC</label>
-                                        <input type="text" id="card-cvc" name="card-cvc" class="form-control cvv-code-mask"  value="{{old('card-cvc')}}"  maxlength="4" placeholder="654" />
-                                        <span class="error card-cvc-error d-none">This field is required.</span>
                                     </div>
-
-                                    <div class="col-12 col-md-3 mb-1">
-                                        <label class="form-label" for="addCardExpiryDate">Exp. Date</label>
-                                        <input type="text" id="card-expire-date" name="card-expire-date" class="form-control expiry-date-mask"  value="{{old('card-expire-date')}}" placeholder="MM/YY" />
-                                        <span class="error card-exp-error d-none">This field is required.</span>
+                                    {{-- <div class="col-lg-6">
+                                        <label>Confirm Password</label>
+                                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
+                                        value="{{ old('password_confirmation') }}">
+                                        <span class="password-confirmation-error error d-none">This field is required.</span>
+                                    </div> --}}
+                                </div>
+                                <p class="mb-0">Already you have an account? <a href="{{ url('/login') }}" class="auth-link">Login</a></p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header card-title-2">Easy checkout with Stripe or PayPal All major credit cards accepted.</div>
+                            <div class="card-body">
+                                <div class="payment-method mb-4">
+                                    <div class="position-relative">
+                                        <input type="radio" class="btn-check" name="payment_option" id="card"  value="stripe" checked>
+                                        <label class="payment-method-radio btn shadow-none" for="card">
+                                            <div class="d-flex gap-2 align-items-center">
+                                                <span class="checkmark-radio"></span>
+                                                <span>Credit / Debit Cards(Stripe)</span>
+                                            </div>
+                                            <div class="radio-img">
+                                                <img src="{{ asset('assets/images/cards.png') }}" class="img-fluid">
+                                            </div>
+                                        </label>
                                     </div>
-                                </div> --}}
-								<div id="card-element"></div>
-
-								<div id="card-errors" role="alert"></div>
-								{{-- <div class="row">
-                                    <div class="col-md-12">
-                                        <span class="payment-errors" style="color: red;margin-top:10px;"></span>
+                                    <div class="position-relative">
+                                        <input type="radio" class="btn-check" name="payment_option" id="paypal"  value="paypal">
+                                        <label class="payment-method-radio btn shadow-none" for="paypal">
+                                            <div class="d-flex gap-2 align-items-center">
+                                                <span class="checkmark-radio"></span>
+                                                <span>Paypal</span>
+                                            </div>
+                                            <div class="radio-img">
+                                                <img src="{{ asset('assets/images/paypal.png') }}" class="img-fluid">
+                                            </div>
+                                        </label>
                                     </div>
-                                </div> --}}
+                                </div>
+                                <div id="stripe" class="desc card-details">
+                                    <div class="mb-3">
+                                        <label>Card Number</label>
+                                        <div id="card-number-element" class="form-control"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="mb-3">
+                                                <label>Expiration Date</label>
+                                                <div class="payment-input-group">
+                                                    <div class="form-control" id="card-expiry-element" placeholder="MM/YY"></div>
+                                                    {{-- <span class="text-muted"> / </span>
+                                                    <input class="form-control" placeholder="YY"> --}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <div class="mb-3">
+                                                <label>CVC Number</label>
+                                                <div id="card-cvc-element" class="form-control"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{-- <div id="card-element"></div> --}}
 
-							</div>
+                                    <div class="error" id="card-errors" role="alert"></div>
+                                </div>
 
-							<button type="submit" id="card-button" class="btn btn_payment">Pay with Credit/Debit Card</button>
-							<div class="img_payment_section">
-								<img src="{{ asset('assets/images/cards-stripe.png') }}" class="img_stripe img_payment" />
-								<img src="{{ asset('assets/images/cards-paypal.png') }}" class="img_paypal img_payment d-none" />
-							</div>
-
-							<div class="terms rule">
-								<input type="checkbox" id="terms" />
-								<label for="terms">I understand that my personal data will be used to process this order, support my
-									experience throughout this website, and for other purposes described in our <a href="#">privacy
-										policy</a>.
-								</label>
-							</div>
-
-							<div class="conditions rule">
-								<input type="checkbox" id="conditions" />
-								<label for="conditions">By joining, I agree to these <a href="#">Terms/Conditions</a></label>
-							</div>
-						</div>
-
-					</div>
-					<div class="col-md-4">
-						<div class="monthly-member-section member-section">
-							<div class="memberships monthly-membership">
-								<div class="membership_radio">
-									<img class="info-icon active-icon" src="{{ asset('assets/images/infoicon-blue.svg') }}" />
-									<img class="info-icon inactive-icon" src="{{ asset('assets/images/infoicon-grey.svg') }}" />
-									<input type="radio" name="membership" id="month" value="month">
-									<label for="month">$147.00 Monthly Membership</label>
-								</div>
-							</div>
-							@component('components.tooltip')
-							@endcomponent
-						</div>
-						<div class="quarterly-member-section member-section">
-							<div class="memberships quarterly-membership">
-								<div class="membership_radio">
-									<img class="info-icon active-icon" src="{{ asset('assets/images/infoicon-blue.svg') }}" />
-									<img class="info-icon inactive-icon" src="{{ asset('assets/images/infoicon-grey.svg') }}" />
-									<input type="radio" name="membership" id="quartely" value="quartely">
-									<label for="quartely">$387.00 Quarterly Membership</label>
-								</div>
-								<div class="save_price_img">
-									<span class="save-price">Save <br> <strong>$366</strong></span>
-									<img src="{{ asset('assets/images/offer-icon1-01.svg') }}" class="membership_save_img" />
-								</div>
-							</div>
-							@component('components.tooltip')
-							@endcomponent
-						</div>
-						<div class="yearly-member-section member-section">
-							<div class="yearly-member-section member-section">
-								<div class="memberships yearly-membership">
-									<div class="membership_radio flex-wrap membership_most_popular">
-										<img class="info-icon active-icon" src="{{ asset('assets/images/infoicon-blue.svg') }}" />
-										<img class="info-icon inactive-icon" src="{{ asset('assets/images/infoicon-grey.svg') }}" />
-										<span class="text-uppercase">most popular</span>
-										<input type="radio" name="membership" id="yearly" value="yearly">
-										<label for="yearly" class="yearly-text">$787.00 Annual Membership</label>
+                                <div class="mt-3">
+                                    <button type="submit" id="card-button" class="btn btn-grn w-100 btn_payment">Pay with Credit/Debit Card</button>
+                                </div>
+                                <div class="my-4 strip-img">
+                                    <img src="{{ asset('assets/images/cards-stripe.png') }}" class="img-fluid">
+                                </div>
+                                <div class="form-check mb-2 terms">
+                                    <input class="form-check-input" type="checkbox" id="terms">
+                                    <label class="form-check-label" for="terms">I understand that my personal data will be used to process this order, support my experience throughout this website, and for other purposes described in our <a href="#" class="auth-link">Privacy Policy</a>.</label>
+									<span class="terms-error error d-none">This field is required.</span>
+                                </div>
+                                <div class="form-check mb-2 conditions">
+                                    <input class="form-check-input" type="checkbox" id="conditions">
+                                    <label class="form-check-label" for="conditions">By joining, I agree to these <a href="#" class="auth-link">Terms/Conditions</a></label>
+									<span class="conditions-error error d-none">This field is required.</span>
+                                </div>
+								<div class="form-check">
+									<div id="overlay" style="display: none;"></div>
+									<div id="loadingSpinner" style="display: none;">
+										<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+										Please wait while we process your order...
 									</div>
-									<div class="save_price_img">
-										<span class="save-price  text-white">Save <br> <strong>$977</strong></span>
-										<img src="{{ asset('assets/images/offer-icon2-01.svg') }}" class="membership_save_img" />
-									</div>
 								</div>
-								<div class="text-center secureimg-section">
-									<img src="{{ asset('assets/images/secure-checkout.png') }}" />
-									<p class="protected-text">Protected by</p>
-									<img src="{{ asset('assets/images/card.png') }}" class="card-img" />
-								</div>
-								@component('components.tooltip')
-								@endcomponent
-							</div>
-						</div>
-					</div>
-			</form>
-			<div id="overlay" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-5 col-lg-5">
+                        <div class="plan-radio mb-4">
+                            <div class="mb-3">
+                                <input type="radio" class="btn-check" name="membership" id="month" checked value="month" checked>
+                                <label id="plan1" class="btn pricing-form-control shadow-none" for="month">
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <span class="btn-check-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
+                                                <path d="M7 13.625C5.37555 13.625 3.81763 12.9797 2.66897 11.831C1.52031 10.6824 0.875 9.12445 0.875 7.5C0.875 5.87555 1.52031 4.31763 2.66897 3.16897C3.81763 2.02031 5.37555 1.375 7 1.375C8.62445 1.375 10.1824 2.02031 11.331 3.16897C12.4797 4.31763 13.125 5.87555 13.125 7.5C13.125 9.12445 12.4797 10.6824 11.331 11.831C10.1824 12.9797 8.62445 13.625 7 13.625ZM7 14.5C8.85652 14.5 10.637 13.7625 11.9497 12.4497C13.2625 11.137 14 9.35652 14 7.5C14 5.64348 13.2625 3.86301 11.9497 2.55025C10.637 1.2375 8.85652 0.5 7 0.5C5.14348 0.5 3.36301 1.2375 2.05025 2.55025C0.737498 3.86301 0 5.64348 0 7.5C0 9.35652 0.737498 11.137 2.05025 12.4497C3.36301 13.7625 5.14348 14.5 7 14.5Z" fill="black"/>
+                                                <path d="M7.81371 6.2645L5.80996 6.51562L5.73821 6.84812L6.13196 6.92075C6.38921 6.982 6.43996 7.07475 6.38396 7.33113L5.73821 10.3656C5.56846 11.1505 5.83008 11.5197 6.44521 11.5197C6.92208 11.5197 7.47596 11.2993 7.72708 10.9965L7.80408 10.6325C7.62908 10.7865 7.37358 10.8478 7.20383 10.8478C6.96321 10.8478 6.87571 10.6789 6.93783 10.3814L7.81371 6.2645ZM7.87496 4.4375C7.87496 4.66956 7.78277 4.89212 7.61868 5.05622C7.45458 5.22031 7.23202 5.3125 6.99996 5.3125C6.76789 5.3125 6.54533 5.22031 6.38124 5.05622C6.21715 4.89212 6.12496 4.66956 6.12496 4.4375C6.12496 4.20544 6.21715 3.98288 6.38124 3.81878C6.54533 3.65469 6.76789 3.5625 6.99996 3.5625C7.23202 3.5625 7.45458 3.65469 7.61868 3.81878C7.78277 3.98288 7.87496 4.20544 7.87496 4.4375Z" fill="black"/>
+                                              </svg>
+                                        </span>
+                                        <span>$147.00 Monthly Membership</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <input type="radio" class="btn-check" name="membership" id="quartely" autocomplete="off" value="quartely">
+                                <label id="plan2" class="btn pricing-form-control shadow-none" for="quartely">
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <span class="btn-check-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
+                                                <path d="M7 13.625C5.37555 13.625 3.81763 12.9797 2.66897 11.831C1.52031 10.6824 0.875 9.12445 0.875 7.5C0.875 5.87555 1.52031 4.31763 2.66897 3.16897C3.81763 2.02031 5.37555 1.375 7 1.375C8.62445 1.375 10.1824 2.02031 11.331 3.16897C12.4797 4.31763 13.125 5.87555 13.125 7.5C13.125 9.12445 12.4797 10.6824 11.331 11.831C10.1824 12.9797 8.62445 13.625 7 13.625ZM7 14.5C8.85652 14.5 10.637 13.7625 11.9497 12.4497C13.2625 11.137 14 9.35652 14 7.5C14 5.64348 13.2625 3.86301 11.9497 2.55025C10.637 1.2375 8.85652 0.5 7 0.5C5.14348 0.5 3.36301 1.2375 2.05025 2.55025C0.737498 3.86301 0 5.64348 0 7.5C0 9.35652 0.737498 11.137 2.05025 12.4497C3.36301 13.7625 5.14348 14.5 7 14.5Z" fill="black"/>
+                                                <path d="M7.81371 6.2645L5.80996 6.51562L5.73821 6.84812L6.13196 6.92075C6.38921 6.982 6.43996 7.07475 6.38396 7.33113L5.73821 10.3656C5.56846 11.1505 5.83008 11.5197 6.44521 11.5197C6.92208 11.5197 7.47596 11.2993 7.72708 10.9965L7.80408 10.6325C7.62908 10.7865 7.37358 10.8478 7.20383 10.8478C6.96321 10.8478 6.87571 10.6789 6.93783 10.3814L7.81371 6.2645ZM7.87496 4.4375C7.87496 4.66956 7.78277 4.89212 7.61868 5.05622C7.45458 5.22031 7.23202 5.3125 6.99996 5.3125C6.76789 5.3125 6.54533 5.22031 6.38124 5.05622C6.21715 4.89212 6.12496 4.66956 6.12496 4.4375C6.12496 4.20544 6.21715 3.98288 6.38124 3.81878C6.54533 3.65469 6.76789 3.5625 6.99996 3.5625C7.23202 3.5625 7.45458 3.65469 7.61868 3.81878C7.78277 3.98288 7.87496 4.20544 7.87496 4.4375Z" fill="black"/>
+                                            </svg>
+                                        </span>
+                                        <span>$387.00 Quarterly Membership</span>
+                                    </div>
 
-			<div id="loadingSpinner" style="display: none;">
-				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				Please wait while we process your order...
-			</div>
-		</section>
-	</div>
+                                    <span class="plan-badge">
+                                        <span class="plan-badge-txt">Save <br> $366</span>
+                                        <span class="plan-badge-img">
+                                            <img src="{{ asset('assets/images/plan-2.svg')}}" class="img-fluid">
+                                        </span>
+                                    </span>
+
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <input type="radio" class="btn-check" name="membership" id="yearly" autocomplete="off" value="yearly">
+                                <label id="plan3" class="btn pricing-form-control shadow-none " for="yearly">
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <span class="btn-check-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
+                                                <path d="M7 13.625C5.37555 13.625 3.81763 12.9797 2.66897 11.831C1.52031 10.6824 0.875 9.12445 0.875 7.5C0.875 5.87555 1.52031 4.31763 2.66897 3.16897C3.81763 2.02031 5.37555 1.375 7 1.375C8.62445 1.375 10.1824 2.02031 11.331 3.16897C12.4797 4.31763 13.125 5.87555 13.125 7.5C13.125 9.12445 12.4797 10.6824 11.331 11.831C10.1824 12.9797 8.62445 13.625 7 13.625ZM7 14.5C8.85652 14.5 10.637 13.7625 11.9497 12.4497C13.2625 11.137 14 9.35652 14 7.5C14 5.64348 13.2625 3.86301 11.9497 2.55025C10.637 1.2375 8.85652 0.5 7 0.5C5.14348 0.5 3.36301 1.2375 2.05025 2.55025C0.737498 3.86301 0 5.64348 0 7.5C0 9.35652 0.737498 11.137 2.05025 12.4497C3.36301 13.7625 5.14348 14.5 7 14.5Z" fill="black"/>
+                                                <path d="M7.81371 6.2645L5.80996 6.51562L5.73821 6.84812L6.13196 6.92075C6.38921 6.982 6.43996 7.07475 6.38396 7.33113L5.73821 10.3656C5.56846 11.1505 5.83008 11.5197 6.44521 11.5197C6.92208 11.5197 7.47596 11.2993 7.72708 10.9965L7.80408 10.6325C7.62908 10.7865 7.37358 10.8478 7.20383 10.8478C6.96321 10.8478 6.87571 10.6789 6.93783 10.3814L7.81371 6.2645ZM7.87496 4.4375C7.87496 4.66956 7.78277 4.89212 7.61868 5.05622C7.45458 5.22031 7.23202 5.3125 6.99996 5.3125C6.76789 5.3125 6.54533 5.22031 6.38124 5.05622C6.21715 4.89212 6.12496 4.66956 6.12496 4.4375C6.12496 4.20544 6.21715 3.98288 6.38124 3.81878C6.54533 3.65469 6.76789 3.5625 6.99996 3.5625C7.23202 3.5625 7.45458 3.65469 7.61868 3.81878C7.78277 3.98288 7.87496 4.20544 7.87496 4.4375Z" fill="black"/>
+                                              </svg>
+                                        </span>
+                                        <span class="d-flex flex-column align-items-start">
+                                            <span class="popular-plan">Most popular</span>
+                                            <span>$787.00 Annual Membership</span>
+                                        </span>
+                                    </div>
+
+                                    <span class="plan-badge">
+                                        <span class="plan-badge-txt2">Save <br> $977</span>
+                                        <span class="plan-badge-img">
+                                            <img src="{{ asset('assets/images/plan-3.svg')}}" class="img-fluid">
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="secure-checkout">
+                            <div class="secure-checkout-main-img">
+                                <img src="{{ asset('assets/images/secure-checkout.png') }}" class="img-fluid">
+                            </div>
+                            <div class="secure-checkout-img">
+                                <img src="{{ asset('assets/images/secure-checkout1.png') }}" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+    </section>
+    <!-- REGISTER -->
+
+    <!-- POPOVER -->
+    <div hidden >
+        <div data-name="plan-1">
+            <ul class="nav flex-column">
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Average of 2-5 easy to follow trade alerts per week</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>All swing trades... perfect for the working professional</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>All entries and exits delivered in real-time via text message</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Access to the real time portfolio tracker</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Access to the exclusive member only weekly Trading Report with market outlook and portfolio update</span>
+                </li>
+            </ul>
+        </div>
+
+
+        <div data-name="plan-2">
+            <ul class="nav flex-column">
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Average of 2-5 easy to follow trade alerts per week</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>All swing trades... perfect for the working professional</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>All entries and exits delivered in real-time via text message</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Access to the real time portfolio tracker</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Access to the exclusive member only weekly Trading Report with market outlook and portfolio update</span>
+                </li>
+            </ul>
+        </div>
+
+        <div data-name="plan-3">
+            <ul class="nav flex-column">
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Average of 2-5 easy to follow trade alerts per week</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>All swing trades... perfect for the working professional</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>All entries and exits delivered in real-time via text message</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Access to the real time portfolio tracker</span>
+                </li>
+                <li>
+                    <span class="popover-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 48 48"><defs><mask id="ipSCheckOne0"><g fill="none" stroke-linejoin="round" stroke-width="4"><path fill="#fff" stroke="#fff" d="M24 44a19.937 19.937 0 0 0 14.142-5.858A19.937 19.937 0 0 0 44 24a19.938 19.938 0 0 0-5.858-14.142A19.937 19.937 0 0 0 24 4A19.938 19.938 0 0 0 9.858 9.858A19.938 19.938 0 0 0 4 24a19.937 19.937 0 0 0 5.858 14.142A19.938 19.938 0 0 0 24 44Z"/><path stroke="#000" stroke-linecap="round" d="m16 24l6 6l12-12"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSCheckOne0)"/></svg>
+                    </span>
+                    <span>Access to the exclusive member only weekly Trading Report with market outlook and portfolio update</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- POPOVER -->
 
 @endsection
 
@@ -652,6 +755,18 @@
 		var stripe_plan_id = $('#stripe_plan_id');
 		var paypal_plan_id = $('#paypal_plan_id');
 
+
+        // <=========== password show/hide start ===========>
+        $(".toggle-passwords-btn").click(function () {
+            $(this).find(".icon").toggle();
+            input = $(this).parent().find("input");
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+        // <=========== password show/hide end ===========>
 
 		member_section.hover(function() {
 			$(this).find('.tooltip-text').removeClass('invisible');
@@ -697,40 +812,53 @@
 			yearly_membership.find('.inactive-icon').removeClass('d-none');
 		}
 
-		payment_option.click(function() {
-			if (!$(this).hasClass('payment_active')) {
-				//remove payment-active class
-				payment_option.removeClass('payment_active');
+		// payment_option.click(function() {
+		// 	// if (!$(this).hasClass('payment_active')) {
+		// 	// 	//remove payment-active class
+		// 	// 	payment_option.removeClass('payment_active');
 
-				//Add class again
-				$(this).addClass('payment_active');
+		// 	// 	//Add class again
+		// 	// 	$(this).addClass('payment_active');
 
-				//remove radion button
-				if ($(this).hasClass('stripe-option')) {
-					stripe_option.prop('checked', true);
-					paypal_option.prop('checked', false);
-					img_stripe.removeClass('d-none');
-					img_paypal.addClass('d-none');
-				} else {
-					stripe_option.prop('checked', false);
-					paypal_option.prop('checked', true);
-					img_stripe.addClass('d-none');
-					img_paypal.removeClass('d-none');
-				}
-			}
+		// 	// 	//remove radion button
+		// 	// 	if ($(this).hasClass('stripe-option')) {
+		// 	// 		stripe_option.prop('checked', true);
+		// 	// 		paypal_option.prop('checked', false);
+		// 	// 		img_stripe.removeClass('d-none');
+		// 	// 		img_paypal.addClass('d-none');
+		// 	// 	} else {
+		// 	// 		stripe_option.prop('checked', false);
+		// 	// 		paypal_option.prop('checked', true);
+		// 	// 		img_stripe.addClass('d-none');
+		// 	// 		img_paypal.removeClass('d-none');
+		// 	// 	}
+		// 	// }
 
-			var paymentOption = $('input[name="payment_option"]:checked').val();
+		// 	// var paymentOption = $('input[name="payment_option"]:checked').val();
 
-			if (paymentOption == 'paypal') {
-				stripe_payment.addClass('d-none');
-				btn_payment.text('Pay with PayPal');
-			} else {
-				stripe_payment.removeClass('d-none');
-				btn_payment.text('Pay with Credit/Debit Card');
-			}
-		})
+		// 	// if (paymentOption == 'paypal') {
+		// 	// 	stripe_payment.addClass('d-none');
+		// 	// 	btn_payment.text('Pay with PayPal');
+		// 	// } else {
+		// 	// 	stripe_payment.removeClass('d-none');
+		// 	// 	btn_payment.text('Pay with Credit/Debit Card');
+		// 	// }
+		// })
 
-		//get period 
+        $("input[name='payment_option']").click(function() {
+            var test = $(this).val();
+            $(".desc").hide();
+
+            if(test == 'paypal'){
+                $(".btn_payment").text('Pay with PayPal');
+            } else{
+                $("#" + test).show();
+                $(".btn_payment").text('Pay with Credit/Debit Card');
+            }
+        });
+
+
+		//get period
 		var period = $('#period').val();
 		if (period == 'mo') {
 			$('.monthly-membership').addClass('membership_active');
@@ -742,34 +870,62 @@
 
 
 
-		//if right side bar is clicking... 
-		memberships.click(function() {
-			var membership_type = 'monthly';
+		//if right side bar is clicking...
+		// memberships.click(function() {
+		// 	var membership_type = 'monthly';
 
-			if ($(this).hasClass('monthly-membership')) {
-				updateCheckoutAttributes('monthly', 147, 'mo');
+		// 	if ($(this).hasClass('monthly-membership')) {
+		// 		updateCheckoutAttributes('monthly', 147, 'mo');
+		// 		clearMembershipClass();
+		// 		$('.monthly-membership').addClass('membership_active');
+		// 		stripe_plan_id.val(month_plan_stripe);
+		// 		paypal_plan_id.val(month_plan_paypal);
+		// 		activeMonthlyIcon();
+		// 	} else if ($(this).hasClass('quarterly-membership')) {
+		// 		updateCheckoutAttributes('quarterly', 387, 'qu');
+		// 		clearMembershipClass();
+		// 		$('.quarterly-membership').addClass('membership_active');
+		// 		stripe_plan_id.val(quarter_plan_stripe);
+		// 		paypal_plan_id.val(quarter_plan_paypal);
+		// 		activeQuareterlyIcon();
+		// 	} else if ($(this).hasClass('yearly-membership')) {
+		// 		updateCheckoutAttributes('yearly', 787, 'yr');
+		// 		clearMembershipClass();
+		// 		$('.yearly-membership').addClass('membership_active');
+		// 		stripe_plan_id.val(year_plan_stripe);
+		// 		paypal_plan_id.val(year_plan_paypal);
+		// 		activeYearlyIcon();
+		// 	}
+
+		// })
+
+        $("input[name='membership']").click(function() {
+            var test = $(this).val();
+            if(test == 'quartely'){
+                $("#plan-price").text('$387/QU');
+                updateCheckoutAttributes('quartely', 387, 'qu');
 				clearMembershipClass();
-				$('.monthly-membership').addClass('membership_active');
-				stripe_plan_id.val(month_plan_stripe);
-				paypal_plan_id.val(month_plan_paypal);
-				activeMonthlyIcon();
-			} else if ($(this).hasClass('quarterly-membership')) {
-				updateCheckoutAttributes('quarterly', 387, 'qu');
-				clearMembershipClass();
-				$('.quarterly-membership').addClass('membership_active');
 				stripe_plan_id.val(quarter_plan_stripe);
 				paypal_plan_id.val(quarter_plan_paypal);
-				activeQuareterlyIcon();
-			} else if ($(this).hasClass('yearly-membership')) {
-				updateCheckoutAttributes('yearly', 787, 'yr');
+                activeQuareterlyIcon();
+            }
+            else if(test == 'yearly'){
+                $("#plan-price").text('$787/YR');
+                updateCheckoutAttributes('yearly', 787, 'yr');
 				clearMembershipClass();
-				$('.yearly-membership').addClass('membership_active');
 				stripe_plan_id.val(year_plan_stripe);
 				paypal_plan_id.val(year_plan_paypal);
-				activeYearlyIcon();
-			}
-
-		})
+                activeYearlyIcon();
+            }
+            else{
+                $("#plan-price").text('$147/MO');
+                updateCheckoutAttributes('monthly', 147, 'mo');
+				clearMembershipClass();
+                stripe_plan_id.val(month_plan_stripe);
+				paypal_plan_id.val(month_plan_paypal);
+                activeMonthlyIcon();
+            }
+        });
 
 		function updateCheckoutAttributes(title, price, period) {
 			//for the title
@@ -810,23 +966,40 @@
 		};
 
 		// Create an instance of the card Element
-		var card = elements.create('card', {
-			style: style,
-			hidePostalCode: true
-		});
+		// var card = elements.create('card', {
+		// 	style: style,
+		// 	hidePostalCode: true
+		// });
 
 		// Add an instance of the card Element into the `card-element` <div>
-		card.mount('#card-element');
+        var cardNumberElement = elements.create('cardNumber', {
+            style: style,
+            placeholder: 'Card number',
+        });
+        cardNumberElement.mount('#card-number-element');
+
+        var cardExpiryElement = elements.create('cardExpiry', {
+            style: style,
+            placeholder: 'MM/YY',
+        });
+        cardExpiryElement.mount('#card-expiry-element');
+
+        var cardCvcElement = elements.create('cardCvc', {
+            style: style,
+            placeholder: 'CVC',
+        });
+        cardCvcElement.mount('#card-cvc-element');
+		// card.mount('#card-element');
 
 		// Handle real-time validation errors from the card Element.
-		card.addEventListener('change', function(event) {
-			var displayError = document.getElementById('card-errors');
-			if (event.error) {
-				displayError.textContent = event.error.message;
-			} else {
-				displayError.textContent = '';
-			}
-		});
+		// cardNumberElement.addEventListener('change', function(event) {
+		// 	var displayError = document.getElementById('card-errors');
+		// 	if (event.error) {
+		// 		displayError.textContent = event.error.message;
+		// 	} else {
+		// 		displayError.textContent = '';
+		// 	}
+		// });
 
 
 		//Phone Number
@@ -837,46 +1010,6 @@
 			});
 		}
 
-		// Credit Card
-		// if (creditCard.length) {
-		//         creditCard.each(function () {
-		//             new Cleave($(this), {
-		//                 creditCard: true,
-		//                 onCreditCardTypeChanged: function (type) {
-		//                 const elementNodeList = document.querySelectorAll('.card-type');
-		//                     if (type != '' && type != 'unknown') {
-		//                         //! we accept this approach for multiple credit card masking
-		//                         for (let i = 0; i < elementNodeList.length; i++) {
-		//                         elementNodeList[i].innerHTML =
-		//                             '<img src="' + assetsPath + '/image/icons/payments/' + type + '-cc.png" height="24"/>';
-		//                         }
-		//                     } else {
-		//                         for (let i = 0; i < elementNodeList.length; i++) {
-		//                         elementNodeList[i].innerHTML = '';
-		//                         }
-		//                     }
-		//                 }
-		//             });
-		//         });
-		//     }
-
-		// // Expiry Date Mask
-		// if (expiryDateMask.length) {
-		//     new Cleave(expiryDateMask, {
-		//         date: true,
-		//         delimiter: '/',
-		//         datePattern: ['m', 'y']
-		//     });
-		// }
-
-		// // CVV
-		// if (cvvMask.length) {
-		//     new Cleave(cvvMask, {
-		//         numeral: true,
-		//         numeralPositiveOnly: true
-		//     });
-		// }
-
 		// Handle form submission
 		var payment_form = document.getElementById('payment-form');
 
@@ -885,16 +1018,17 @@
 			event.preventDefault();
 
 			var paymentOption = $('input[name="payment_option"]:checked').val();
+
 			var isValid = true;
 			var cardButton = $('#card-button');
 			var termsChecked = $('#terms').is(':checked');
 			var conditionsChecked = $('#conditions').is(':checked');
-			var first_name = $('#payment-form #first_name');
-			var last_name = $('#payment-form #last_name');
+			var first_name = $('#payment-form #first-name');
+			var last_name = $('#payment-form #last-name');
 			var email = $('#payment-form #email');
-			var mobile_number = $('#payment-form #mobile_number');
-			var password = $('#payment-form #password');
-			var password_confirmation = $('#payment-form #password_confirmation');
+			var mobile_number = $('#payment-form #mobile-number');
+			var password = $('#payment-form #password1');
+			// var password_confirmation = $('#payment-form #password_confirmation');
 
 			if (first_name.val() == '') {
 				isValid = false;
@@ -923,7 +1057,7 @@
 			if (mobile_number.val() == '') {
 				isValid = false;
 				mobile_number.addClass('error');
-				$('.mobile-number-error').removeClass('d-none');
+				$('.mobile-number-error').removeClass('d-none').addClass('d-block');
 			} else {
 				mobile_number.removeClass('error');
 			}
@@ -931,52 +1065,45 @@
 			if (password.val() == '') {
 				isValid = false;
 				password.addClass('error');
-				$('.password-error').removeClass('d-none');
+				$('.password1-error').removeClass('d-none');
 			} else {
 				password.removeClass('error');
 			}
 
-			if (password_confirmation.val() == '') {
-				isValid = false;
-				password_confirmation.addClass('error');
-				$('.password-confirmation-error').removeClass('d-none');
-			} else {
-				password_confirmation.removeClass('error');
-			}
-
 			if (paymentOption == 'stripe') {
 
-				// var card_number = $('#card-number');
-				// var card_cvc = $('#card-cvc');
-				// var card_date = $('#card-expire-date');
+				var card_number = $('#card-number');
+				var card_cvc = $('#card-cvc');
+				var card_date = $('#card-expire-date');
 
-				// if(card_number.val() == ''){
-				//     isValid = false;
-				//     card_number.addClass('error');
-				//     $('.card-error').removeClass('d-none');
-				// }else{
-				//     card_number.removeClass('error');
-				// }
+				if(card_number.val() == ''){
+				    isValid = false;
+				    card_number.addClass('error');
+				    $('.card-error').removeClass('d-none');
+				}else{
+				    card_number.removeClass('error');
+				}
 
-				// if(card_cvc.val() == ''){
-				//     isValid = false;
-				//     card_cvc.addClass('error');
-				//     $('.card-cvc-error').removeClass('d-none');
-				// }else{
-				//     card_cvc.removeClass('error');
-				// }
+				if(card_cvc.val() == ''){
+				    isValid = false;
+				    card_cvc.addClass('error');
+				    $('.card-cvc-error').removeClass('d-none');
+				}else{
+				    card_cvc.removeClass('error');
+				}
 
-				// if(card_date.val() == ''){
-				//     isValid = false;
-				//     card_date.addClass('error');
-				//     $('.card-exp-error').removeClass('d-none');
-				// }else{
-				//     card_date.removeClass('error');
-				// }
+				if(card_date.val() == ''){
+				    isValid = false;
+				    card_date.addClass('error');
+				    $('.card-exp-error').removeClass('d-none');
+				}else{
+				    card_date.removeClass('error');
+				}
 
 				if (!termsChecked) {
 					isValid = false;
 					$('.terms').addClass('error');
+					$('.terms-error').removeClass('d-none').addClass('d-block');
 				} else {
 					$('.terms').removeClass('error');
 				}
@@ -984,17 +1111,18 @@
 				if (!conditionsChecked) {
 					isValid = false;
 					$('.conditions').addClass('error');
+					$('.conditions-error').removeClass('d-none').addClass('d-block');
 				} else {
 					$('.conditions').removeClass('error');
 				}
-
 				if (isValid) {
 
-					stripe.createToken(card).then(function(result) {
+					stripe.createToken(cardNumberElement).then(function(result) {
 						if (result.error) {
 							// Display an error message to the user.
-							var errorElement = document.getElementById('card-errors');
-							errorElement.textContent = result.error.message;
+							$('#card-errors').text(result.error.message)
+							// var errorElement = document.getElementById('card-errors');
+							// errorElement.textContent = result.error.message;
 						} else {
 							// You can now use the Payment Method ID on your server to make a payment.
 							// console.log(result.token.id);
@@ -1036,6 +1164,42 @@
 
 		});
 
+		$('input[type="text"],input[type="email"],input[type="password"]').on('keyup',function(e){
+
+			var input_id = $(`#payment-form #${this.id}`);
+			if(this.value){
+
+				if(this.id == 'email'){
+					var pattern = /^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i
+					var email_input = input_id.val();
+					if(!pattern.test(email_input)){
+						input_id.addClass('error');
+						$(`.${this.id}-error-invelid`).removeClass('d-none').addClass('d-block');
+					}else{
+						input_id.removeClass('error');
+						$(`.${this.id}-error-invelid`).addClass('d-none').removeClass('d-block');
+					}
+				}else{
+					input_id.removeClass('error');
+				}
+				$(`.${this.id}-error`).addClass('d-none').removeClass('d-block');
+			}else{
+				input_id.addClass('error');
+				$(`.${this.id}-error`).removeClass('d-none').addClass('d-block');
+			}
+		});
+
+		$('input[type="checkbox"]').on('change',function(e){
+			var input_check_id = $(`#payment-form #${this.id}`);
+			if(input_check_id.is(':checked')){
+				input_check_id.removeClass('error');
+				$(`.${this.id}-error`).addClass('d-none').removeClass('d-block');
+			}else{
+				input_check_id.addClass('error');
+				$(`.${this.id}-error`).removeClass('d-none').addClass('d-block');
+			}
+		});
+
 		function stripeTokenHandler(token) {
 			// Insert the token ID into the form so it gets submitted to the server
 			var payment_form = document.getElementById('payment-form');
@@ -1052,5 +1216,42 @@
 			var payment_form = document.getElementById('payment-form');
 			payment_form.submit();
 		}
+
+        $(document).ready(function() {
+            var plan1options = {
+                html: true,
+                trigger: 'hover',
+                placement: 'left',
+                customClass: 'popover-custom',
+                content: $('[data-name="plan-1"]'),
+            }
+            var plan1 = document.getElementById('plan1')
+            var popover1 = new bootstrap.Popover(plan1, plan1options)
+
+            var plan2options = {
+                html: true,
+                trigger: 'hover',
+                placement: 'left',
+                customClass: 'popover-custom',
+                content: $('[data-name="plan-2"]'),
+            }
+            var plan2 = document.getElementById('plan2')
+            var popover2 = new bootstrap.Popover(plan2, plan2options)
+
+            var plan3options = {
+                html: true,
+                trigger: 'hover',
+                placement: 'left',
+                customClass: 'popover-custom',
+                content: $('[data-name="plan-3"]'),
+            }
+            var plan3 = document.getElementById('plan3')
+            var popover3 = new bootstrap.Popover(plan3, plan3options)
+
+        })
+
+        const phoneInputField = document.querySelector("#mobile-number");
+        const phoneInput = window.intlTelInput(phoneInputField,{
+        utilsScript:"https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",});
 	</script>
 @endsection

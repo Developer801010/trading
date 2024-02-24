@@ -2,37 +2,33 @@
 
 namespace App\Http\Middleware;
 
+use App\Providers\RouteServiceProvider;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
-class RedirectIfNotAuthenticated
+class RedirectIfAuthenticated
 {
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string|null              $guard
-     *
-     * @return mixed
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle($request, Closure $next, $guard = 'web')
+    public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        if (!$request->hasValidSignature()) {
-            switch ($guard) {
-                case 'sanctum':
-                    $redirect_url = '/api/unauthorized';
-                    break;
-                case 'admin':
-                    $redirect_url = '/admin/login';
-                    break;
-                case 'web':
-                    $redirect_url = '/login';
-                default:
-                    $redirect_url = '/login';
-                    break;
-            }
-            if (!Auth::guard($guard)->check()) {
-                return redirect($redirect_url);
+        $guards = empty($guards) ? [null] : $guards;
+
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                if(Auth::check()){
+                    if(Auth::user()->hasRole('admin')){
+                        return redirect(RouteServiceProvider::HOME);
+                    }else{
+                        return redirect('/dashboard/main-feed');        
+                    }
+                }
+                return redirect(RouteServiceProvider::HOME);
             }
         }
 

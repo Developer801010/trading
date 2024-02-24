@@ -46,7 +46,6 @@ class PaymentController extends Controller
                 'required',
                 'string',
                 'min:8',
-                'confirmed',
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
             ],
         ], $messages);
