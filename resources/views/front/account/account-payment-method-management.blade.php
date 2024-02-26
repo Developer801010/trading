@@ -61,11 +61,11 @@
                                                             <h6>{{$paymentMethod->card->brand}} ending in {{$paymentMethod->card->last4}}</h6>
                                                             <span>Card expires at {{sprintf('%02d/%02d', $paymentMethod->card->exp_month, $paymentMethod->card->exp_year % 100)}}</span>
                                                         </div>
-                                                        <div class="ms-auto">
+                                                        <div class="card-delete-btn ms-auto">
                                                             <form method="post" class="btn_payment_delete_form" action="{{ route('front.account-delete-card', ['id'=>$paymentMethod->id]) }}">
                                                                 @csrf
                                                                 @method('delete')
-                                                                <button type="submit" class="btn btn-dang py-2 px-3">Delete</button>
+                                                                <button type="submit" class="btn btn-dang px-3">Delete</button>
                                                             </form>
                                                         </div>
                                                     </div>

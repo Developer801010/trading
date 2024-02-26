@@ -5,57 +5,38 @@
 @endsection
 
 @section('content')
-<main class="main-wrapper">
-    <div class="main-feed">
-        <div class="container-lg">
-            <div class="card login-section">
-                <div class="card-body">
-                    <div class="row">
-                        <form class="auth-login-form mt-2" action="{{ route('login') }}" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="login-email" class="form-label">Email</label>
-                                <input type="email" class="form-control"
-                                                id="email" placeholder="Email" name="email"
-                                                value="{{ old('email') }}" required autofocus>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <label class="form-label" for="login-password">Password</label>
-                                    <a href="{{ url('/password/reset') }}">
-                                        <small>Forgot Password?</small>
-                                    </a>
-                                </div>
-                                <div class="input-group input-group-merge form-password-toggle">
-                                    <input type="password" class="form-control form-control-merge"
-                                        id="password" name="password" tabindex="2"
-                                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                        aria-describedby="login-password" />
-                                    {{-- <span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span> --}}
-                                </div>
-
-                                @include('layouts.error')
-                            </div>
-
-                            <div class="mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox"
-                                    id="remember" name="remember" {{ old('remember') ? 'checked' : '' }} tabindex="3" />
-                                    <label class="form-check-label" for="remember">   {{ __('Remember Me') }} </label>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary w-100" tabindex="4">Sign in</button>
-                        </form>
-                    </div>
-
-                    <div class="my-2">
-                    </div>
+ <!-- LOGIN -->
+ <section class="auth-wrapper auth-login">
+    <div class="container-lg container-section">
+        <div class="card">
+            <h1 class="title">Login</h1>
+            @include('layouts.error')
+            <form class="auth-login-form mt-2" action="{{ route('login') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" id="email" placeholder="Email" name="email" value="{{ old('email') }}" required autofocus>
                 </div>
-            </div>
+                <div class="mb-3">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="password" name="password"  placeholder="Password" required>
+                </div>
+                {{-- <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                    <label class="form-check-label" for="remember">Term Condition & policies apply</label>
+                </div> --}}
+                <div class="mb-4">
+                    <a href="{{ url('/password/reset') }}" class="auth-link">Forgot Password?</a>
+                </div>
+                <div class="mb-4">
+                    <button class="btn shadow-none btn-grn w-100 rounded-0">Login</button>
+                </div>
+                <p>You don't have an account? <a href="{{ route('front.checkout', 'm') }}" class="auth-link">Register</a></p>
+            </form>
         </div>
     </div>
-</main>
+</section>
+<!-- LOGIN -->
 @endsection
 
 @section('custom-js')

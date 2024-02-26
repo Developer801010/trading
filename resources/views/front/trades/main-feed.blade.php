@@ -29,8 +29,8 @@
                                     </svg>
                                 </span>
                                 <input type="text" name="search" class="form-control search_input" placeholder="Search" value="{{ request()->get('search') }}">
-                                <i class="fas fa-times-circle close-icon m-auto"></i>
-                                <button type="submit" class="btn btn-primary opacity-0" >Search</button>
+                                <i class="fas fa-times-circle close-icon m-auto p-2"></i>
+                                <button type="submit" class="btn btn-primary opacity-0 d-none" >Search</button>
                             </div>
                         </form>
                     </div>
@@ -38,7 +38,7 @@
                 <div class="row g-3">
                     @foreach ($results as $trade)
 						@if ($trade->trade_type == 'message')
-							<div class="col-12 col-sm-6 col-lg-4">
+							<div class="col-12 col-sm-6 col-lg-6 col-xxl-4">
 								<div class="feed-card-msg">
 									<div class="card-badge">
 										Message
@@ -62,148 +62,174 @@
 								</div>
 							</div>
 						@else
-							<div class="col-12 col-md-6 col-lg-4">
-								<div class="feed-card">
-									<div class="card-header">
-										@php
-											$tradeDirection = ucfirst($trade->original_trade_direction);
-											$tradeSymbol = strtoupper($trade->trade_symbol);
+						<div class="col-12 col-md-6 col-lg-6 col-xxl-4">
+							@php
+								$tradeDirection = ucfirst($trade->original_trade_direction);
+								$tradeSymbol = strtoupper($trade->trade_symbol);
 
-											$formattedEntryPrice = number_format($trade->entry_price, 2);
-											$formattedExitPrice = number_format($trade->exit_price, 2);
-										@endphp
-										<div class="card-badge">
-											{{$tradeDirection}} {{$tradeSymbol}}
+								$formattedEntryPrice = number_format($trade->entry_price, 2);
+								$formattedExitPrice = number_format($trade->exit_price, 2);
+							@endphp
+							<div class="feed-card gap-3">
+								<div class="card-header m-0">
+									<div class="card-badge w-100 d-flex flex-column align-items-start gap-2 m-0">
+										<div class="top-bar w-100 justify-content-between d-flex align-items-center gap-3 text-uppercase">
+											<p class="mb-0 ">{{ucfirst($trade->trade_type)}} Alert</p>
+											<p class="date-time mb-0"> <span class="date">{{\Carbon\Carbon::parse($trade->updated_at)->format('m/d/Y h:i A')}} EST</span> </p>
 										</div>
-										<h4 class="feed-card-title">
-											{{ucfirst($trade->trade_type)}} Alert -
-
-											@if( $trade->exit_price == null && $trade->exit_date == null && $trade->child_direction == null ) New Trade @endif
-
-											{{-- closed trade    --}}
-											@if ($trade->exit_price !== null && $trade->exit_date !== null)
-												@if ($trade->original_trade_direction == 'buy') Sell to Close @else Cover to Close @endif
-											@else
-												{{$tradeDirection}}
-											@endif
-
-
-											{{$tradeSymbol}} @if($trade->trade_type == 'option') {{\Carbon\Carbon::parse($trade->expiration_date)->format('ymd')}} {{ucfirst(substr($trade->trade_option,0,1))}} {{rtrim(rtrim(number_format($trade->strike_price, 1), '0'), '.')}} @endif
-
-											@if ($trade->child_direction !== null )
-												({{$trade->child_direction}})
-											@endif
-										</h4>
+										<div class="buy-sell-info d-flex align-items-center gap-1">
+											<p class="title mb-0 mt-0 text-uppercase">
+												{{$tradeDirection}} TO OPEN : {{ $tradeSymbol.' '.date('M d Y', strtotime($trade->entry_date)) }}{{($trade->trade_type == 'option') ? ' '.$trade->trade_option : '' }}{{ ' @ $'.number_format($trade->entry_price, 2)}}
+												{{-- ($trade->trade_type == 'option' && $trade->original_trade_direction == 'buy')?  ' (Add)' : '' --}}
+											</p>
+											{{-- <p class="mb-0 info-item"><span class="name flex-grow-1">AMZN</span> <span class="date">JAN 26th 2024</span> <span>149.00 CALL</span></p> --}}
+										</div>
 									</div>
-									<div class="card-body">
-										<ul class="nav feed-card-list">
-											@if ( $trade->company_name ?? false)
-												<li>
-													<span class="listtitle fw-bold">Company Name:</span>
-													<span class="listamt fw-bold text-uppercase">{{ $trade->company_name }}</span>
-												</li>
-											@endif
-											{{-- <li>
-												<span class="listtitle fw-bold">Current Price:</span>
-												<span class="listamt fw-bold">${{ number_format($trade->current_price, 2) }}</span>
-											</li> --}}
-											<li>
-												<span class="listtitle fw-bold">Entry Price:</span>
-												<span class="listamt fw-bold">${{ number_format($trade->entry_price, 2) }}</span>
-											</li>
-											@if ($trade->exit_price !== null && $trade->exit_date !== null)
-											<li>
-												<span class="listtitle">Exit Price:</span>
-												<span class="listamt">${{$formattedExitPrice}}</span>
-											</li>
-											@endif
-											<li>
-												<span class="listtitle">Position Size:</span>
-												<span class="listamt">{{rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.')}}% of Portfolio</span>
-											</li>
-
-											@if ($trade->exit_price !== null && $trade->exit_date !== null)
-												<li>
-													<span class="listtitle">Average Entry Price:</span>
-													<span class="listamt">${{$formattedEntryPrice}}</span>
-												</li>
-											@else
-												<li>
-													<span class="listtitle">Stop Price:</span>
-													<span class="listamt">{{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 2) : $trade->stop_price }}</span>
-												</li>
-												<li>
-													<span class="listtitle">Target Price:</span>
-													<span class="listamt">{{number_format($trade->target_price, 2)}}</span>
-												</li>
-											@endif
-
-											@if ($trade->exit_price !== null && $trade->exit_date !== null)
-											<li class="profit">
-												<span class="listtitle">Profits:</span>
-												<span class="listamt">
-													@if ($trade->original_trade_direction == 'buy')
-														@php
-															$buyProfits = number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
-														@endphp
-
-														@if ($trade->entry_price != 0 ) {{ $buyProfits }}% @else 0% @endif
-													@else
-														@php
-															$sellProfits = number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
-														@endphp
-														@if ($trade->entry_price != 0 ) {{ $sellProfits }}% @else 0% @endif
+								</div>
+								<div class="card-body m-0">
+									<div class="card-body-caption d-flex flex-column align-items-start gap-2">
+										<div class="d-flex alin-items-start gap-2 w-100">
+											<div class="stock-company-img">
+												@if(!empty($trade->symbol_image)  && file_exists(public_path($trade->symbol_image))) 
+													<img src="{{asset($trade->symbol_image)}}" alt="">
+												@else 
+													@if(!empty($trade->symbol_image)) 
+														<img src="{{$trade->symbol_image}}" alt="">
 													@endif
-												</span>
-											</li>
-											@endif
-											<li class="view-comment">
-												<span class="listtitle">Comments:</span>
-												@if ($trade->exit_price !== null && $trade->exit_date !== null)
-													{!! $trade->close_comment !!}
-												@else
-													{!! $trade->trade_description !!}
 												@endif
-											</li>
-										</ul>
-										@if ($trade->exit_price !== null && $trade->exit_date !== null)
-											@if($trade->close_image && file_exists(public_path($trade->close_image)))
-												<img src="{{ asset($trade->close_image) }}" class="mb-1 comment_img" 
-												data-image="{{ asset($trade->close_image) }}" width="50%"/>
-											@endif
-										@else
-											@if($trade->chart_image && file_exists(public_path($trade->chart_image)))
-												<img src="{{ asset($trade->chart_image) }}" class="mb-1 comment_img" 
-												data-image="{{ asset($trade->chart_image) }}" width="50%"/>
-											@endif
-										@endif
-									</div>
-									<div class="card-footer">
-										{{\Carbon\Carbon::parse($trade->updated_at)->format('F d, Y h:i A')}}
+											</div>
+											<ul class="nav feed-card-list flex-grow-1">
+												<li>
+													<span class="listamt fw-normal">
+														@if ( $trade->company_name ?? false)
+															{{ $trade->company_name }}	
+														@endif
+													</span>
+												</li>
+												<li>
+													<span class="listtitle fw-bold">Direction:</span>
+													<span class="listamt fw-normal">
+														@if ($trade->original_trade_direction !== null )
+															{{($trade->original_trade_direction == 'buy') ? 'Long' : 'Short'}}
+															@if ($trade->child_direction != '')
+																({{$trade->child_direction}})
+															@endif
+														@endif
+													</span>
+												</li>
+											</ul>
+										</div>
+										
+										<div class="caption-box d-flex flex-column">
+											<ul class="nav feed-card-list flex-grow-1">
+												@if ($trade->trade_type == 'option')
+												<li>
+													<span class="listtitle fw-bold">Order:</span>
+													<span class="listamt fw-normal text-uppercase">
+														{{ $tradeSymbol.' '.date('M d Y', strtotime($trade->entry_date)) }}{{ ' @ $'.number_format($trade->entry_price, 2)}}{{($trade->trade_type == 'option') ? ' '.$trade->trade_option : '' }}
+													</span>
+												</li>
+												@endif
+												
+												@if($trade->original_trade_direction == 'buy')
+													<li>
+														<span class="listtitle fw-bold">Buy Price:</span>
+														<span class="listamt fw-normal">${{ number_format($trade->entry_price, 2) }}</span>
+													</li>
+												@else
+													<li>
+														<span class="listtitle fw-bold">Sell Price:</span>
+														<span class="listamt fw-normal text-uppercase">{{ $trade->current_price }}</span>
+													</li>
+												@endif
+
+												<li>
+													<span class="listtitle fw-bold">Size:</span>
+													<span class="listamt fw-normal">{{rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.')}}% of Portfolio</span>
+												</li>
+
+												@if ($trade->trade_type == 'stock')
+												<li>
+													<span class="listtitle fw-bold">Average :</span>
+													<span class="listamt fw-normal">${{$formattedEntryPrice}}</span>
+												</li>
+												@endif
+
+												<li>
+													<span class="listtitle fw-bold">Stop :</span>
+													<span class="listamt fw-normal">{{ is_numeric($trade->stop_price) ? '$' . number_format((float) $trade->stop_price, 2) : $trade->stop_price }}</span>
+												</li>
+												<li>
+													<span class="listtitle fw-bold">Target:</span>
+													<span class="listamt fw-normal">{{number_format($trade->target_price, 2)}}</span>
+												</li>
+
+												<li class="mt-3">
+													<span class="listtitle fw-bold">Comment:</span>
+													<span class="listamt fw-normal">
+														@if ($trade->exit_price !== null && $trade->exit_date !== null)
+															{!! strip_tags($trade->close_comment) !!}
+														@else
+															{!! strip_tags($trade->trade_description) !!}
+														@endif
+													</span>
+												</li>
+												<li class="mt-3">
+													<span class="listtitle fw-bold">Chart:</span>
+													<span class="listamt fw-normal">
+														@if(!empty($trade->chart_image) && file_exists(public_path($trade->chart_image))) 
+															yes 
+														@else 
+															@if($trade->chart_image != '') yes  @else no @endif
+														@endif
+													</span>
+												</li>
+											</ul>
+											<div class="chart-thumbnail-block">
+												<ul class="chart-thumbnail-list list-unstyled  m-0">
+													<li>
+														@if(!empty($trade->chart_image) && file_exists(public_path($trade->chart_image))) 
+															<a> 
+																<img class="chart-thumb-img comment_img" src="{{ asset($trade->chart_image) }}" data-image="{{ asset($trade->chart_image) }}" alt="">
+															</a>
+														@else 
+															@if($trade->chart_image != '') 
+																<a> 
+																	<img class="chart-thumb-img comment_img" src="{{ $trade->chart_image }}" data-image="{{ $trade->chart_image }}" alt="">
+																</a>
+															@endif
+														@endif
+													</li>
+												</ul>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
+						</div>
 						@endif
                     @endforeach
                 </div>
-                {{ $results->appends(request()->query())->links() }}
+                {{ $results->appends(request()->query())->onEachSide(0)->links() }}
             </div>
         </div>
     </main>
     <!-- MAIN -->
 
-    <div class="modal fade" id="commentImage" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-add-trade">
-            <div class="modal-content">
-                <div class="modal-header bg-transparent">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+	<!-- chart img MODAL start -->
+    <div class="modal fade chart-img-modal" id="commentImage" tabindex="-1" aria-labelledby="chart_img_modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
                 <div class="modal-body pb-5 px-sm-5 pt-50">
-                    <img class="modalImg" src="" width="100%"/>
+					<div class="modal-body-caption">
+						<img class="modalImg" src=""/>
+					</div>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
             </div>
         </div>
     </div>
+	<!-- chart img MODAL end -->
 
 	<div class="modal fade" id="MsgModal" tabindex="-1" aria-labelledby="MsgModalLabel">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -241,7 +267,6 @@
         });
 
         $('.comment_img, .view-comment img').on('click', function(e) {
-			console.log('clicked');
             var comment_img = $(this).attr('src');
             $('.modalImg').attr('src', comment_img);
             $('#commentImage').modal('show');

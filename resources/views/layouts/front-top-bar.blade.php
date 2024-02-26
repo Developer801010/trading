@@ -1,7 +1,7 @@
 
-<div class="header-main">
+<div class="header-main lp-header-main">
     <a href="{{route('front.home')}}" class="logo">
-        <img src="{{ asset('assets/images/Logo.png') }}" alt="Logo">
+        <img src="{{ asset('assets/images/Logo.png') }}" alt="Logo" class="img-fluid">
     </a>
     <div class="d-flex gap-3 align-items-center">
         <div class="dropdown account-drop">
@@ -27,10 +27,9 @@
 							@csrf
 						</form>
 					</li>
-				@else
-				
-				<li><a class="dropdown-item" href="{{ route('login') }}">Member Login</a></li>
-                    <li><a class="dropdown-item" href="{{ route('front.subscription') }}">Start Trading</a></li>
+				    {{-- @else
+				    <li><a class="dropdown-item" href="{{ route('login') }}">Member Login</a></li>
+                    <li><a class="dropdown-item" href="{{ route('front.subscription') }}">Start Trading</a></li> --}}
                 @endauth
             </ul>
           </div>

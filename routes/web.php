@@ -40,6 +40,8 @@ Route::get('/checkout/{subscription_type}', [FrontController::class, 'checkout']
 Route::post('/payment/process', [PaymentController::class, 'process'])->name('front.payment.process');
 Route::get('execute-agreement/{success}', [PaymentController::class, 'executeAgreement'])->name('front.execute-agreement-paypal');  //PayPal execute agreement
 Route::get('/thanks', [PaymentController::class, 'thanks'])->name('front.thanks');
+Route::post('/contact_us_mail_send', [FrontController::class, 'contactus_mailsend'])->name('front.contact-us-mail-send');
+
 
 Route::post('/keep-alive', function () {
 	return 1;
