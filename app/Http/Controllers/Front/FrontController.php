@@ -66,7 +66,7 @@ class FrontController extends Controller
         ->where('t.trade_type', 'stock')
         ->whereNotNull('t.exit_price')
         ->whereNotNull('t.exit_date')
-        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option', 't.entry_date','t.current_price','t.company_name','t.symbol_image',
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image', 't.created_at', 't.updated_at');
