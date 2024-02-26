@@ -1,44 +1,49 @@
 <?php
 
-namespace App\Http\Controllers\Backend;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Exception;
 use App\Models\User;
 use App\Models\Trade;
-use Illuminate\Http\Request;
 use App\Mail\MessageAlertMail;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Validator;
 
-class MessageController extends Controller
+class APIMessageManagementController extends Controller
 {
-
-	
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function messageIndex()
     {
-        $messages = Trade::where('trade_type', 'message')->orderBy('created_at','desc')->paginate(10);
-        return view('admin.message.index', compact('messages'));
+		
+        $data = Trade::where('trade_type', 'message')->orderBy('created_at','desc')->paginate(10);
+        return response()->json([
+            'status' => true,
+            'message' => 'Get Message Data Successfully',
+            'data' => $data,
+        ], 200);  
+        
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function messageStore(Request $request)
     {
-		$validated = $this->validate($request, [
+		$validator = Validator::make($request->all(), [
 			'message_title' => 'required',	
 			'quill_html' => 'required'
-		]);
+		]);  
 
-		if(!$validated) {
-			return back()->with('flash_error', 'Please fill all required fields');
+		if ($validator->fails()) {
+			return response()->json([
+                'status' => false,
+                'message' => 'Please fill all required fields',                
+            ], 422);		
 		}
-		
+
         $trade_type = 'message';
         $trade_description = $request->quill_html;
 
@@ -93,17 +98,24 @@ class MessageController extends Controller
 
 			Artisan::call('queue:work --stop-when-empty');
 			
-			return redirect()->route('messages.index')->with('flash_success', 'Message was created successfully!')->withInput();
+            return response()->json([
+                'status' => true,
+                'message' => 'Message was created successfully!',
+                'data' => $data,
+            ], 200);			
 
 		}catch(Exception $ex){
-			return back()->withErrors($ex->getMessage())->withInput();
+            return response()->json([
+                'status' => false,
+                'message' => $ex->getMessage()
+            ], 422);			
 		}
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function messageUpdate(Request $request, string $id)
     {
         $trade_type = 'message';
         $trade_description = $request->quill_html;
@@ -159,22 +171,32 @@ class MessageController extends Controller
 
 			Artisan::call('queue:work --stop-when-empty');
 			
-			return redirect()->route('messages.index')->with('flash_success', 'Message was updated successfully!')->withInput();
+            return response()->json([
+                'status' => true,
+                'message' => 'Message was updated successfully!',
+                'data' => $data,
+            ], 200);
 
 		}catch(Exception $ex){
-			return back()->withErrors($ex->getMessage())->withInput();
+            return response()->json([
+                'status' => false,
+                'message' => $ex->getMessage()
+            ], 422);	
 		}
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function messageDestroy(Request $request)
     {
+		$id = $request->input('id');
 		Trade::destroy($id);
-        return redirect()->route('messages.index')->with('flash_success','Message was deleted successfully');
+        return response()->json([
+            'status' => true,
+            'message' => 'Message was deleted successfully',
+        ], 200);
+
     }
 
 }
-
-

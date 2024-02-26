@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\APIMessageManagementController;
 use App\Http\Controllers\Api\AuthenticateController;
-use App\Http\Controllers\Api\APIPositionmanagementController;
+use App\Http\Controllers\Api\APIPositionManagementController;
+use App\Http\Controllers\Api\APITradeAlertController;
 use App\Http\Controllers\FirebasePushController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,9 +24,9 @@ Route::get('unauthorized', [AuthenticateController::class, 'unauthorized']);
 
 Route::post('login', [AuthenticateController::class, 'login']);
 //This route takes closed stock trades for unregistered users.
-Route::get('/closed-stock-trades-no-logged', [APIPositionmanagementController::class, 'closedStockTradesNoLogged'])->name('api.closed-stock-trades-no-logged');
+Route::get('/closed-stock-trades-no-logged', [APIPositionManagementController::class, 'closedStockTradesNoLogged'])->name('api.closed-stock-trades-no-logged');
 //This route takes closed options trades.
-Route::get('/closed-options-trades-no-logged', [APIPositionmanagementController::class, 'closedOptionsTradesNoLogged'])->name('api.closed-options-trades-no-logged');
+Route::get('/closed-options-trades-no-logged', [APIPositionManagementController::class, 'closedOptionsTradesNoLogged'])->name('api.closed-options-trades-no-logged');
 
 Route::post('register', [AuthenticateController::class, 'register']);
 
@@ -44,16 +46,38 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::post('change-password', [AuthenticateController::class, 'changePassword']);
 
     //This route takes main-feed data.
-    Route::get('/main-feed', [APIPositionmanagementController::class, 'mainFeed'])->name('api.main-feed');
+    Route::get('/main-feed', [APIPositionManagementController::class, 'mainFeed'])->name('api.main-feed');
     //This route takes open stock trades.
-    Route::get('/open-stock-trades', [APIPositionmanagementController::class, 'openStockTrades'])->name('api.open-stock-trades');
+    Route::get('/open-stock-trades', [APIPositionManagementController::class, 'openStockTrades'])->name('api.open-stock-trades');
     //This route takes closed stock trades.
-    Route::get('/closed-stock-trades', [APIPositionmanagementController::class, 'closedStockTrades'])->name('api.closed-stock-trades');
+    Route::get('/closed-stock-trades', [APIPositionManagementController::class, 'closedStockTrades'])->name('api.closed-stock-trades');
     //This route takes open options trade.
-    Route::get('/open-options-trades', [APIPositionmanagementController::class, 'openOptionsTrades'])->name('api.open-options-trades');
+    Route::get('/open-options-trades', [APIPositionManagementController::class, 'openOptionsTrades'])->name('api.open-options-trades');
     //This route takes closed options trades.
-    Route::get('/closed-options-trades', [APIPositionmanagementController::class, 'closedOptionsTrades'])->name('api.closed-options-trades');
+    Route::get('/closed-options-trades', [APIPositionManagementController::class, 'closedOptionsTrades'])->name('api.closed-options-trades');
 
+    //This route sets the token on firebase.
     Route::post('/setToken', [FirebasePushController::class, 'setToken'])->name('firebase.token_update');
+    //This route removes the token on firebase.
     Route::post('/removeToken', [FirebasePushController::class, 'removeToken'])->name('firebase.token_remove');
+
+    Route::group(['middleware' => 'sanctum.role_permissions'], function(){
+        //This route takes tradeAlerts data.
+        Route::get('/trade-alerts', [APITradeAlertController::class, 'tradeAlerts'])->name('api.trade-alerts');
+        //This route creates tradeAlerts data.
+        Route::post('/trade-store', [APITradeAlertController::class, 'tradeStore'])->name('api.trade-store');
+        //This route closes an existing tradeAlerts data.
+        Route::post('trade-close', [APITradeAlertController::class, 'tradeClose'])->name('api.trade-close');
+        //This route adds a new trade into an existing tradeAlerts data.
+        Route::post('trade-add', [APITradeAlertController::class, 'tradeAdd'])->name('api.trade-add');
+
+
+        //This route takes message data.
+        Route::get('/message-display', [APIMessageManagementController::class, 'messageIndex'])->name('api.message-display');
+        //This route creates message data.
+        Route::post('/message-store', [APIMessageManagementController::class, 'messageStore'])->name('api.message-store');
+        //This route deletes an existing message data.
+        Route::post('/message-delete', [APIMessageManagementController::class, 'messageDestroy'])->name('api.message-delete');
+    });
+ 
 });

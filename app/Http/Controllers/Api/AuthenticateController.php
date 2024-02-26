@@ -8,10 +8,20 @@ use App\Models\User;
 use App\Notifications\ApiPasswordResetNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\PersonalAccessToken;
 use Throwable;
+use Stripe\Stripe;
+use App\Paypal\PaypalAgreement;
+use Stripe\PaymentMethod;
+use App\Models\Plan;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Artisan;
+use App\Mail\Welcome;
 
 class AuthenticateController extends Controller
 {
@@ -52,7 +62,7 @@ class AuthenticateController extends Controller
             $token = $user->createToken($request->device_name)->plainTextToken;
 
             $response = [
-                'user' => $user,
+                'user' => $user,                
                 'token' => $token
             ];
 
@@ -61,6 +71,7 @@ class AuthenticateController extends Controller
                 'message' => 'Login Successful',
                 'data' => $response,
             ], 200);
+
         }catch(Throwable $th){
             return response()->json([
                 'status' => false,
@@ -91,7 +102,8 @@ class AuthenticateController extends Controller
 
         $user = auth()->guard('sanctum')->user();
         if (Hash::check($request->current_password, $user->password)) {
-            $user->password = bcrypt($request->new_password);
+            $user->password = Hash::make($request->new_password);
+
             $user->save();
 
             return response()->json([
@@ -114,72 +126,148 @@ class AuthenticateController extends Controller
 
     public function register(Request $request)
     {
-        try{
+        $messages = [
+            'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
+            'email.unique' => 'This email address is in use. Maybe you already have an account? <a href="http://portal.tradeinsync.com/password/reset">Need password help?</a>',
+        ];
 
-            $messages = [
-                'password.regex' => 'Your password must be 8 or more characters, at least 1 uppercase and lowercase letter, 1 number, and 1 special character ($#@!%?*-+).',
-                'email.unique' => 'This email address is in use. Maybe you already have an account? <a href="http://portal.tradeinsync.com/password/reset">Need password help?</a>',
-            ];
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email|unique:users',
+            'mobile_number' => 'required',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
+            ],
+        ], $messages);
 
-            $validator = Validator::make($request->all(), [
-                'first_name' => 'required',
-                'last_name' => 'required',
-                'email' => 'required|email|unique:users',
-                'mobile_number' => 'required',
-                'password' => [
-                    'required',
-                    'string',
-                    'min:8',
-                    'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@!%?*-+]).+$/',
-                ],
-            ], $messages);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validation error',
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
-
-            $firstName = $request->first_name;
-            $lastName = $request->last_name;
-            $email = $request->email;
-            $mobile_number = $request->mobile_number;
-            $password = $request->password;
-            $username = $firstName.$lastName;
-            $count = 1;
-
-            //check if the username already exists: if it does, increment the count
-            while (User::where('name', $username)->exists()){
-                $username = $username.$count;
-                $count++;
-            }
-
-            $user = User::create([
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'email' => $email,
-                'mobile_number' => trim($mobile_number),
-                'password' => bcrypt($password),
-            ]);
-
-            $token = $user->createToken('myAppToken')->plainTextToken;
-
-            $response = [
-                'user' => $user,
-                'token' => $token
-            ];
-            // Your success logic here
+        if ($validator->fails()) {
             return response()->json([
-                'message' => 'Registration successful',
-                'data' => $response,
-            ], 200);
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
-        }catch(\Exception $exception){
+        $firstName = $request->first_name;
+        $lastName = $request->last_name;
+        $email = $request->email;
+        $mobile_number = $request->mobile_number;
+        $password = $request->password;
+        $username = $firstName.$lastName;
+        $count = 1;
+
+        //check if the username already exists: if it does, increment the count
+        while (User::where('name', $username)->exists()){
+            $username = $username.$count;
+            $count++;
+        }
+
+        //Get the payment option
+        $payment_option = $request->input('payment_option');
+    
+        // Start the database transaction
+        DB::beginTransaction();  
+
+        try{
+            if($payment_option == 'stripe')
+            {
+                //the workflow to create an account
+                $user = User::create([
+                    'first_name' => $firstName, 
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'mobile_number' => trim($mobile_number),
+                    'password' => bcrypt($password),
+                    'name' => $username               
+                ]);
+
+                Stripe::setApiKey(config('services.stripe.secret_key'));
+
+                $paymentMethod = PaymentMethod::create([
+                    'type' => 'card',
+                    'card' => [
+                        'token' => $request->token,
+                    ],
+                ]);  
+
+                $user->createOrGetStripeCustomer();  
+
+                if($paymentMethod != null) {
+                    $paymentMethod = $user->addPaymentMethod($paymentMethod);
+                }
+
+                $plan = $request->stripe_plan_id;
+                $membership_level = Plan::where('stripe_plan', $plan)->value('name');
+            
+                $result = $user->newSubscription('TlS '.$membership_level. ' Membership', $plan)
+                    ->create($paymentMethod != null ? $paymentMethod->id: '', [
+                        $user->email
+                    ]);
+
+                if ($result['stripe_status'] == 'active'){
+                    // if status is active, add a subscribe role. 
+                    $role = Role::where('name', 'subscriber')->first(); 
+                    $user->roles()->attach($role->id);
+                }
+
+                // Commit the database transaction
+                DB::commit();
+
+                // Authenticate the user
+                Auth::attempt(['email' => $email, 'password' => $password]);
+
+                //Welcome Email
+                $data = [
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'user_name' => $username
+                ];
+                Mail::to($email)->queue(new Welcome($data));
+                Artisan::call('queue:work --stop-when-empty');
+
+                $token = $user->createToken('myAppToken')->plainTextToken;
+
+                $response = [
+                    'user' => $user,
+                    'token' => $token
+                ];
+                // Your success logic here
+                return response()->json([
+                    'message' => 'Registration successful',
+                    'data' => $response,
+                ], 200);                    
+            }
+            else
+            {
+                $paypal_plan_id = $request->paypal_plan_id;
+                $description = Plan::where('paypal_plan', $paypal_plan_id)->value('name');
+
+                $data = [
+                    'paypal_plan_id' => $paypal_plan_id,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'mobile_number' => $mobile_number,
+                    'password' => $password,
+                    'user_name' => $username                    
+                ];
+            
+                $agreement = new PaypalAgreement();
+                return response()->json([
+                    'message' => 'Registration successful',
+                    'data' => $agreement->create($data, $description)
+                ], 200);     
+            }    
+
+        } catch (\Exception $exception) {
+            DB::rollback();
             return response()->json([
                 'status' => false,
-                $exception
+                'message' =>  $exception->getMessage(),               
             ], 500);
         }
     }
@@ -374,7 +462,7 @@ class AuthenticateController extends Controller
         }
 
         $userObj = User::findOrFail($user_id);
-        $userObj->password = bcrypt($request->password);
+        $userObj->password = Hash::make($request->password);
         $userObj->update();
 
         $verifyToken[0]->update([

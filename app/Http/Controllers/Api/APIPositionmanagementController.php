@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Subscription;
 
-class APIPositionmanagementController extends Controller
+class APIPositionManagementController extends Controller
 {
     public function mainFeed(Request $request)
     {
@@ -25,6 +25,8 @@ class APIPositionmanagementController extends Controller
             't.trade_type',
             't.entry_date',
             't.trade_symbol',
+            't.symbol_image',
+            't.company_name',
             't.trade_direction AS original_trade_direction',
             DB::raw('NULL as child_direction'),
             't.trade_option',
@@ -54,7 +56,7 @@ class APIPositionmanagementController extends Controller
             't.created_at',
             't.updated_at'
         ])
-        ->groupBy( 't.id', 't.trade_type', 't.entry_date', 't.trade_symbol', 't.trade_direction', 't.trade_option',
+        ->groupBy( 't.id', 't.trade_type', 't.entry_date', 't.trade_symbol', 't.symbol_image', 't.company_name', 't.trade_direction', 't.trade_option', 
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image',  't.expiration_date', 't.created_at', 't.updated_at');
@@ -72,6 +74,8 @@ class APIPositionmanagementController extends Controller
             't.trade_type',
             't.entry_date',
             't.trade_symbol',
+            't.symbol_image',
+            't.company_name',
             't.trade_direction as original_trade_direction',
             'td.trade_direction as child_direction',
             't.trade_option',
@@ -134,7 +138,7 @@ class APIPositionmanagementController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'get Main Feed Data Succeessfully',
+            'message' => 'get Main Feed Data Successfully',
             'data' => $data,
         ], 200);
     }
@@ -194,7 +198,7 @@ class APIPositionmanagementController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'get open stock trades Data Succeessfully',
+                'message' => 'get open stock trades Data Successfully',
                 'data' => $trades,
             ], 200);
     }
@@ -208,6 +212,7 @@ class APIPositionmanagementController extends Controller
             't.trade_type',
             't.trade_symbol',
             't.trade_direction',
+            't.company_name',
             't.entry_date',
             DB::raw('NULL as child_direction'),
             't.trade_option',
@@ -239,7 +244,7 @@ class APIPositionmanagementController extends Controller
         ->where('trade_type', 'stock')
         ->whereNotNull('exit_price')
         ->whereNotNull('exit_date')
-        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date', 't.company_name',
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image', 't.created_at', 't.updated_at');
@@ -276,7 +281,7 @@ class APIPositionmanagementController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'get closed stock trades Data Succeessfully',
+            'message' => 'get closed stock trades Data Successfully',
             'data' => $trades,
         ], 200);
     }
@@ -358,7 +363,7 @@ class APIPositionmanagementController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'get closed stock trades Data Succeessfully',
+            'message' => 'get closed stock trades Data Successfully',
             'data' => $trades,
         ], 200);
     }
@@ -418,7 +423,7 @@ class APIPositionmanagementController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'get open option trades Data Succeessfully',
+            'message' => 'get open option trades Data Successfully',
             'data' => $trades,
         ], 200);
     }
@@ -433,6 +438,7 @@ class APIPositionmanagementController extends Controller
             't.trade_symbol',
             't.trade_direction',
             't.entry_date',
+            't.company_name',
             DB::raw('NULL as child_direction'),
             't.trade_option',
             DB::raw('CAST(t.strike_price as DECIMAL(10,2)) + 0 as strike_price'),
@@ -463,7 +469,7 @@ class APIPositionmanagementController extends Controller
         ->where('trade_type', 'option')
         ->whereNotNull('exit_price')
         ->whereNotNull('exit_date')
-        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',
+        ->groupBy( 't.id', 't.trade_type', 't.trade_symbol', 't.trade_direction', 't.trade_option',  't.entry_date',  't.company_name',
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image', 't.created_at', 't.updated_at');
@@ -500,7 +506,7 @@ class APIPositionmanagementController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'get closed options trades Data Succeessfully',
+            'message' => 'get closed options trades Data Successfully',
             'data' => $trades,
         ], 200);
     }
@@ -583,7 +589,7 @@ class APIPositionmanagementController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'get closed options trades Data Succeessfully',
+            'message' => 'get closed options trades Data Successfully',
             'data' => $trades,
         ], 200);
     }

@@ -82,9 +82,12 @@
                                         <td>${{ number_format($trade->entry_price, 2) }}</td>
                                         <td>{{Carbon\Carbon::parse($trade->exit_date)->format('m/d/Y')}}</td>
                                         <td>${{$trade->exit_price}}</td>
-                                        {{-- <td>${{ number_format($trade->current_price, 2) }}</td> --}}
+                                        
                                         <td>{{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%</td>
                                         <td>
+                                            @php
+                                                $buyProfit  = 0;
+                                            @endphp
                                             @if ($trade->trade_direction == 'buy')
                                                 @php
                                                     $buyProfit =  number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);

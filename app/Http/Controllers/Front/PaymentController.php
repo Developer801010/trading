@@ -77,6 +77,8 @@ class PaymentController extends Controller
         try{
             if($payment_option == 'stripe')
             {
+
+                // dd($request->all());
                 //the workflow to create an account
                 $user = User::create([
                     'first_name' => $firstName, 
@@ -88,22 +90,6 @@ class PaymentController extends Controller
                 ]);
 
                 Stripe::setApiKey(config('services.stripe.secret_key'));
-
-                 //card validation and get the payment method
-                // $cardNumber = $request->input('card-number');
-                // $expDate = $request->input('card-expire-date');
-                // list($expMonth, $expYear) = explode('/', $expDate);
-                // $cvc = $request->input('card-cvc');
-
-                // $paymentMethod = PaymentMethod::create([
-                //     'type' => 'card',
-                //     'card' => [
-                //         'number' => $cardNumber,
-                //         'exp_month' => $expMonth,
-                //         'exp_year' => $expYear,
-                //         'cvc' => $cvc,
-                //     ],
-                // ]);  
 
                 $paymentMethod = PaymentMethod::create([
                     'type' => 'card',
@@ -147,8 +133,7 @@ class PaymentController extends Controller
                 Mail::to($email)->queue(new Welcome($data));
 				Artisan::call('queue:work --stop-when-empty');
 
-                return redirect()->route('front.main-feed')->with('success', 'Subscription successful! You are now logged in.');
-                // return redirect()->route('front.thanks')->with('success','You can see the trade alert page real time');
+                return redirect()->route('front.main-feed')->with('success', 'Subscription successful! You are now logged in.');                
             }
             else
             {
@@ -169,7 +154,7 @@ class PaymentController extends Controller
                 return $agreement->create($data, $description);
             }    
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->withErrors([ 'error' => 'Unable to create subscription due to this issue ' .$e->getMessage()]);              
         }

@@ -337,7 +337,7 @@
 			display: flex;
 			align-items: baseline;
 			padding-bottom: 15px;
-		}ay: flex;
+			display: flex;
 			align-items: baseline;
 			padding-bottom: 15px;
 		}
@@ -779,7 +779,7 @@
 			if (subscription_type_title == 'monthly') {
 				activeMonthlyIcon();
 			} else if (subscription_type_title == 'quarterly') {
-				activeQuareterlyIcon();
+				activeQuarterIcon();
 			} else if (subscription_type_title == 'yearly') {
 				activeYearlyIcon();
 			}
@@ -803,7 +803,7 @@
 			yearly_membership.find('.inactive-icon').removeClass('d-none');
 		}
 
-		function activeQuareterlyIcon() {
+		function activeQuarterIcon() {
 			monthly_membership.find('.active-icon').addClass('d-none');
 			monthly_membership.find('.inactive-icon').removeClass('d-none');
 			quarterly_membership.find('.active-icon').removeClass('d-none');
@@ -1125,14 +1125,15 @@
 							// errorElement.textContent = result.error.message;
 						} else {
 							// You can now use the Payment Method ID on your server to make a payment.
-							// console.log(result.token.id);
-							stripeTokenHandler(result.token.id);
+							console.log(result.token.id);
+							stripeTokenHandler(result.token.id); 
 							// Send the Payment Method ID to your server for further processing.
 							$('#overlay, #loadingSpinner').show();
 						}
 					});
 				} else {
 					// $('#overlay, #loadingSpinner').hide();
+					console.log('isValid false');
 				}
 
 
@@ -1202,6 +1203,7 @@
 
 		function stripeTokenHandler(token) {
 			// Insert the token ID into the form so it gets submitted to the server
+			console.log("stripe-token:"+token);
 			var payment_form = document.getElementById('payment-form');
 			var hiddenInput = document.createElement('input');
 			hiddenInput.setAttribute('type', 'hidden');
