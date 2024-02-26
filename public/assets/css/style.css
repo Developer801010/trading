@@ -819,6 +819,9 @@ position: unset;
 }
 .swiper-button-prev,
 .swiper-button-next {
+display: flex;
+align-items: center;
+justify-content: center;
 border: 2px solid #fff;
 height: fit-content;
 margin: 0;
