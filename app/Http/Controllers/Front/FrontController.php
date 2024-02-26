@@ -70,7 +70,7 @@ class FrontController extends Controller
        't.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
         't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
         't.close_image', 't.created_at', 't.updated_at');
-        // $query->whereBetween('t.exit_date', array($sevenAgoDate,$currentDate));
+        $query->whereBetween('t.exit_date', array($sevenAgoDate,$currentDate));
         $trades = $query->orderBy('t.id', 'DESC')->get();
         // dd(\DB::getQueryLog()); // Show results of log
 
