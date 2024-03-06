@@ -79,10 +79,18 @@
 										</div>
 										<div class="buy-sell-info d-flex align-items-center gap-1">
 											<p class="title mb-0 mt-0 text-uppercase">
-												{{$tradeDirection}} TO OPEN : {{ $tradeSymbol.' '.date('M d Y', strtotime($trade->entry_date)) }}{{($trade->trade_type == 'option') ? ' '.$trade->trade_option : '' }}{{ ' @ $'.number_format($trade->entry_price, 2)}}
-												{{-- ($trade->trade_type == 'option' && $trade->original_trade_direction == 'buy')?  ' (Add)' : '' --}}
+												@if ($trade->exit_price !== null && $trade->exit_date !== null)
+													@if ($trade->original_trade_direction == 'buy') Sell to Close @else Cover to Close @endif
+												@else
+													{{$tradeDirection}}  TO OPEN : 
+												@endif
+												@if ($trade->child_direction != '')
+													{{$tradeSymbol.' ('.$trade->child_direction.')'}}
+												@else
+													{{ $tradeSymbol.' '.date('M d Y', strtotime($trade->entry_date)) }}{{($trade->trade_type == 'option') ? ' '.$trade->trade_option : '' }}{{ ' @ $'.number_format($trade->entry_price, 2)}}
+												@endif
+												{{-- {{ $tradeSymbol.' '.date('M d Y', strtotime($trade->entry_date)) }}{{($trade->trade_type == 'option') ? ' '.$trade->trade_option : '' }}{{ ' @ $'.number_format($trade->entry_price, 2)}} --}}
 											</p>
-											{{-- <p class="mb-0 info-item"><span class="name flex-grow-1">AMZN</span> <span class="date">JAN 26th 2024</span> <span>149.00 CALL</span></p> --}}
 										</div>
 									</div>
 								</div>
