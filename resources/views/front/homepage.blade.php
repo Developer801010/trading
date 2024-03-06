@@ -10,6 +10,10 @@
         display: none;
         color: green;
     }
+    .trade-stocks-card{
+        background-color: white;
+        padding: 20px;
+    }
 </style>
 @endsection
 
@@ -362,7 +366,7 @@
                         </div>
                     </div>
                     @else
-                    <div class="trade-stocks-card">
+                    <div class="trade-stocks-card ">
                         SHOW widget of closed trades from system. Dynamically update to show last 12 closed trades each week here.
                     </div>
                     @endif
