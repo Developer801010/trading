@@ -103,6 +103,15 @@
                         <span class="menu-title text-truncate">Articles</span>
                     </a>
                 </li>
+                <li class="navigation-header">
+                    <span>Settings</span>
+                </li>
+                <li class="nav-item  @if(request()->is('settings*')) active @endif">
+                    <a class="d-flex align-items-center" href="{{ route('settings.index') }}">
+                        <i data-feather="user"></i>
+                        <span class="menu-title text-truncate">Settings</span>
+                    </a>
+                </li>
             @endrole
 
             @role(['user'])
