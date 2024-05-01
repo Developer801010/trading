@@ -74,6 +74,8 @@
                                 data-option="{{$parentTrade->trade_option}}" 
                                 data-entryprice="{{$parentTrade->entry_price}}" 
                                 data-currentprice="{{$parentTrade->current_price}}" 
+                                data-shareqty="{{$parentTrade->share_qty}}"
+                                data-shareinamount="{{$parentTrade->share_in_amount}}"
                                 data-expirationdate="{{\Carbon\Carbon::parse($parentTrade->expiration_date)->format('Ymd')}}" >
                                 Close
                             </a>
@@ -310,6 +312,8 @@
                         <input type="hidden" name="closeTradeEntryPrice" id="closeTradeEntryPrice" value="" />
                         <input type="hidden" name="closeTradePositionSize" id="closeTradePositionSize" value="" />
                         <input type="hidden" name="closeTradeOption" id="closeTradeOption" value="" />
+                        <input type="hidden" name="closeTradeShareQTY" id="closeTradeShareQTY" value="" />
+                        <input type="hidden" name="closeTradeShareInAmount" id="closeTradeShareInAmount" value="" />
                         <input type="hidden" name="closeOptionExpirationDate" id="closeOptionExpirationDate" value="" />
 
                         <div class="col-12 col-md-4">
@@ -416,7 +420,7 @@
             var trade_type = $(this).data('type'); 
             var direction = $(this).data('direction').toUpperCase();
             var symbol = $(this).data('symbol');
-            var strikeprice = $(this).data('strikeprice').replace(/\.00$/, '');            
+            var strikeprice = $(this).data('strikeprice');            
             var option = $(this).data('option');
             var entryprice = $(this).closest('tr').find('.average-price').find('.price').text();
             if(entryprice == undefined)
@@ -424,7 +428,7 @@
             var expirationdate = $(this).data('expirationdate');  
 
             if(trade_type == 'option'){
-                var tradeTitle = direction+space+symbol+expirationdate.toString().substring(2,8)+option.substring(0,1).toUpperCase()+strikeprice.replace(/\.00$/, '');
+                var tradeTitle = direction+space+symbol+expirationdate.toString().substring(2,8)+option.substring(0,1).toUpperCase()+strikeprice;
             }else{
                 var tradeTitle = direction+space+symbol;
             }
@@ -476,15 +480,18 @@
 			
             var strikeprice = $(this).data('strikeprice');
             var option = $(this).data('option');
+
+            var shareqty = $(this).data('shareqty');
+            var shareinamount = $(this).data('shareinamount');
           
             var expirationdate = $(this).data('expirationdate');
             if(direction =='sell') direction = 'Buy';
             else direction = 'Sell'
 
             if(type == 'option'){
-                var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size.replace(/[\$\(\)]/g, '')+'%'+space+expirationdate.toString().substring(2,8)+option.substring(0,1).toUpperCase()+strikeprice;
+                var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size.replace(/[\$\(\)]/g, '')+'%'+space+expirationdate.toString().substring(2,8)+space+option.substring(0,1).toUpperCase()+space+strikeprice;
             }else{
-                var tradeTitle = direction.toUpperCase()+space+symbol;
+                var tradeTitle = direction.toUpperCase()+space+symbol+space+position_size+'%';
             }
 
 			$('.modal_trade_title').html('Close Trade (<span class="text-success">$'+ currentprice +'</span>)');
@@ -500,7 +507,8 @@
             $('#closeTradeOption').val(option);
             $('#closeOptionExpirationDate').val(expirationdate);  
             $('#closeExitPrice').val(currentprice);
-
+            $('#closeTradeShareQTY').val(shareqty);
+            $('#closeTradeShareInAmount').val(shareinamount);
 
             var quill_close = new Quill('.quill_close_editor', {
                 modules: {

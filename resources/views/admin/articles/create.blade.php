@@ -4,6 +4,11 @@
 
 @section('page-style')
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/editors/quill/quill.snow.css') }}">
+    <style>
+        .ql-container{
+            min-height: 140px;
+        }
+    </style>
 @endsection
 @section('content')
 <section>
@@ -27,8 +32,8 @@
                             </div>
                         </div>
                           
-                        <div class="row">
-                            <div class="col-md-12 mb-1">
+                        <div class="col-md-12">
+                            <div class="mb-1">
                                 <label class="form-label" for="itemname">Description</label>
                                 <div class="quill-toolbar">
                                     <span class="ql-formats">
@@ -75,9 +80,11 @@
                             <input type="hidden" id="quill_html" name="quill_html"></input>
                         </div>
 
-                        <div class="col-12 mb-1 image_row">
-                            <label for="customFile" class="form-label">Image</label>
-                            <input class="form-control" type="file" id="image" name="image" />
+                        <div class="col-12 image_row">
+                            <div class="mb-1">
+                                <label for="customFile" class="form-label">Image</label>
+                                <input class="form-control" type="file" id="image" name="image" />
+                            </div>
                         </div>                        
                         <div class="row">
                             <div class="col-12">
