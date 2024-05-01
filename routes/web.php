@@ -12,6 +12,7 @@ use App\Http\Controllers\Backend\PaymentManagementController;
 use App\Http\Controllers\Backend\PlanManagementController;
 use App\Http\Controllers\Backend\PostController;
 use App\Http\Controllers\Backend\ProfileController;
+use App\Http\Controllers\Backend\SettingsController;
 use App\Http\Controllers\Backend\RoleController;
 use App\Http\Controllers\Backend\UserController;
 use App\Http\Controllers\Front\AccountController;
@@ -92,6 +93,8 @@ Route::group(['middleware' => ['auth', 'role:admin', 'auth.timeout'], ['prefix' 
     Route::resource('users', UserController::class);
 
     Route::resource('profiles', ProfileController::class);
+
+    Route::resource('settings', SettingsController::class);
 
     Route::resource('articles', PostController::class);
 
