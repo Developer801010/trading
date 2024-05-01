@@ -23,6 +23,7 @@ use Stripe\PaymentMethod;
 use Stripe\Stripe;
 use Stripe\Subscription as StripeSubscription;
 
+
 class AccountController extends Controller
 {
     public function index()

@@ -26,8 +26,8 @@
                                     </svg>
                                 </span>
                                 <input type="text" name="search" class="form-control search_input" placeholder="Search" value="{{ request()->get('search') }}">
-                                <i class="fas fa-times-circle close-icon m-auto"></i>
-                                <button type="submit" class="btn btn-primary opacity-0" >Search</button>
+                                <i class="fas fa-times-circle close-icon m-auto p-2"></i>
+                                <button type="submit" class="btn btn-primary opacity-0 d-none" >Search</button>
                             </div>
                         </form>
                     </div>
@@ -82,22 +82,18 @@
                                         <td>${{ number_format($trade->entry_price, 2) }}</td>
                                         <td>{{Carbon\Carbon::parse($trade->exit_date)->format('m/d/Y')}}</td>
                                         <td>${{$trade->exit_price}}</td>
-                                        
+                                        {{-- <td>${{ number_format($trade->current_price, 2) }}</td> --}}
                                         <td>{{ rtrim(rtrim(number_format($trade->position_size, 1), '0'), '.') }}%</td>
                                         <td>
-                                            @php
-                                                $buyProfit  = 0;
-                                            @endphp
                                             @if ($trade->trade_direction == 'buy')
                                                 @php
                                                     $buyProfit =  number_format(( $trade->exit_price - $trade->entry_price ) / $trade->entry_price * 100, 2);
                                                 @endphp
                                                 <span class="@if($buyProfit > 0) tblprofit @else tblloss @endif">{{ $buyProfit  }}%</span>
                                             @else
-                                                @php
-                                                    $sellProfit =  number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
-                                                @endphp
-                                                <span class="@if($buyProfit > 0) tblprofit @else tblloss @endif">{{ $sellProfit }}%</span>
+                                                @php $sellProfit = ($trade->exit_price >= $trade->entry_price) ? number_format(($trade->exit_price - $trade->entry_price) / $trade->entry_price * 100, 2) : number_format(($trade->entry_price - $trade->exit_price) / $trade->entry_price * 100, 2); @endphp
+                                                
+                                                <span class="@if($trade->exit_price >= $trade->entry_price) tblprofit @else tblloss @endif">{{ $sellProfit }}%</span>
                                             @endif
                                         </td>
                                     </tr>
