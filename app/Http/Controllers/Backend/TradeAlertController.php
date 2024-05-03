@@ -64,8 +64,8 @@ class TradeAlertController extends Controller
 		$expiration_date = $request->expiration_date;
 		$strike_price = $request->strike_price;
 		$stop_price = $request->stop_price;
-		$target_price = $request->target_price;
-		$entry_price = $request->entry_price;
+		$target_price = str_replace(',', '', $request->target_price);
+		$entry_price = str_replace(',', '', $request->entry_price);
 		$entry_date = $request->entry_date;
 		$position_size = $request->position_size;
 		$trade_description = $request->quill_html;

@@ -43,7 +43,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 
     Route::post('logout', [AuthenticateController::class, 'logout']);
 
-    Route::post('change-password', [AuthenticateController::class, 'changePassword']);
+    Route::post('change-password', [AuthenticateController::class, 'changePassword'])->name('api.change-password');
 
     //This route takes main-feed data.
     Route::get('/main-feed', [APIPositionManagementController::class, 'mainFeed'])->name('api.main-feed');
@@ -55,7 +55,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::get('/open-options-trades', [APIPositionManagementController::class, 'openOptionsTrades'])->name('api.open-options-trades');
     //This route takes closed options trades.
     Route::get('/closed-options-trades', [APIPositionManagementController::class, 'closedOptionsTrades'])->name('api.closed-options-trades');
-
+  
     //This route sets the token on firebase.
     Route::post('/setToken', [FirebasePushController::class, 'setToken'])->name('firebase.token_update');
     //This route removes the token on firebase.
@@ -71,7 +71,9 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
         //This route adds a new trade into an existing tradeAlerts data.
         Route::post('trade-add', [APITradeAlertController::class, 'tradeAdd'])->name('api.trade-add');
 
-
+        //Dashboard home page
+        Route::get('/home', [APIPositionManagementController::class, 'home'])->name('api.home');
+        
         //This route takes message data.
         Route::get('/message-display', [APIMessageManagementController::class, 'messageIndex'])->name('api.message-display');
         //This route creates message data.
