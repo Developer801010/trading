@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Artisan;
 class MessageController extends Controller
 {
 
-	
     /**
      * Display a listing of the resource.
      */
@@ -36,7 +35,7 @@ class MessageController extends Controller
 		]);
 
 		if(!$validated) {
-			return back()->with('flash_error', 'Please fill all required fields');
+			return back()->with('flash_error', 'Please fill all requried fields');
 		}
 		
         $trade_type = 'message';

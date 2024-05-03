@@ -4,6 +4,8 @@
 
 use App\Models\Plan;
 use Laravel\Cashier\Subscription;
+use App\Models\Trade;
+use App\Models\TradeDetail;
 
 function generateRandomString($length = 10) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -75,4 +77,25 @@ function check_image($url)
 	}
 
 	return false;
+}
+
+function stock_average_price_get($id = ''){
+    
+    $totalPrice = ''; $totalPercentage = '';
+    $trade_id = TradeDetail::where('id', $id)->value('trade_id');
+    if($trade_id){
+        $averagePrice = 0;
+        $parentTrade = Trade::where('id', $trade_id)->first();
+        $totalPrice = $parentTrade->entry_price * $parentTrade->position_size / 100;
+        $totalPercentage = $parentTrade->position_size / 100;  
+        $tradeDetail = TradeDetail::where('trade_id', $trade_id)->get();
+        foreach($tradeDetail as $childTrade){
+            $totalPrice += $childTrade->entry_price * $childTrade->position_size /100;
+            $totalPercentage += $childTrade->position_size / 100;
+        }
+        $averagePrice = $totalPrice / $totalPercentage;
+        $totalPercentage1 = $totalPercentage * 100;
+    }
+    // $164.45 // 10% of portfolio
+    return number_format($averagePrice,2).' // '.$totalPercentage1;
 }

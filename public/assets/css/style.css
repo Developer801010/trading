@@ -130,11 +130,12 @@ header .navigation-menu .active {color: #627413;font-weight: 800;}
 .feed-card-img .view-comment .text-muted{color: #909090;}
 /* IMG CARD */
 /* MSG CARD */
-.card-badge-dark{border-radius: 4px;background: #000;padding: 6px 10px;font-weight: 400;line-height: normal;color: #FFF;font-size: 16px;width: fit-content;margin-bottom: 10px;}
+.card-badge-dark{border-radius: 4px;background: #000;padding: 13px 20px;font-weight: 400;line-height: normal;color: #FFF;font-size: 16px;width: fit-content;margin-bottom: 10px;}
 .card-badge {
     /*border-radius: 4px; */
-    background: #627413;
-    padding: 6px 10px;
+    /* background: #627413; */
+    background: #132c47;
+    padding: 13px 20px;
     font-weight: 400;
     line-height: normal;
     color: #FFF;
@@ -517,7 +518,8 @@ footer .navbar-nav .nav-link:hover{color: #627413;}
 .add-card-detail{display: flex; align-items: center; gap: 15px; justify-content: space-between; margin-top: auto; margin-bottom: auto;}
 .add-card .card-head{display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between;}
 
-
+.report-listing .price-box .title{ font-size: 16px; font-weight: 400; }
+.report-listing .price-box .amount{ font-size: 22px; font-weight: 600; }
 
 .radio-button-container input {position: absolute;opacity: 0;cursor: pointer;}
 .checkmark {width: 23px;height: 23px;position: relative;background-color: rgba(0,0,0,0);border-radius: 50%;border: 2px solid rgba(0,0,0,0.25);transition: all 0.3s;display: flex;align-items: center;justify-content: center;padding: 10px;}
@@ -2181,9 +2183,67 @@ gap: 4px;
     .payment-input-group {
         flex-direction: column;
         gap: 2px;
+    }
+    .checkout-row .btn-grn {
+        font-size: 14px;
+    }
+}
 
-        .checkout-row .btn-grn {
-            font-size: 14px;
-        }
+@media(max-width:520px){
+    .report-listing .price-box{
+        padding: 0.5rem !important;
+    }
+    .report-listing .price-box .title{
+        font-size: 12px;
+    }
+    .report-listing .price-box .amount{
+        font-size: 15px;
+        font-weight: 600;
+        word-break: break-all;
+    }
+    .main-feed{
+        padding-top: 25px !important; 
+    }
 }
+
+@media(max-width:412px){
+    .report-listing .price-box{
+        padding: 0.5rem !important;
+    }
+    .report-listing .price-box .title{
+        font-size: 9px;
+    }
+    .report-listing .price-box .amount{
+        font-size: 11px;
+        font-weight: 600;
+        word-break: break-all;
+    }
 }
+
+@media(max-width:369px){
+    .report-listing .price-box .title{
+        font-size: 8px;
+    }
+    .report-listing .price-box .amount{
+        font-size: 8px;
+        font-weight: 600;
+        word-break: break-all;
+    }
+}
+
+/* @media(max-width:369px){
+    .report-listing .price-box .title{
+        font-size: 9px;
+    }
+    .report-listing .price-box .amount{
+        font-size: 9px;
+        font-weight: 600;
+        word-break: break-all;
+    }
+} */
+
+.caption-box{
+    width: 100%;
+    word-break: break-all;
+}
+.caption-box img{max-width: 100%; height: auto;}

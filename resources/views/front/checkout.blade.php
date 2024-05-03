@@ -2,354 +2,6 @@
 @section('title', 'Checkout')
 
 @section('page-style')
-	{{-- <style>
-		.input-group-text {
-			padding: 0;
-		}
-
-		.checkout-title {
-			text-transform: uppercase;
-			padding-bottom: 30px;
-			font-weight: 900;
-			color: #0731c5;
-		}
-
-		.payment-option {
-			border: 2px solid #c9c4c4;
-			padding: 15px;
-			margin: 15px 0;
-			display: flex;
-			justify-content: space-between;
-			border-radius: 15px;
-			cursor: pointer;
-		}
-
-		.stripe-image {
-			width: 170px;
-		}
-
-		.paypal-image {
-			width: 80px;
-		}
-
-		#stripe,
-		#paypal {
-			margin-right: 5px;
-		}
-
-		.payment_radio {
-			display: flex;
-			align-items: center;
-		}
-
-		.payment_active,
-		.membership_active {
-			border: 2px solid #0731c5 !important;
-			background: lightgray;
-		}
-
-		.btn_payment {
-			background: #f78d1f;
-			border: 1px solid #f78d1f;
-			position: relative;
-			display: block;
-			letter-spacing: 1px;
-			padding: 10px 0;
-			border-radius: 10px;
-			font-size: 23px;
-			width: 100%;
-			color: white;
-			margin-top: 15px;
-		}
-
-		.btn_payment:hover {
-			color: #f78d1f;
-			border: 1px solid #f78d1f;
-		}
-
-		.img_payment {
-			width: 300px;
-		}
-
-		.terms {
-			margin-top: 20px;
-		}
-
-		.conditions a {
-			text-decoration: none;
-		}
-
-		.membership_save_img {
-			width: 70px;
-		}
-
-		.memberships {
-			border: 2px solid #c9c4c4;
-			padding: 5px 15px;
-			margin: 15px 0;
-			display: flex;
-			justify-content: space-between;
-			border-radius: 15px;
-			cursor: pointer;
-			min-height: 84px;
-		}
-
-		.membership_radio {
-			display: flex;
-			align-items: center;
-			cursor: pointer;
-		}
-
-		.memberships .membership_radio i {
-			margin-right: 10px;
-		}
-
-		.memberships .membership_radio input {
-			display: none;
-		}
-
-		.memberships .membership_radio label {
-			font-weight: bold;
-			padding-top: 6px;
-			font-size: 18px;
-			cursor: pointer;
-		}
-
-		.memberships .membership_radio span {
-			color: #0731c5;
-		}
-
-		.membership_most_popular label {
-			padding-left: 15px;
-		}
-
-		.subscription_price {
-			font-size: 50px;
-		}
-
-		.position-section {
-			padding: 20px 0 70px;
-		}
-
-		.sidebar-inner {
-			position: relative;
-			display: block;
-			min-height: 100%;
-			background: #F8F8F8;
-			padding: 50px 22px 50px;
-		}
-
-		.sidebar-inner ul {
-			list-style: none;
-			margin: 0 0;
-			padding-left: 0;
-		}
-
-		.sidebar-inner li {
-			position: relative;
-			border-bottom: 3px solid #ffffff;
-			background: #617694;
-		}
-
-		.sidebar-inner ul li:hover {
-			cursor: pointer;
-			background: #627413;
-		}
-
-		.sidebar-inner li a {
-			position: relative;
-			display: block;
-			font-size: 18px;
-			text-transform: uppercase;
-			padding: 9px 20px;
-			line-height: 24px;
-			color: #ffffff;
-			text-decoration: none;
-			letter-spacing: 1px;
-		}
-
-		.white-box {
-			padding: 43px 50px 50px !important;
-			border: 2px solid #e5e5e5;
-			margin-bottom: 20px;
-			border-radius: 5px;
-		}
-
-		.checkout-subtitle {
-			margin-bottom: 40px;
-			color: #0731c5;
-		}
-
-		.secureimg-section {
-			box-shadow: rgba(100, 100, 111, .2) 0px 7px 29px 0px;
-			padding: 30px 10px;
-		}
-
-		.secureimg-section .card-img {
-			width: 80%;
-		}
-
-		.save_price_img {
-			position: relative;
-			width: 25%;
-			text-align: right;
-		}
-
-		.save-price {
-			font-size: 12px;
-			position: absolute;
-			top: 14px;
-			font-weight: normal;
-			text-align: center;
-			padding-left: 21px;
-			color: #51b36a;
-			z-index: 99;
-		}
-
-		.info-icon {
-			width: 18px;
-			margin-right: 8px
-		}
-
-		.yearly-text {
-			padding: 0 0 0 25px !important;
-		}
-
-		.monthly-member-section,
-		.quarterly-member-section,
-		.yearly-member-section {
-			position: relative;
-		}
-
-		ul.tooltip-text {
-			position: absolute;
-			z-index: 1;
-			width: 300px;
-			color: #000;
-			font-size: 16px;
-			background-color: #fff;
-			border-radius: 20px;
-			padding: 20px 30px !important;
-			box-shadow: rgba(100, 100, 111, .2) 0px 7px 29px 0px;
-			list-style: none;
-			border-radius: 20px;
-		}
-
-		.tooltip-text i {
-			color: #0731c5;
-			margin-right: 5px;
-		}
-
-		.tooltip-text {
-			top: 0;
-			left: -320px;
-		}
-
-		.tooltip-text li {
-			line-height: 23px;
-			margin: 15px 0px;
-		}
-
-		.img_payment_section {
-			padding-top: 20px;
-		}
-
-		.password_change_title {
-			padding-bottom: 15px;
-		}
-
-		#LoginForm {
-			margin-bottom: 30px;
-		}
-
-		.login-section {
-			max-width: 600px;
-			margin: 250px auto 100px;
-		}
-
-		.login-section .card-body {
-			padding: 45px 40px;
-		}
-
-		.accountInfoCard {
-			padding: 5px 25px;
-		}
-
-		.accountInfoCard p {
-			margin-bottom: 5px;
-		}
-
-		.close-icon {
-			position: absolute;
-			top: 50%;
-			right: 20px;
-			transform: translateY(-50%);
-			cursor: pointer;
-			display: none;
-			/* Initially hide the icon */
-		}
-
-		@media screen and (max-width: 768px) {
-			.subscription-section h1 {
-				font-size: 30px;
-			}
-
-			.subscription_content h2 {
-				padding-top: 30px;
-			}
-
-			.subscription_content ul li {
-				font-size: 16px;
-			}
-
-			.subscription_row {
-				display: block;
-				padding: 30px 10px;
-			}
-
-			.subscription_box {
-				margin-bottom: 50px;
-			}
-
-			.subscription_box .btn_subscribe {
-				font-size: 16px;
-			}
-
-			.btn_payment {
-				font-size: 16px;
-			}
-
-			.stripe-image {
-				width: 80px;
-			}
-
-			.checkout-title {
-				font-size: 22px;
-			}
-
-			.checkout-subtitle {
-				margin-bottom: 20px;
-				text-align: center;
-			}
-		}
-
-		.rule {
-			display: flex;
-			align-items: baseline;
-			padding-bottom: 15px;
-			display: flex;
-			align-items: baseline;
-			padding-bottom: 15px;
-		}
-
-		.rule input {
-			margin-right: 10px;
-		}
-
-		.rule input {
-			margin-right: 10px;
-		}
-	</style> --}}
     <style>
         /* INTL NUM SELECT */
         .iti.iti--allow-dropdown {width: 100%;}
@@ -384,64 +36,67 @@
                         <div class="card mb-4">
                             <div class="card-header">Create an account</div>
                             <div class="card-body">
-                                <div class="row g-3 mb-4">
-                                    <div class="col-lg-6">
-                                        <label>First Name :</label>
-                                        <input type="text" name="first_name" id="first-name" class="form-control" value="{{ old('first_name') }}">
-                                        <span class="first-name-error error d-none">This field is required.</span>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label>Last Name :</label>
-                                        <input type="text" name="last_name" id="last-name" class="form-control" value="{{ old('last_name') }}">
-                                        <span class="last-name-error error d-none">This field is required.</span>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label>Email Address :</label>
-                                        <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}">
-                                        <span class="email-error error d-none">This field is required.</span>
-										<span class="email-error-invelid error d-none">This email address not a valid.</span>
-                                    </div>
-                                    <div class="col-lg-6 position-relative">
-                                        <label>Phone Number :</label>
-                                        <div class="form-group">
-                                            <input type="text" name="mobile_number" id="mobile-number" class="form-control mobile-number-mask w-100"
-                                            value="{{ old('mobile_number') }}">
+                                @if (Auth::check())
+                                @else
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-lg-6">
+                                            <label>First Name :</label>
+                                            <input type="text" name="first_name" id="first-name" class="form-control" value="{{ old('first_name') }}">
+                                            <span class="first-name-error error d-none">This field is required.</span>
                                         </div>
-                                        <span class="mobile-number-error error d-none">This field is required.</span>
-                                        <span class="phone-txt">Where Text Message (SMS) Alerts Will Be Sent (optional)</span>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label>Password :</label>
-                                        {{-- <input type="password" name="password" id="password" class="form-control" value="{{ old('password') }}"> --}}
-                                        <div class="input-box position-relative with-icon">
-                                            <input name="password" type="password" class="form-control" id="password1" value="">
-                                            <button type="button" class="input-group-text bg-transparent border-0 p-0 pe-1 position-absolute end-0 top-50 translate-middle toggle-passwords-btn">
-                                                <div class="icon password-show-icon" style="">
-                                                    <svg width="15" height="28" viewBox="0 0 41 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M40.9333 14.062C40.9333 14.062 33.4083 0.266113 20.8666 0.266113C8.32491 0.266113 0.799896 14.062 0.799896 14.062C0.799896 14.062 8.32491 27.8578 20.8666 27.8578C33.4083 27.8578 40.9333 14.062 40.9333 14.062ZM3.74218 14.062C4.95499 12.2187 6.34995 10.5019 7.90602 8.93744C11.1342 5.70419 15.5489 2.77445 20.8666 2.77445C26.1843 2.77445 30.5964 5.70419 33.8297 8.93744C35.3858 10.5019 36.7807 12.2187 37.9935 14.062C37.848 14.2802 37.6875 14.521 37.5044 14.7844C36.6641 15.9884 35.4225 17.5937 33.8297 19.1865C30.5964 22.4198 26.1818 25.3495 20.8666 25.3495C15.5489 25.3495 11.1368 22.4198 7.90351 19.1865C6.34745 17.6221 4.95501 15.9053 3.74218 14.062Z" fill="black"></path>
-                                                        <path d="M20.8666 7.79117C19.2035 7.79117 17.6085 8.45185 16.4324 9.62786C15.2564 10.8039 14.5958 12.3989 14.5958 14.062C14.5958 15.7252 15.2564 17.3202 16.4324 18.4962C17.6085 19.6722 19.2035 20.3329 20.8666 20.3329C22.5297 20.3329 24.1247 19.6722 25.3008 18.4962C26.4768 17.3202 27.1374 15.7252 27.1374 14.062C27.1374 12.3989 26.4768 10.8039 25.3008 9.62786C24.1247 8.45185 22.5297 7.79117 20.8666 7.79117ZM12.0874 14.062C12.0874 11.7336 13.0124 9.50062 14.6588 7.8542C16.3052 6.20778 18.5382 5.28284 20.8666 5.28284C23.195 5.28284 25.428 6.20778 27.0744 7.8542C28.7208 9.50062 29.6458 11.7336 29.6458 14.062C29.6458 16.3904 28.7208 18.6234 27.0744 20.2698C25.428 21.9163 23.195 22.8412 20.8666 22.8412C18.5382 22.8412 16.3052 21.9163 14.6588 20.2698C13.0124 18.6234 12.0874 16.3904 12.0874 14.062Z" fill="black"></path>
-                                                    </svg>
-                                                </div>
-                                                <div class="icon password-hide-icon" style="display: none;">
-                                                    <svg width="15" height="32" viewBox="0 0 41 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M33.5756 24.184C37.8423 20.3763 40.2001 16.062 40.2001 16.062C40.2001 16.062 32.6751 2.26611 20.1334 2.26611C17.7244 2.27441 15.3426 2.77637 13.1351 3.74102L15.0666 5.67494C16.6905 5.08336 18.405 4.77866 20.1334 4.77445C25.4511 4.77445 29.8632 7.70419 33.0965 10.9374C34.6525 12.5019 36.0475 14.2187 37.2603 16.062C37.1148 16.2802 36.9543 16.521 36.7712 16.7844C35.9309 17.9884 34.6893 19.5937 33.0965 21.1865C32.6826 21.6004 32.2512 22.0092 31.7997 22.4056L33.5756 24.184Z" fill="black"></path>
-                                                        <path d="M28.4034 19.0118C28.9631 17.4462 29.0668 15.7538 28.7023 14.1316C28.3378 12.5094 27.5202 11.024 26.3445 9.84834C25.1688 8.67267 23.6835 7.85502 22.0612 7.49053C20.439 7.12604 18.7467 7.2297 17.1811 7.78945L19.2454 9.85381C20.2094 9.71584 21.1923 9.80426 22.1162 10.1121C23.04 10.4199 23.8795 10.9387 24.5681 11.6272C25.2567 12.3158 25.7754 13.1553 26.0833 14.0792C26.3911 15.0031 26.4795 15.9859 26.3415 16.9499L28.4034 19.0118ZM21.0213 22.2701L23.0832 24.3319C21.5176 24.8917 19.8252 24.9953 18.203 24.6309C16.5808 24.2664 15.0955 23.4487 13.9198 22.273C12.7441 21.0974 11.9265 19.612 11.562 17.9898C11.1975 16.3676 11.3011 14.6752 11.8609 13.1096L13.9253 15.174C13.7873 16.138 13.8757 17.1208 14.1835 18.0447C14.4913 18.9686 15.0101 19.8081 15.6987 20.4967C16.3873 21.1852 17.2267 21.704 18.1506 22.0118C19.0745 22.3196 20.0574 22.4081 21.0213 22.2701Z" fill="black"></path>
-                                                        <path d="M8.46963 9.71591C8.01813 10.1172 7.58418 10.5236 7.17031 10.9375C5.61425 12.5019 4.2193 14.2187 3.00647 16.062L3.49559 16.7844C4.33589 17.9884 5.57751 19.5937 7.17031 21.1865C10.4036 24.4198 14.8182 27.3495 20.1334 27.3495C21.9294 27.3495 23.62 27.0159 25.2002 26.4465L27.1317 28.383C24.9242 29.3475 22.5424 29.8495 20.1334 29.8579C7.59171 29.8579 0.0666962 16.062 0.0666962 16.062C0.0666962 16.062 2.42203 11.7452 6.69122 7.94L8.46712 9.71842L8.46963 9.71591ZM34.2955 32L4.19542 1.89993L5.97132 0.124023L36.0714 30.2241L34.2955 32Z" fill="black"></path>
-                                                    </svg>
-                                                </div>
-                                            </button>
+                                        <div class="col-lg-6">
+                                            <label>Last Name :</label>
+                                            <input type="text" name="last_name" id="last-name" class="form-control" value="{{ old('last_name') }}">
+                                            <span class="last-name-error error d-none">This field is required.</span>
                                         </div>
-                                        <span class="password1-error error d-none">This field is required.</span>
+                                        <div class="col-lg-6">
+                                            <label>Email Address :</label>
+                                            <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}">
+                                            <span class="email-error error d-none">This field is required.</span>
+                                            <span class="email-error-invelid error d-none">This email address not a valid.</span>
+                                        </div>
+                                        <div class="col-lg-6 position-relative">
+                                            <label>Phone Number :</label>
+                                            <div class="form-group">
+                                                <input type="text" name="mobile_number" id="mobile-number" class="form-control mobile-number-mask w-100"
+                                                value="{{ old('mobile_number') }}">
+                                            </div>
+                                            <span class="mobile-number-error error d-none">This field is required.</span>
+                                            <span class="phone-txt">Where Text Message (SMS) Alerts Will Be Sent (optional)</span>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <label>Password :</label>
+                                            {{-- <input type="password" name="password" id="password" class="form-control" value="{{ old('password') }}"> --}}
+                                            <div class="input-box position-relative with-icon">
+                                                <input name="password" type="password" class="form-control" id="password1" value="">
+                                                <button type="button" class="input-group-text bg-transparent border-0 p-0 pe-1 position-absolute end-0 top-50 translate-middle toggle-passwords-btn">
+                                                    <div class="icon password-show-icon" style="">
+                                                        <svg width="15" height="28" viewBox="0 0 41 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M40.9333 14.062C40.9333 14.062 33.4083 0.266113 20.8666 0.266113C8.32491 0.266113 0.799896 14.062 0.799896 14.062C0.799896 14.062 8.32491 27.8578 20.8666 27.8578C33.4083 27.8578 40.9333 14.062 40.9333 14.062ZM3.74218 14.062C4.95499 12.2187 6.34995 10.5019 7.90602 8.93744C11.1342 5.70419 15.5489 2.77445 20.8666 2.77445C26.1843 2.77445 30.5964 5.70419 33.8297 8.93744C35.3858 10.5019 36.7807 12.2187 37.9935 14.062C37.848 14.2802 37.6875 14.521 37.5044 14.7844C36.6641 15.9884 35.4225 17.5937 33.8297 19.1865C30.5964 22.4198 26.1818 25.3495 20.8666 25.3495C15.5489 25.3495 11.1368 22.4198 7.90351 19.1865C6.34745 17.6221 4.95501 15.9053 3.74218 14.062Z" fill="black"></path>
+                                                            <path d="M20.8666 7.79117C19.2035 7.79117 17.6085 8.45185 16.4324 9.62786C15.2564 10.8039 14.5958 12.3989 14.5958 14.062C14.5958 15.7252 15.2564 17.3202 16.4324 18.4962C17.6085 19.6722 19.2035 20.3329 20.8666 20.3329C22.5297 20.3329 24.1247 19.6722 25.3008 18.4962C26.4768 17.3202 27.1374 15.7252 27.1374 14.062C27.1374 12.3989 26.4768 10.8039 25.3008 9.62786C24.1247 8.45185 22.5297 7.79117 20.8666 7.79117ZM12.0874 14.062C12.0874 11.7336 13.0124 9.50062 14.6588 7.8542C16.3052 6.20778 18.5382 5.28284 20.8666 5.28284C23.195 5.28284 25.428 6.20778 27.0744 7.8542C28.7208 9.50062 29.6458 11.7336 29.6458 14.062C29.6458 16.3904 28.7208 18.6234 27.0744 20.2698C25.428 21.9163 23.195 22.8412 20.8666 22.8412C18.5382 22.8412 16.3052 21.9163 14.6588 20.2698C13.0124 18.6234 12.0874 16.3904 12.0874 14.062Z" fill="black"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="icon password-hide-icon" style="display: none;">
+                                                        <svg width="15" height="32" viewBox="0 0 41 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M33.5756 24.184C37.8423 20.3763 40.2001 16.062 40.2001 16.062C40.2001 16.062 32.6751 2.26611 20.1334 2.26611C17.7244 2.27441 15.3426 2.77637 13.1351 3.74102L15.0666 5.67494C16.6905 5.08336 18.405 4.77866 20.1334 4.77445C25.4511 4.77445 29.8632 7.70419 33.0965 10.9374C34.6525 12.5019 36.0475 14.2187 37.2603 16.062C37.1148 16.2802 36.9543 16.521 36.7712 16.7844C35.9309 17.9884 34.6893 19.5937 33.0965 21.1865C32.6826 21.6004 32.2512 22.0092 31.7997 22.4056L33.5756 24.184Z" fill="black"></path>
+                                                            <path d="M28.4034 19.0118C28.9631 17.4462 29.0668 15.7538 28.7023 14.1316C28.3378 12.5094 27.5202 11.024 26.3445 9.84834C25.1688 8.67267 23.6835 7.85502 22.0612 7.49053C20.439 7.12604 18.7467 7.2297 17.1811 7.78945L19.2454 9.85381C20.2094 9.71584 21.1923 9.80426 22.1162 10.1121C23.04 10.4199 23.8795 10.9387 24.5681 11.6272C25.2567 12.3158 25.7754 13.1553 26.0833 14.0792C26.3911 15.0031 26.4795 15.9859 26.3415 16.9499L28.4034 19.0118ZM21.0213 22.2701L23.0832 24.3319C21.5176 24.8917 19.8252 24.9953 18.203 24.6309C16.5808 24.2664 15.0955 23.4487 13.9198 22.273C12.7441 21.0974 11.9265 19.612 11.562 17.9898C11.1975 16.3676 11.3011 14.6752 11.8609 13.1096L13.9253 15.174C13.7873 16.138 13.8757 17.1208 14.1835 18.0447C14.4913 18.9686 15.0101 19.8081 15.6987 20.4967C16.3873 21.1852 17.2267 21.704 18.1506 22.0118C19.0745 22.3196 20.0574 22.4081 21.0213 22.2701Z" fill="black"></path>
+                                                            <path d="M8.46963 9.71591C8.01813 10.1172 7.58418 10.5236 7.17031 10.9375C5.61425 12.5019 4.2193 14.2187 3.00647 16.062L3.49559 16.7844C4.33589 17.9884 5.57751 19.5937 7.17031 21.1865C10.4036 24.4198 14.8182 27.3495 20.1334 27.3495C21.9294 27.3495 23.62 27.0159 25.2002 26.4465L27.1317 28.383C24.9242 29.3475 22.5424 29.8495 20.1334 29.8579C7.59171 29.8579 0.0666962 16.062 0.0666962 16.062C0.0666962 16.062 2.42203 11.7452 6.69122 7.94L8.46712 9.71842L8.46963 9.71591ZM34.2955 32L4.19542 1.89993L5.97132 0.124023L36.0714 30.2241L34.2955 32Z" fill="black"></path>
+                                                        </svg>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                            <span class="password1-error error d-none">This field is required.</span>
 
+                                        </div>
+                                        {{-- <div class="col-lg-6">
+                                            <label>Confirm Password</label>
+                                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
+                                            value="{{ old('password_confirmation') }}">
+                                            <span class="password-confirmation-error error d-none">This field is required.</span>
+                                        </div> --}}
                                     </div>
-                                    {{-- <div class="col-lg-6">
-                                        <label>Confirm Password</label>
-                                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
-                                        value="{{ old('password_confirmation') }}">
-                                        <span class="password-confirmation-error error d-none">This field is required.</span>
-                                    </div> --}}
-                                </div>
-                                <p class="mb-0">Already you have an account? <a href="{{ url('/login') }}" class="auth-link">Login</a></p>
+                                    <p class="mb-0">Already you have an account? <a href="{{ url('/login') }}" class="auth-link">Login</a></p>
+                                @endif
                             </div>
                         </div>
                         <div class="card">
@@ -779,7 +434,7 @@
 			if (subscription_type_title == 'monthly') {
 				activeMonthlyIcon();
 			} else if (subscription_type_title == 'quarterly') {
-				activeQuarterIcon();
+				activeQuareterlyIcon();
 			} else if (subscription_type_title == 'yearly') {
 				activeYearlyIcon();
 			}
@@ -803,7 +458,7 @@
 			yearly_membership.find('.inactive-icon').removeClass('d-none');
 		}
 
-		function activeQuarterIcon() {
+		function activeQuareterlyIcon() {
 			monthly_membership.find('.active-icon').addClass('d-none');
 			monthly_membership.find('.inactive-icon').removeClass('d-none');
 			quarterly_membership.find('.active-icon').removeClass('d-none');
@@ -1125,15 +780,14 @@
 							// errorElement.textContent = result.error.message;
 						} else {
 							// You can now use the Payment Method ID on your server to make a payment.
-							console.log(result.token.id);
-							stripeTokenHandler(result.token.id); 
+							// console.log(result.token.id);
+							stripeTokenHandler(result.token.id);
 							// Send the Payment Method ID to your server for further processing.
 							$('#overlay, #loadingSpinner').show();
 						}
 					});
 				} else {
 					// $('#overlay, #loadingSpinner').hide();
-					console.log('isValid false');
 				}
 
 
@@ -1203,7 +857,6 @@
 
 		function stripeTokenHandler(token) {
 			// Insert the token ID into the form so it gets submitted to the server
-			console.log("stripe-token:"+token);
 			var payment_form = document.getElementById('payment-form');
 			var hiddenInput = document.createElement('input');
 			hiddenInput.setAttribute('type', 'hidden');

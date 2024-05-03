@@ -9,6 +9,7 @@ use App\Models\Trade;
 use GuzzleHttp\Client;
 use App\Jobs\SendTwilioSMS;
 use App\Models\TradeDetail;
+use App\Models\Settings;
 use Illuminate\Http\Request;
 use App\Mail\TradeAddAlertMail;
 use App\Mail\TradeCloseAlertMail;
@@ -19,6 +20,7 @@ use App\Mail\TradeCreationAlertMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\FirebasePushController;
+use Illuminate\Support\Facades\Log;
 
 class TradeAlertController extends Controller
 {
@@ -36,6 +38,7 @@ class TradeAlertController extends Controller
 	 */
 	public function index()
 	{
+		// Log::info("\n".'================================'. "\n".'in_amount : 10000*4/100 = 400. ' . "\n". 'share : 400/50 = 8'. "\n".'================================');
 		$parentTrades = Trade::with('tradeDetail')
 			->where('trade_type', '!=', 'message')
 			->whereNull('exit_price')->whereNull('exit_date')  //open trade
@@ -62,7 +65,7 @@ class TradeAlertController extends Controller
 		$trade_option = $request->trade_option;
 		$trade_direction = $request->trade_direction;
 		$expiration_date = $request->expiration_date;
-		$strike_price = $request->strike_price;
+		$strike_price = str_replace(',','',$request->strike_price);
 		$stop_price = $request->stop_price;
 		$target_price = str_replace(',', '', $request->target_price);
 		$entry_price = str_replace(',', '', $request->entry_price);
@@ -131,13 +134,13 @@ class TradeAlertController extends Controller
 			$tradeObj->trade_type = $trade_type;
 			$tradeObj->trade_symbol = $trade_symbol;
 			$tradeObj->trade_direction = $trade_direction;
-			$tradeObj->stop_price = $stop_price;
-			$tradeObj->target_price = $target_price;
+			$tradeObj->stop_price = str_replace(',','',$stop_price);
+			$tradeObj->target_price = str_replace(',','',$target_price);
 			$tradeObj->entry_date = $entry_date;
-			$tradeObj->entry_price = $entry_price;
-			$tradeObj->current_price = $request->current_price;
+			$tradeObj->entry_price = str_replace(',','',$entry_price);
+			$tradeObj->current_price = str_replace(',','',$request->current_price);
 			$tradeObj->company_name = $request->company_name;
-			$tradeObj->position_size = $position_size;
+			$tradeObj->position_size = str_replace(',','',$position_size);
 			$tradeObj->trade_description = $trade_description;
 
 			if($trade_type == 'option'){
@@ -159,6 +162,33 @@ class TradeAlertController extends Controller
 
 			$tradeObj->symbol_image = $request->symbol_image;
 
+			// share qty find
+			$settings = Settings::first();
+			if(!is_null($settings)){
+				$portfolio_size = $settings->portfolio_size;
+				$position_size = str_replace(',','',$position_size);
+				$entry_price_s = str_replace(',','',$entry_price);
+
+				// position size find investment amount find by (portfolio size multiplication position size in to division) this formula used
+				// (portfolio_size * position_size / 100)
+				$find_investment_amount = (($portfolio_size*$position_size)/100);
+				
+				// share find by(investment amount division by entry price) 
+				// find_investment_amount/entry_price_s = round figure 
+				$share = round($find_investment_amount/$entry_price_s);
+				$share = ($share == 0)? 1 : $share;
+				$tradeObj->share_qty = $share;
+				
+				$share_investment_amount = $entry_price_s*$share;
+
+				$tradeObj->share_in_amount = $share_investment_amount;
+
+				$new_investment_amount = $settings->investment_amount + $share_investment_amount;
+				$settings->investment_amount = $new_investment_amount;
+
+				$settings->portfolio_size = $portfolio_size - $share_investment_amount;
+				$settings->save();
+			}
 			$tradeObj->save();
 			DB::commit();
 
@@ -221,7 +251,7 @@ class TradeAlertController extends Controller
 
 			//Send Mobile users----------------
 			$push_service = new FirebasePushController();
-			$push_service->notificationToAllMobiles($data);
+			$push_service->notificationToAllMobiles($msg);
 			//-------------------------------
 
 			return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
@@ -280,7 +310,6 @@ class TradeAlertController extends Controller
 		$addStopPrice = $request->addStopPrice;
 		$addTargetPrice = $request->addTargetPrice;
 		$addComments = $request->quill_add_html;
-		
 
 		// Extract base64 encoded image data from Quill content
 		$pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -310,15 +339,15 @@ class TradeAlertController extends Controller
 			$tradeObj->trade_id = $addFormID;
 			$tradeObj->trade_direction = 'Add';
 			$tradeObj->entry_date = $addEntryDate;
-			$tradeObj->entry_price = $addBuyPrice;
-			$tradeObj->position_size = $addPositionSize;
-			$tradeObj->stop_price = $addStopPrice;
-			$tradeObj->target_price = $addTargetPrice;
+			$tradeObj->entry_price = str_replace(',','',$addBuyPrice);
+			$tradeObj->position_size = str_replace(',','',$addPositionSize);
+			$tradeObj->stop_price = str_replace(',','',$addStopPrice);
+			$tradeObj->target_price = str_replace(',','',$addTargetPrice);
 			$tradeObj->trade_description = $addComments;
 
 			if($addTradeType == 'option'){
 				$tradeObj->expiration_date = \Carbon\Carbon::parse($addExpirationDate)->format('Y-m-d');
-				$tradeObj->strike_price = $addTradeStrikePrice;
+				$tradeObj->strike_price = str_replace(',','',$addTradeStrikePrice);
 			}
 
 			if($request->hasFile('addImage')){
@@ -328,12 +357,41 @@ class TradeAlertController extends Controller
 				$tradeObj->chart_image = 'uploads/trade/' . $imageName;
 			}
 
+			$settings = Settings::first();
+			if(!is_null($settings)){
+				$position_size = str_replace(',','',$addPositionSize);
+				$entry_price = str_replace(',','',$addBuyPrice);
+				$portfolio_size = $settings->portfolio_size;
+				$position_size = str_replace(',','',$position_size);
+				$entry_price_s = str_replace(',','',$entry_price);
+
+				// investment amount find by (portfolio size multiplication position size in to division) this formula used
+				// (portfolio_size * position_size / 100)
+				// 100000*5/100 = 5000
+				$find_investment_amount = (($portfolio_size*$position_size)/100);
+				
+				// share find by(investment amount division by entry price)  
+				$share = round($find_investment_amount/$entry_price_s);
+				$tradeObj->share_qty = $share;
+				
+				$share_investment_amount = $entry_price_s*$share;
+
+				$tradeObj->share_in_amount = $share_investment_amount;
+
+				$new_investment_amount = $settings->investment_amount + $share_investment_amount;
+				$settings->investment_amount = $new_investment_amount;
+
+				$settings->portfolio_size = $portfolio_size - $share_investment_amount;
+				$settings->save();
+			}
+
 			$tradeObj->save();
 			DB::commit();
 
 			 //Bulk Trade add email to activated users
 			$activeSubscribers = $this->getActiveSubscriptionUsers();
-
+			
+			
 			if($addTradeType == 'option'){
 				$trade_mail_title = $this->tradeinSyncText.$addTradeType.' Alert';
 
@@ -373,12 +431,13 @@ class TradeAlertController extends Controller
 					 'target_price' => $addTargetPrice,
 					 'comments' => $addComments,
 					 'visit' => $url
-				 ]			
+				 ]
 			 ];
 
 			foreach($activeSubscribers as $subscriber){
 				Mail::to($subscriber->email)->queue(new TradeAddAlertMail($data));
 			}
+			
 			Artisan::call('queue:work --stop-when-empty');
 
 			//Bulk trade creation notification to activated users' phone
@@ -386,14 +445,14 @@ class TradeAlertController extends Controller
 
 			foreach($activeSubscribers as $subscriber)
 			{
-				 //if user subscribed for the mobile notification and verified the phone number
+				//if user subscribed for the mobile notification and verified the phone number
 				if($subscriber->mobile_notification_setting == 1 && $subscriber->mobile_verified_at !== null)
 				{
 					SendTwilioSMS::dispatch($subscriber->mobile_number, $msg);
 				}
 			}
 
-			return back()->with('flash_success', 'Trade was added successfully!')->withInput();
+			return back()->with('flash_success', 'Trade was added successfully!');
 		}catch(Exception $ex){
 			DB::rollBack();
 			return back()->withErrors($ex->getMessage());
@@ -406,7 +465,7 @@ class TradeAlertController extends Controller
 		$closeFormID = $request->closeFormID;
 		$closeTradeType = $request->closeTradeType;
 		$closeExitDate = $request->closeExitDate;
-		$closeExitPrice = (float)$request->closeExitPrice;
+		$closeExitPrice = str_replace(',','',$request->closeExitPrice);
 		$closeTradeEntryPrice = (float)str_replace(['$', '(', ')'], '', $request->closeTradeEntryPrice);
 		$closedComments = $request->quill_close_html;
 		$closeTradeSymbol = $request->closeTradeSymbol;
@@ -414,8 +473,9 @@ class TradeAlertController extends Controller
 		$closeTradePositionSize = $request->closeTradePositionSize;
 		$closeTradeStrikePrice = $request->closeTradeStrikePrice;
 		$closeTradeOption = $request->closeTradeOption;
+		$closeTradeShareQTY = $request->closeTradeShareQTY;
+		$closeTradeShareInAmount = $request->closeTradeShareInAmount;
 		$closeOptionExpirationDate = $request->closeOptionExpirationDate;
-		
 
 		 // Extract base64 encoded image data from Quill content
 		 $pattern = '/data:image\/(.*?);base64,([^\'"]*)/';
@@ -453,6 +513,42 @@ class TradeAlertController extends Controller
 				$tradeObj->close_image = 'uploads/trade/' . $imageName;
 			}
 
+			// share qty find
+			$settingsObj = Settings::first();
+			if(!is_null($settingsObj)){
+				$portfolio_size = $settingsObj->portfolio_size;
+				$totle_investment_amount = $settingsObj->investment_amount;
+				$share_close_investment_amount = $closeExitPrice*$closeTradeShareQTY;
+				
+				$find_portfolio = $portfolio_size + $share_close_investment_amount;
+				$find_investment_amount = $totle_investment_amount - $closeTradeShareInAmount;
+				
+				Log::info("\n".'================================'. "\n".'name:'.$closeTradeSymbol .'('.$closeFormID.')'. "\n".'portfolio_size :'.$portfolio_size . "\n". 'totle_investment_amount :'.$totle_investment_amount. "\n".'find_portfolio:'.$portfolio_size.'+'.$share_close_investment_amount.'='.$find_portfolio. "\n".'find_investment_amount:'.$totle_investment_amount .'-'. $closeTradeShareInAmount.'='.$find_investment_amount. "\n".'================================');
+
+				Settings::where('id', $settingsObj->id)->update(['portfolio_size' => $find_portfolio,'investment_amount' => $find_investment_amount]);
+			}
+
+			// at time close
+			$tradeDetails = TradeDetail::where('trade_id',$tradeObj->id)->get();
+			if(!is_null($tradeDetails)){
+				
+				foreach ($tradeDetails as $key => $tradeDetail) {
+					$settingsObjAdd = Settings::first();
+					if(!is_null($settingsObjAdd)){
+						$portfolio_size_add = $settingsObjAdd->portfolio_size;
+						$totle_investment_amount_add = $settingsObjAdd->investment_amount;
+						$share_close_investment_amount_add = $closeExitPrice * $tradeDetail->share_qty;
+
+						$find_portfolio_add = $portfolio_size_add + $share_close_investment_amount_add;
+						$find_investment_amount_add = $totle_investment_amount_add - $tradeDetail->share_in_amount;
+						
+						Log::info("\n".'================================'. "\n".'name:'.$closeTradeSymbol.'(Add-'.$tradeDetail->id.')'. "\n".'portfolio_size_add :'.$portfolio_size_add . "\n". 'totle_investment_amount_add :'.$totle_investment_amount_add. "\n".'find_portfolio_add:'.$portfolio_size_add.'+'.$share_close_investment_amount_add.'='.$find_portfolio_add. "\n".'find_investment_amount_add:'.$totle_investment_amount_add .'-'. $tradeDetail->share_in_amount.'='.$find_investment_amount_add. "\n".'================================');
+
+						Settings::where('id', $settingsObjAdd->id)->update(['portfolio_size' => $find_portfolio_add,'investment_amount' => $find_investment_amount_add]);
+					}
+				}
+			}
+
 			$tradeObj->save();
 			DB::commit();
 
@@ -460,28 +556,26 @@ class TradeAlertController extends Controller
 			 $activeSubscribers = $this->getActiveSubscriptionUsers();
 
 			 //converted Closed trade Direction from frontend
-			 if($closeTradeDirection == 'buy')
-			 {
-				 //original: Sell Trade  [average sell price – buy price]/average sell price]*100.
-				 if ($closeTradeEntryPrice != 0)
-					$profits = ($closeTradeEntryPrice - $closeExitPrice) / $closeTradeEntryPrice * 100;  //closeTradeEntryPrice: it's average price.
-				 else
-					$profits = 0;
-
-			 }
-			 else   // original: Buy Trade
-			 {
-				//Profit % for a buy trade = [[close price- average purchase price]/average purchase price]*100.
+			 if($closeTradeDirection == 'Buy')
+             {
+				//original: Sell Trade  [average sell price – buy price]/average sell price]*100.
 				if ($closeTradeEntryPrice != 0)
-					$profits = ($closeExitPrice - $closeTradeEntryPrice) / $closeTradeEntryPrice * 100;
+					$profits = ($closeTradeEntryPrice - $closeExitPrice) / $closeTradeEntryPrice * 100;  //closeTradeEntryPrice: it's average price.
 				else
 					$profits = 0;
-			 }
 
-			 if($closeTradeDirection == 'buy')  $closeTradeDirection = 'cover';
+             }
+             else   // original: Buy Trade
+             {
+                //Profit % for a buy trade = [[close price- average purchase price]/average purchase price]*100.
+                if ($closeTradeEntryPrice != 0)
+                    $profits = ($closeExitPrice - $closeTradeEntryPrice) / $closeTradeEntryPrice * 100;
+                else
+                    $profits = 0;
+             }
 
-			 if($closeTradeType == 'option')
-			 {
+			if($closeTradeType == 'option')
+			{
 				$trade_mail_title = $this->tradeinSyncText.$closeTradeType.' Alert';
 
 				$sms_title = $this->tradeinSyncText.$closeTradeType.' Alert - '.strtoupper($closeTradeDirection). ' To Close '.strtoupper($closeTradeSymbol).' '.Carbon::parse($closeOptionExpirationDate)
@@ -547,9 +641,8 @@ class TradeAlertController extends Controller
 		}
 	}
 
-	public function getActiveSubscriptionUsers()
+	private function getActiveSubscriptionUsers()
 	{
-
 		$activeSubscribers = User::whereHas('subscriptions', function ($query) {
 			$query->where('ends_at', '>', now())
 					->orWhereNull('ends_at');
@@ -559,7 +652,7 @@ class TradeAlertController extends Controller
 	}
 
 	function searchTread(Request $request) : JsonResponse {
-
+		
 		$symbol = $request->get('symbol');
 		$type = $request->get('type');
 		$apiKey = 'rVepuhvI6BzfIXsCa6P3JdygCmXAYL7p';
@@ -569,11 +662,11 @@ class TradeAlertController extends Controller
 		switch($type) {
 			case 'list-companies':
 				$url_info = "$apiDomain/search?query=$symbol&limit=10&apikey=$apiKey";
-
+			
 				$http = new Client();
 				$response = $http->request('GET', $url_info);
 				$companyLists = json_decode($response->getBody());
-
+		
 				foreach($companyLists as $company) {
 					$resultLists[] = [
 						'value' => $company->symbol,
@@ -584,12 +677,12 @@ class TradeAlertController extends Controller
 
 			case 'company-details':
 				$url_info = "$apiDomain/profile/$symbol?apikey=$apiKey";
-
+			
 				$http = new Client();
 				$response = $http->request('GET', $url_info);
 				$company = json_decode($response->getBody());
 				$company = $company[0];
-
+		
 				$resultLists = [
 					'price' => $company->price,
 					'image' => $company->image,
@@ -599,7 +692,7 @@ class TradeAlertController extends Controller
 		}
 
 		return response()->json($resultLists);
-
+		
 	}
 }
 

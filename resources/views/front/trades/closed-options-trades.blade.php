@@ -80,10 +80,9 @@
                                                 @endphp
                                                 <span class="@if($buyProfit > 0) tblprofit @else tblloss @endif">{{ $buyProfit  }}%</span>
                                             @else
-                                                @php
-                                                    $sellProfit =  number_format(( $trade->entry_price - $trade->exit_price ) / $trade->entry_price * 100, 2);
-                                                @endphp
-                                                <span class="@if($sellProfit > 0) tblprofit @else tblloss @endif">{{ $sellProfit }}%</span>
+                                                @php $sellProfit = ($trade->exit_price >= $trade->entry_price) ? number_format(($trade->exit_price - $trade->entry_price) / $trade->entry_price * 100, 2) : number_format(($trade->entry_price - $trade->exit_price) / $trade->entry_price * 100, 2); @endphp
+
+                                                <span class="@if($trade->exit_price >= $trade->entry_price) tblprofit @else tblloss @endif">{{ $sellProfit }}%</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -138,13 +137,13 @@
         });
 
       // JavaScript to handle the close icon click event
-      $('.close-icon').click(function() {
+        $('.close-icon').click(function() {
            const input = $(this).parent().find('input');
            input.val('');
            input.focus();
            $(this).hide();
            $(".mainFeedSearch").submit();
-       });
+        });
 
        search_input.on('input', function() {
            const icon = $(this).parent().find('.close-icon');

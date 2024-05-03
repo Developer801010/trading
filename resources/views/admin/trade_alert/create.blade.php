@@ -267,7 +267,7 @@
     //     }
     // });
 
-    var fields = ['#entry_price', '#target_price'];
+    var fields = ['#entry_price', '#target_price','#strike_price'];
     var options = {
         numeral: true,
         numeralThousandsGroupStyle: 'thousand'
