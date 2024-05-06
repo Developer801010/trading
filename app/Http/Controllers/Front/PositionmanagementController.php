@@ -111,7 +111,7 @@ class PositionManagementController extends Controller
         $unionQuery = $trades->union($tradeDetails)->orderBy('updated_at', 'desc');
 
         // Combine both queries
-        $results = $unionQuery->paginate(12);
+        $results = $unionQuery->paginate(1200);
 
         //Get Account login info and Billing info
         $billing_data = Subscription::where('user_id', auth()->user()->id)->first();

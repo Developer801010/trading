@@ -251,7 +251,7 @@ class TradeAlertController extends Controller
 
 			//Send Mobile users----------------
 			$push_service = new FirebasePushController();
-			$push_service->notificationToAllMobiles($msg);
+			$push_service->notificationToAllMobiles($data);
 			//-------------------------------
 
 			return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
