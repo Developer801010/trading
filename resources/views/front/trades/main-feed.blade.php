@@ -157,23 +157,23 @@
 														@if ($trade->original_trade_direction == 'buy') Sell to Close : @else Buy to Close : @endif
 
 														{{ $tradeSymbol }}{{ !empty($trade->expiration_date) ? ' '.date('M d Y', strtotime($trade->expiration_date)) : ''}}{{(($trade->strike_price) ? ' $'.number_format($trade->strike_price, 2) : '').' '.$trade->trade_option }}{{ ' @ $'.number_format($trade->exit_price, 2)}} 
-													@else
-														{{$tradeDirection }} TO OPEN {{($trade->child_direction != '') ? ' ('.$trade->child_direction.')' : ''}}:
+													@else														
+														{{($tradeDirection == 'buy') ? 'Buy' : '' }} TO OPEN {{($tradeDirection == 'Add') ? ' ('.$tradeDirection.')' : ''}}: 
 														
 														{{ $tradeSymbol }}{{ !empty($trade->expiration_date) ? ' '.date('M d Y', strtotime($trade->expiration_date)) : ''}}{{(($trade->strike_price) ? ' $'.number_format($trade->strike_price, 2) : '').' '.$trade->trade_option }}{{ ' @ $'.number_format($trade->entry_price, 2)}}
 													@endif
 												@else
 													@if ($trade->exit_price !== null && $trade->exit_date !== null)
-														@if ($trade->original_trade_direction == 'buy') Sell to Close : @else Buy to Close : @endif
-														@if ($trade->child_direction != '')
-															{{$tradeSymbol.' ('.$trade->child_direction.')'}}
+														@if ($tradeDirection == 'buy') Sell to Close : @else Buy to Close : @endif
+														@if ($tradeDirection == 'Add')
+															{{$tradeSymbol.' ('.$tradeDirection.')'}}
 														@else
 															{{ $tradeSymbol }}{{ ' @ $'.number_format($trade->exit_price, 2)}}
 														@endif 
-													@else
-														{{$tradeDirection }} TO OPEN {{($trade->child_direction != '') ? ' ('.$trade->child_direction.')' : ''}}: 
+													@else														
+														{{($tradeDirection == 'buy') ? 'Buy' : '' }} TO OPEN {{($tradeDirection == 'Add') ? ' ('.$tradeDirection.')' : ''}}: 
 														
-														@if ($trade->child_direction != '')
+														@if ($tradeDirection == 'Add')
 															{{$tradeSymbol}}{{ ' @ $'.number_format($trade->entry_price, 2)}}
 														@else
 															{{ $tradeSymbol }}{{($trade->trade_type == 'option') ? ' '.$trade->trade_option : '' }}{{ ' @ $'.number_format($trade->entry_price, 2)}}
@@ -215,8 +215,8 @@
 														@else
 															@if ($trade->original_trade_direction !== null )
 																{{($trade->original_trade_direction == 'buy') ? 'LONG' : 'SHORT SELL'}}
-																@if ($trade->child_direction != '' && $trade->original_trade_direction == 'buy')
-																	({{strtoupper($trade->child_direction)}})
+																@if ($trade->original_trade_direction == 'buy')
+																	({{strtoupper($trade->original_trade_direction)}})
 																@endif
 															@endif
 														@endif
@@ -273,10 +273,10 @@
 												@endif
 												
 												{{-- Average --}}
-												@if ($trade->child_direction != '')
+												@if ($tradeDirection == 'Add')
 												<li>
 													<span class="listtitle fw-bold">Average :</span>
-													<span class="listamt fw-normal">${{stock_average_price_get($trade->id)}}% of Portfolio</span>
+													<span class="listamt fw-normal">${{stock_average_price_get($trade->trade_details_id)}}% of Portfolio</span>
 												</li>
 												@endif
 
@@ -320,7 +320,9 @@
 													<span class="listtitle fw-bold">Comment:</span>
 													<span class="listamt comment_line_height fw-normal">
 														@if ($trade->exit_price !== null && $trade->exit_date !== null)
-															{!! ($trade->close_comment) !!}
+															{{-- {!! ($trade->close_comment) !!} --}}
+															{{-- After I create trade logs table for the history, don't need it  05/21/2024 --}}
+															{!! ($trade->trade_description) !!}
 														@else
 															{!! ($trade->trade_description) !!}
 														@endif
@@ -331,26 +333,26 @@
 												<li class="mt-3">
 													<span class="listtitle fw-bold">Chart:</span>
 													<span class="listamt fw-normal">
-														@if ($trade->exit_price !== null && $trade->exit_date !== null)
+														{{-- @if ($trade->exit_price !== null && $trade->exit_date !== null)
 															@if(!empty($trade->close_image) && file_exists(public_path($trade->close_image))) 
 																yes 
 															@else 
 																@if($trade->close_image != '') yes  @else no @endif
 															@endif
-														@else
+														@else --}}
 															@if(!empty($trade->chart_image) && file_exists(public_path($trade->chart_image))) 
 																yes 
 															@else 
 																@if($trade->chart_image != '') yes  @else no @endif
 															@endif
-														@endif
+														{{-- @endif --}}
 													</span>
 												</li>
 											</ul>
 											<div class="chart-thumbnail-block">
 												<ul class="chart-thumbnail-list list-unstyled  m-0">
 													<li>
-														@if ($trade->exit_price !== null && $trade->exit_date !== null)
+														{{-- @if ($trade->exit_price !== null && $trade->exit_date !== null)
 															@if(!empty($trade->close_image) && file_exists(public_path($trade->close_image))) 
 																<a> 
 																	<img class="chart-thumb-img comment_img" src="{{ asset($trade->close_image) }}" data-image="{{ asset($trade->close_image) }}" alt="">
@@ -362,7 +364,7 @@
 																	</a>
 																@endif
 															@endif
-														@else
+														@else --}}
 															@if(!empty($trade->chart_image) && file_exists(public_path($trade->chart_image))) 
 																<a> 
 																	<img class="chart-thumb-img comment_img" src="{{ asset($trade->chart_image) }}" data-image="{{ asset($trade->chart_image) }}" alt="">
@@ -374,7 +376,7 @@
 																	</a>
 																@endif
 															@endif
-														@endif
+														{{-- @endif --}}
 													</li>
 												</ul>
 											</div>

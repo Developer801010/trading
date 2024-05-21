@@ -81,7 +81,8 @@ function check_image($url)
 
 function stock_average_price_get($id = ''){
     
-    $totalPrice = ''; $totalPercentage = '';
+    $totalPrice = ''; 
+    $totalPercentage = '';
     $trade_id = TradeDetail::where('id', $id)->value('trade_id');
     if($trade_id){
         $averagePrice = 0;

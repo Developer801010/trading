@@ -19,100 +19,56 @@ class PositionManagementController extends Controller
     {
         $search = $request->input('search');
 
-        // Define the first query
-        $trades = DB::table('trades as t')
-        ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
-        ->select([
-            't.id',
-            't.trade_type',
-            't.symbol_image',
-            't.entry_date',
-            't.trade_symbol',
-            't.trade_title',
-			't.current_price',
-			't.company_name',
-            't.trade_direction AS original_trade_direction',
-            DB::raw('NULL as child_direction'),
-            't.trade_option',
-            't.strike_price',
-            DB::raw('CASE
-                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    ((t.entry_price * t.position_size) + COALESCE(SUM(td.entry_price * td.position_size), 0)) /
-                    (t.position_size + COALESCE(SUM(td.position_size), 0))
-                ELSE
-                    t.entry_price
-                END AS entry_price'),
-            't.stop_price',
-            't.target_price',
-            DB::raw('CASE
-                WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
-                    (t.position_size + COALESCE(SUM(td.position_size), 0))
-                ELSE
-                    t.position_size
-                END AS position_size'),
-            't.exit_price',
-            't.exit_date',
-            't.trade_description',
-            't.chart_image',
-            't.close_comment',
-            't.close_image',
-            't.expiration_date',
-            't.created_at',
-            't.updated_at'
-        ])
-        ->groupBy( 't.id', 't.trade_type', 't.symbol_image', 't.entry_date', 't.trade_symbol', 't.trade_direction', 't.trade_option','t.trade_title','t.current_price','t.company_name','t.strike_price', 't.entry_price', 't.stop_price', 't.target_price', 't.position_size',
-        't.exit_price', 't.exit_date', 't.trade_description', 't.chart_image', 't.close_comment',
-        't.close_image',  't.expiration_date', 't.created_at', 't.updated_at');
-       
-
+        // Base query for trades
+        $query = DB::table('trade_logs as t')
+            ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
+            ->select([
+                't.id',
+                't.trade_id',
+                't.trade_details_id',
+                't.trade_type',
+                't.symbol_image',
+                't.entry_date',
+                't.trade_symbol',
+                't.trade_title',
+                't.current_price',
+                't.company_name',
+                't.trade_direction AS original_trade_direction',                
+                't.trade_option',
+                't.strike_price',
+                DB::raw('CASE
+                    WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
+                        ((t.entry_price * t.position_size)) / (t.position_size)
+                    ELSE
+                        t.entry_price
+                    END AS entry_price'),
+                't.stop_price',
+                't.target_price',
+                DB::raw('CASE
+                    WHEN t.exit_price IS NOT NULL AND t.exit_date IS NOT NULL THEN
+                        (t.position_size )
+                    ELSE
+                        t.position_size
+                    END AS position_size'),
+                't.exit_price',
+                't.exit_date',
+                't.trade_description',
+                't.chart_image',
+                't.close_comment',
+                't.close_image',
+                't.expiration_date',
+                't.created_at',
+                't.updated_at'
+            ]);
+        
         // Add search condition for trades
         if (!empty($search)) {
-            $trades->where('t.trade_symbol', 'LIKE', '%' . $search . '%');
+            $query->where('t.trade_symbol', 'LIKE', '%' . $search . '%');
         }
-
-        // Define the second query and join with the trades table
-        $tradeDetails = DB::table('trade_details as td')
-        ->join('trades as t', 'td.trade_id', '=', 't.id')
-        ->select([
-            'td.id',
-            't.trade_type',
-            't.symbol_image',
-            't.entry_date',
-            't.trade_symbol',
-            't.trade_title',
-			't.current_price',
-			't.company_name',
-            't.trade_direction as original_trade_direction',
-            'td.trade_direction as child_direction',
-            't.trade_option',
-            'td.strike_price',
-            'td.entry_price',
-            'td.stop_price',
-            'td.target_price',
-            'td.position_size',
-            DB::raw('NULL AS exit_price'),
-            DB::raw('NULL AS exit_date'),
-            'td.trade_description',
-            'td.chart_image',
-            DB::raw("'' AS close_comment"),
-            DB::raw("'' AS close_image"),
-            'td.expiration_date',
-            'td.created_at',
-            'td.updated_at'
-        ])
-        ->whereNull('t.exit_price')
-        ->whereNull('t.exit_date');
-
-        // Add search condition for tradeDetails
-        if (!empty($search)) {
-            $tradeDetails->where('t.trade_symbol', 'LIKE', '%' . $search . '%');
-        }
-
-        $unionQuery = $trades->union($tradeDetails)->orderBy('updated_at', 'desc');
-
-        // Combine both queries
-        $results = $unionQuery->paginate(1200);
-
+        
+        // Execute the query with pagination
+        $results = $query->orderBy('created_at', 'desc')->paginate(12);
+        
         //Get Account login info and Billing info
         $billing_data = Subscription::where('user_id', auth()->user()->id)->first();
 
@@ -230,7 +186,7 @@ class PositionManagementController extends Controller
         $query = DB::table('trades as t')
         ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
         ->select([
-            't.id',
+            't.id',           
             't.trade_type',
             't.trade_symbol',
             't.trade_direction',
