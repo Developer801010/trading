@@ -160,8 +160,8 @@ class TradeAlertController extends Controller
 
 				$tradeObj->chart_image = 'uploads/trade/' . $imageName;
 			}
-			
-			// $tradeObj->symbol_image = $request->symbol_image;
+
+			$tradeObj->symbol_image = $request->symbol_image;
 
 			// share qty find
 			$settings = Settings::first();
@@ -191,65 +191,6 @@ class TradeAlertController extends Controller
 				$settings->save();
 			}
 			$tradeObj->save();
-
-			//Save trade data into trade logs table when trade is created newly.
-			$tradeLogObj = new TradeLog();
-			$tradeLogObj->trade_id = $tradeObj->id;
-			$tradeLogObj->trade_type = $trade_type;
-			$tradeLogObj->trade_symbol = $trade_symbol;
-			$tradeLogObj->trade_direction = $trade_direction;
-			$tradeLogObj->stop_price = str_replace(',','',$stop_price);
-			$tradeLogObj->target_price = str_replace(',','',$target_price);
-			$tradeLogObj->entry_date = $entry_date;
-			$tradeLogObj->entry_price = str_replace(',','',$entry_price);
-			$tradeLogObj->current_price = str_replace(',','',$request->current_price);
-			$tradeLogObj->company_name = $request->company_name;
-			$tradeLogObj->position_size = str_replace(',','',$position_size);
-			$tradeLogObj->trade_description = $trade_description;
-
-			if($trade_type == 'option'){
-				$tradeLogObj->trade_option = $trade_option;
-				$tradeLogObj->expiration_date = $expiration_date;
-				$tradeLogObj->strike_price = $strike_price;
-			}
-
-			if($request->hasFile('image')){
-
-				$tradeLogObj->chart_image = 'uploads/trade/' . $imageName;
-			}
-
-			// $tradeLogObj->symbol_image = $request->symbol_image;
-
-			// share qty find
-			$settings = Settings::first();
-			if(!is_null($settings)){
-				$portfolio_size = $settings->portfolio_size;
-				$position_size = str_replace(',','',$position_size);
-				$entry_price_s = str_replace(',','',$entry_price);
-
-				// position size find investment amount find by (portfolio size multiplication position size in to division) this formula used
-				// (portfolio_size * position_size / 100)
-				$find_investment_amount = (($portfolio_size*$position_size)/100);
-				
-				// share find by(investment amount division by entry price) 
-				// find_investment_amount/entry_price_s = round figure 
-				$share = round($find_investment_amount/$entry_price_s);
-				$share = ($share == 0)? 1 : $share;
-				$tradeLogObj->share_qty = $share;
-				
-				$share_investment_amount = $entry_price_s*$share;
-
-				$tradeLogObj->share_in_amount = $share_investment_amount;
-
-				$new_investment_amount = $settings->investment_amount + $share_investment_amount;
-				$settings->investment_amount = $new_investment_amount;
-
-				$settings->portfolio_size = $portfolio_size - $share_investment_amount;
-				$settings->save();
-			}
-			$tradeLogObj->save();
-
-
 			DB::commit();
 
 			//Bulk trade creation email to activated users's email
@@ -311,7 +252,7 @@ class TradeAlertController extends Controller
 
 			//Send Mobile users----------------
 			$push_service = new FirebasePushController();
-			$push_service->notificationToAllMobiles($data);
+			$push_service->notificationToAllMobiles($msg);
 			//-------------------------------
 
 			return redirect()->route('trades.index')->with('flash_success', 'Trade was created successfully!')->withInput();
@@ -446,69 +387,6 @@ class TradeAlertController extends Controller
 			}
 
 			$tradeObj->save();
-
-			//Saves all trade add data into trade log table 
-			$tradeLogObj = new TradeLog();
-			$tradeData = Trade::findOrFail($addFormID);			
-			$trade_type = $tradeData->trade_type;
-			$trade_symbol = $tradeData->trade_symbol;
-			$trade_company_name = $tradeData->company_name;
-			$trade_current_price = $tradeData->current_price;
-
-			$tradeLogObj->trade_id = $addFormID;
-			$tradeLogObj->trade_details_id = $tradeObj->id;
-			$tradeLogObj->trade_type = $trade_type;
-			$tradeLogObj->trade_symbol = $trade_symbol;
-			$tradeLogObj->company_name = $trade_company_name;
-			$tradeLogObj->trade_direction = 'Add';
-			$tradeLogObj->current_price = $trade_current_price;
-			$tradeLogObj->entry_date = $addEntryDate;
-			$tradeLogObj->entry_price = str_replace(',','',$addBuyPrice);
-			$tradeLogObj->position_size = str_replace(',','',$addPositionSize);
-			$tradeLogObj->stop_price = str_replace(',','',$addStopPrice);
-			$tradeLogObj->target_price = str_replace(',','',$addTargetPrice);
-			$tradeLogObj->trade_description = $addComments;
-
-			if($addTradeType == 'option'){
-				$tradeLogObj->expiration_date = \Carbon\Carbon::parse($addExpirationDate)->format('Y-m-d');
-				$tradeLogObj->strike_price = str_replace(',','',$addTradeStrikePrice);
-			}
-
-			if($request->hasFile('addImage')){
-				
-				$tradeLogObj->chart_image = 'uploads/trade/' . $imageName;
-			}
-
-			$settings = Settings::first();
-			if(!is_null($settings)){
-				$position_size = str_replace(',','',$addPositionSize);
-				$entry_price = str_replace(',','',$addBuyPrice);
-				$portfolio_size = $settings->portfolio_size;
-				$position_size = str_replace(',','',$position_size);
-				$entry_price_s = str_replace(',','',$entry_price);
-
-				// investment amount find by (portfolio size multiplication position size in to division) this formula used
-				// (portfolio_size * position_size / 100)
-				// 100000*5/100 = 5000
-				$find_investment_amount = (($portfolio_size*$position_size)/100);
-				
-				// share find by(investment amount division by entry price)  
-				$share = round($find_investment_amount/$entry_price_s);
-				$tradeLogObj->share_qty = $share;
-				
-				$share_investment_amount = $entry_price_s*$share;
-
-				$tradeLogObj->share_in_amount = $share_investment_amount;
-
-				$new_investment_amount = $settings->investment_amount + $share_investment_amount;
-				$settings->investment_amount = $new_investment_amount;
-
-				$settings->portfolio_size = $portfolio_size - $share_investment_amount;
-				$settings->save();
-			}
-
-			$tradeLogObj->save();
-
 			DB::commit();
 
 			 //Bulk Trade add email to activated users
@@ -673,33 +551,6 @@ class TradeAlertController extends Controller
 			}
 
 			$tradeObj->save();
-
-			//Save Trade data into trade Logs table when the trade is closed. 
-			$tradeLogObj = new TradeLog();
-			$tradeData = Trade::findorFail($closeFormID);
-			$tradeLogObj->trade_id = $closeFormID;
-			$tradeLogObj->trade_type = $tradeData->trade_type;
-			$tradeLogObj->trade_symbol = $tradeData->trade_symbol;
-			$tradeLogObj->company_name = $tradeData->company_name;
-			$tradeLogObj->trade_direction = 'Close';
-			$tradeLogObj->current_price = $tradeData->current_price;
-			$tradeLogObj->entry_price = $tradeData->entry_price;
-			$tradeLogObj->stop_price = $tradeData->stop_price;
-			$tradeLogObj->target_price = $tradeData->target_price;
-			$tradeLogObj->entry_date = $tradeData->entry_date;
-			$tradeLogObj->share_qty = $tradeData->share_qty;
-			$tradeLogObj->share_in_amount = $tradeData->share_in_amount;
-			$tradeLogObj->position_size = $tradeData->position_size;
-			$tradeLogObj->trade_description = $closedComments;
-
-			$tradeLogObj->exit_date = $closeExitDate;
-			$tradeLogObj->exit_price = $closeExitPrice;
-
-			if($request->hasFile('closeImage')){
-				$tradeLogObj->chart_image = 'uploads/trade/' . $imageName;
-			}
-
-			$tradeLogObj->save();
 			DB::commit();
 
 			 //Bulk Trade add email to activated users
