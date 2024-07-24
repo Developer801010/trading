@@ -20,6 +20,7 @@ use App\Mail\TradeCreationAlertMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\FirebasePushController;
+use App\Models\TradeLog;
 use Illuminate\Support\Facades\Log;
 
 class TradeAlertController extends Controller
@@ -68,8 +69,8 @@ class TradeAlertController extends Controller
 		$expiration_date = $request->expiration_date;
 		$strike_price = str_replace(',','',$request->strike_price);
 		$stop_price = $request->stop_price;
-		$target_price = $request->target_price;
-		$entry_price = $request->entry_price;
+		$target_price = str_replace(',', '', $request->target_price);
+		$entry_price = str_replace(',', '', $request->entry_price);
 		$entry_date = $request->entry_date;
 		$position_size = $request->position_size;
 		$trade_description = $request->quill_html;
@@ -152,7 +153,7 @@ class TradeAlertController extends Controller
 				$tradeObj->expiration_date = $expiration_date;
 				$tradeObj->strike_price = $strike_price;
 			}
-
+		
 			if($request->hasFile('image')){
 				$request->validate([
 					'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',

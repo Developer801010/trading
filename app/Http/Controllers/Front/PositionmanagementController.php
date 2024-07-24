@@ -113,7 +113,7 @@ class PositionManagementController extends Controller
 
         // Combine both queries
         $results = $unionQuery->paginate(12);
-
+        
         //Get Account login info and Billing info
         $billing_data = Subscription::where('user_id', auth()->user()->id)->first();
 
@@ -233,7 +233,7 @@ class PositionManagementController extends Controller
         $query = DB::table('trades as t')
         ->leftJoin('trade_details as td', 't.id', '=', 'td.trade_id')
         ->select([
-            't.id',
+            't.id',           
             't.trade_type',
             't.trade_symbol',
             't.trade_direction',
